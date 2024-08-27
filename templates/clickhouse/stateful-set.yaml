@@ -1,0 +1,150 @@
+{{- if not .Values.clickhouse.external.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+    {{- with.Values.clickhouse.statefulSet.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- include "portkey.annotations" . | nindent 4 }}
+    {{- with.Values.clickhouse.statefulSet.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  serviceName: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "portkey.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
+  template:
+    metadata:
+      {{- with .Values.clickhouse.statefulSet.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- with.Values.clickhouse.statefulSet.labels }}
+            {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- include "portkey.labels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
+    spec:
+      {{- with .Values.images.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.clickhouse.statefulSet.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ include "clickhouse.serviceAccountName" . }}
+      containers:
+        - name: {{ .Values.clickhouse.name }}
+          image: "{{ .Values.images.clickhouseImage.repository }}:{{ .Values.images.clickhouseImage.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.clickhouseImage.pullPolicy }}
+          {{- with.Values.clickhouse.statefulSet.command }}
+          command:
+             {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: CLICKHOUSE_DB
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "portkey.clickhouseSecretsName" . }}
+                  key: clickhouse_db
+            - name: CLICKHOUSE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "portkey.clickhouseSecretsName" . }}
+                  key: clickhouse_user
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "portkey.clickhouseSecretsName" . }}
+                  key: clickhouse_password
+            {{- with .Values.clickhouse.statefulSet.extraEnv }}
+               {{- toYaml . | nindent 12 }}
+             {{- end }}
+            {{- with .Values.commonEnv }}
+              {{ toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: ch
+              containerPort: {{ .Values.clickhouse.containerHttpPort }}
+              protocol: TCP
+            - name: ch-native
+              containerPort: {{ .Values.clickhouse.containerNativePort }}
+              protocol: TCP
+          {{- with .Values.clickhouse.statefulSet.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.clickhouse.statefulSet.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.clickhouse.statefulSet.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.clickhouse.statefulSet.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.clickhouse.statefulSet.securityContext | nindent 12 }}
+          volumeMounts:
+            {{- with .Values.clickhouse.statefulSet.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+            - mountPath: /var/lib/clickhouse
+              name: data
+            - mountPath: /etc/clickhouse-server/users.d/users.xml
+              name: clickhouse-conf
+              subPath: users.xml
+          {{- with .Values.clickhouse.statefulSet.extraContainerConfig }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- with .Values.clickhouse.statefulSet.sidecars }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.clickhouse.statefulSet.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.clickhouse.statefulSet.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.clickhouse.statefulSet.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: clickhouse-conf
+          configMap:
+            name: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
+            items:
+              - key: users.xml
+                path: users.xml
+      {{- with .Values.clickhouse.statefulSet.volumes }}
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+        labels:
+          {{- include "portkey.selectorLabels" . | nindent 10 }}
+          app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.clickhouse.statefulSet.persistence.size }}
+        {{- if .Values.clickhouse.statefulSet.persistence.storageClassName }}
+        storageClassName: {{ .Values.clickhouse.statefulSet.persistence.storageClassName }}
+        {{- end }}
+{{- end }}
