@@ -29,7 +29,7 @@ images:
   backendImage:
     repository: "docker.io/portkeyai/backend"
     pullPolicy: IfNotPresent
-    tag: "ag-16"
+    tag: "ag-19"
   frontendImage:
     repository: "docker.io/portkey/frontend"
     pullPolicy: IfNotPresent
@@ -240,11 +240,10 @@ clickhouse:
     tolerations: []
     affinity: {}
     volumes: []
-    volumeMounts: []
     # We recommend using a persistent volume and increasing the storage size to something like 50Gi when using in a production environment!
     persistence:
-      size: 10Gi
-      storageClassName: ""
+      size: 50Gi
+      storageClassName: "standard"
   service:
     type: ClusterIP
     httpPort: 8123
