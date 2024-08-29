@@ -46,15 +46,20 @@ spec:
           command:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if or .Values.redis.statefulSet.extraEnv .Values.commonEnv  }}
           env:
+            - name: REDIS_DATABASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "portkey.redisSecretsName" . }}
+                  key: redis_connection_url
+          {{- if or .Values.redis.statefulSet.extraEnv .Values.commonEnv  }}
             {{- with .Values.redis.statefulSet.extraEnv}}
-             {{- toYaml . | nindent 12 }}
+              {{- toYaml . | nindent 12 }}
             {{- end }}
             {{- with .Values.commonEnv}}
-             {{- toYaml . | nindent 12 }}
+              {{- toYaml . | nindent 12 }}
             {{- end }}
-           {{- end }}
+          {{- end }}
           image: "{{ .Values.images.redisImage.repository }}:{{ .Values.images.redisImage.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.redisImage.pullPolicy }}
           ports:

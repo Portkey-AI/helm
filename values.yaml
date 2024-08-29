@@ -29,7 +29,7 @@ images:
   backendImage:
     repository: "docker.io/portkeyai/backend"
     pullPolicy: IfNotPresent
-    tag: "latest"
+    tag: "ag-16"
   frontendImage:
     repository: "docker.io/portkey/frontend"
     pullPolicy: IfNotPresent
@@ -70,12 +70,24 @@ config:
   
   noAuth:
     enabled: true
-    jwtSecret: "some secret"
+    jwtPrivateKey: "some private key"
+    jwtPublicKey: "some known public key"
 
   oauth:
     enabled: false
     oauthClientId: ""
     oauthIssuerUrl: ""
+    oauthClientSecret: ""
+    oauthRedirectURI: ""
+
+  smtp:
+    enabled: false
+    smtpHost: ""
+    smtpPort: ""
+    smtpUser: ""
+    smtpPassword: ""
+    smtpFrom: ""
+
   
 # -- Log storage configuration
 # Used to store raw inputs & outputs of all requests going through portkey
@@ -122,27 +134,28 @@ backend:
       requests:
         cpu: 200m
         memory: 500Mi
-    startupProbe:
-      httpGet:
-        path: /health
-        port: 8080
-      failureThreshold: 3
-      periodSeconds: 10
-      timeoutSeconds: 1
-    livenessProbe:
-      httpGet:
-        path: /health
-        port: 8080
-      failureThreshold: 3
-      periodSeconds: 10
-      timeoutSeconds: 1
-    readinessProbe:
-      httpGet:
-        path: /health
-        port: 8080
-      failureThreshold: 3
-      periodSeconds: 10
-      timeoutSeconds: 1
+    # startupProbe:
+    #   httpGet:
+    #     path: /health
+    #     port: 8080
+    #   initialDelaySeconds: 180
+    #   failureThreshold: 3
+    #   periodSeconds: 10
+    #   timeoutSeconds: 1
+    # livenessProbe:
+    #   httpGet:
+    #     path: /health
+    #     port: 8080
+    #   failureThreshold: 3
+    #   periodSeconds: 10
+    #   timeoutSeconds: 1
+    # readinessProbe:
+    #   httpGet:
+    #     path: /health
+    #     port: 8080
+    #   failureThreshold: 3
+    #   periodSeconds: 10
+    #   timeoutSeconds: 1
     extraContainerConfig: {}
     nodeSelector: {}
     tolerations: []
@@ -190,11 +203,11 @@ clickhouse:
     securityContext: {}
     resources:
       limits:
-        cpu: 5000m
-        memory: 20Gi
-      requests:
         cpu: 3000m
-        memory: 12Gi
+        memory: 6Gi
+      requests:
+        cpu: 1000m
+        memory: 4Gi
     command:
       - "/bin/bash"
       - "-c"
@@ -230,7 +243,7 @@ clickhouse:
     volumeMounts: []
     # We recommend using a persistent volume and increasing the storage size to something like 50Gi when using in a production environment!
     persistence:
-      size: 50Gi
+      size: 10Gi
       storageClassName: ""
   service:
     type: ClusterIP
@@ -334,6 +347,8 @@ mysql:
     existingSecretName: ""
     # Use this to set the root password for the mysql instance, only when NOT using an external Mysql.
     rootPassword: "portkey@123"
+  containerHttpPort: 3306
+  containerNativePort: 3306
   containerPort: 3306
   statefulSet:
     labels: {}
@@ -342,54 +357,37 @@ mysql:
     securityContext: {}
     resources:
       limits:
-        cpu: 4000m
-        memory: 16Gi
+        cpu: 2000m
+        memory: 4Gi
       requests:
         cpu: 1000m
-        memory: 4Gi
+        memory: 2Gi
     command: []
     startupProbe:
       exec:
         command:
-          - CMD
-          - mysqladmin
-          - ping
-          - -h
-          - localhost
-          - -u
-          - portkey
-          - -p
-          - portkey@123
+          - /bin/sh
+          - -c
+          - mysqladmin ping -u${MYSQL_USER} -p${MYSQL_PASSWORD}
+      initialDelaySeconds: 10
       failureThreshold: 6
       periodSeconds: 10
-      timeoutSeconds: 1
+      timeoutSeconds: 5
     readinessProbe:
       exec:
         command:
-          - CMD
-          - mysqladmin
-          - ping
-          - -h
-          - localhost
-          - -u
-          - portkey
-          - -p
-          - portkey@123
+          - /bin/sh
+          - -c
+          - mysqladmin ping -u${MYSQL_USER} -p${MYSQL_PASSWORD}
       failureThreshold: 6
       periodSeconds: 10
       timeoutSeconds: 1
     livenessProbe:
       exec:
         command:
-          - CMD
-          - mysqladmin
-          - ping
-          - -h
-          - localhost
-          - -u
-          - portkey
-          - -p
-          - portkey@123
+          - /bin/sh
+          - -c
+          - mysqladmin ping -u${MYSQL_USER} -p${MYSQL_PASSWORD}
       failureThreshold: 6
       periodSeconds: 10
       timeoutSeconds: 1
@@ -424,6 +422,9 @@ redis:
     # creation of a redis stateful-set and service.
     enabled: false
     connectionUrl: "redis://localhost:6379"
+    tlsEnabled: "false"
+    mode: "standalone"
+    store: "redis"
     existingSecretName: ""
   containerPort: 6379
   statefulSet:
@@ -437,7 +438,6 @@ redis:
         memory: 16Gi
       requests:
         cpu: 1000m
-
         memory: 2Gi
     command: []
     startupProbe:

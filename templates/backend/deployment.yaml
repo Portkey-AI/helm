@@ -54,6 +54,10 @@ spec:
             {{- include "portkey.commonEnv" . | nindent 12 }}
             - name: PORT
               value: {{ .Values.backend.containerPort | quote }}
+            - name: PRIVATE_DEPLOTMENT
+              value: "ON"
+            - name: SERVICE_NAME
+              value: "portkey-backend"
             {{- with .Values.backend.deployment.extraEnv }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -62,6 +66,14 @@ spec:
             {{- end }}
           image: "{{ .Values.images.backendImage.repository }}:{{ .Values.images.backendImage.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.backendImage.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              /app/docker-entrypoint.sh &&
+              npx knex migrate:latest --env local &&
+              npx knex seed:run --env local &&
+              node ch_init.js &&
+              pm2-runtime src/server.js
           ports:
             - name: backend
               containerPort: {{ .Values.backend.containerPort }}

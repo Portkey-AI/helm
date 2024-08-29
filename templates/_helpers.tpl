@@ -129,12 +129,27 @@ the user or some other secret provisioning mechanism
 Template containing common environment variables that are used by several services.
 */}}
 {{- define "portkey.commonEnv" -}}
-- name: REDIS_DATABASE_URI
+- name: REDIS_URL
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.redisSecretsName" . }}
-      key: connection_url
-- name: CLICKHOUSE_DB
+      key: redis_connection_url
+- name: REDIS_TLS_ENABLED
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.redisSecretsName" . }}
+      key: redis_tls_enabled
+- name: REDIS_MODE
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.redisSecretsName" . }}
+      key: redis_mode
+- name: REDIS_STORE
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.redisSecretsName" . }}
+      key: redis_store
+- name: CLICKHOUSE_DATABASE
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.clickhouseSecretsName" . }}
@@ -169,27 +184,27 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.clickhouseSecretsName" . }}
       key: clickhouse_tls
-- name: MYSQL_DB
+- name: DB_NAME
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.mysqlSecretsName" . }}
       key: mysql_db
-- name: MYSQL_HOST
+- name: DB_HOST
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.mysqlSecretsName" . }}
       key: mysql_host
-- name: MYSQL_PORT
+- name: DB_PORT
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.mysqlSecretsName" . }}
       key: mysql_port
-- name: MYSQL_USER
+- name: DB_USER
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.mysqlSecretsName" . }}
       key: mysql_user
-- name: MYSQL_PASSWORD
+- name: DB_PASS
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.mysqlSecretsName" . }}
@@ -199,9 +214,10 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.mysqlSecretsName" . }}
       key: mysql_root_password
-# - name: LOG_LEVEL
-#   value: {{ .Values.config.logLevel }}
+
 {{- if .Values.config.oauth.enabled }}
+- name: AUTH_MODE
+  value: "SSO"
 - name: OAUTH_CLIENT_ID
   valueFrom:
     secretKeyRef:
@@ -212,29 +228,60 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauth_issuer_url
+- name: OAUTH_CLIENT_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.secretsName" . }}
+      key: oauth_client_secret
+- name: OAUTH_REDIRECT_URI
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.secretsName" . }}
+      key: oauth_redirect_uri
 {{- end }}
-# - name: portkey_LICENSE_KEY
-#   valueFrom:
-#     secretKeyRef:
-#       name: {{ include "portkey.secretsName" . }}
-#       key: portkey_license_key
-# - name: API_KEY_SALT
-#   valueFrom:
-#     secretKeyRef:
-#       name: {{ include "portkey.secretsName" . }}
-#       key: api_key_salt
-# - name: OPENAI_API_KEY
-#   valueFrom:
-#     secretKeyRef:
-#       name: {{ include "portkey.secretsName" . }}
-#       key: openai_api_key
-#       optional: true
-# - name: X_SERVICE_AUTH_JWT_SECRET
-#   valueFrom:
-#     secretKeyRef:
-#       name: {{ include "portkey.secretsName" . }}
-#       key: api_key_salt
-# {{- end }}
+{{- if .Values.config.noAuth.enabled }}
+- name: AUTH_MODE
+  value: "NO_AUTH"
+- name: JWT_PRIVATE_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.secretsName" . }}
+      key: jwtPrivateKey
+- name: JWT_PUBLIC_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.secretsName" . }}
+      key: jwtPublicKey
+{{- end }}
+
+{{- if .Values.config.smtp.enabled }}
+- name: SMTP_HOST
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.secretsName" . }}
+      key: smtp_host
+- name: SMTP_PORT
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.secretsName" . }}
+      key: smtp_port
+- name: SMTP_USER
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.secretsName" . }}
+      key: smtp_user
+- name: SMTP_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.secretsName" . }}
+      key: smtp_password
+- name: SMTP_FROM
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.secretsName" . }}
+      key: smtp_from
+{{- end }}
+{{- end }}
 
 {{- define "backend.serviceAccountName" -}}
 {{- if .Values.backend.serviceAccount.create -}}

@@ -43,15 +43,35 @@ spec:
           command:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if or .Values.mysql.statefulSet.extraEnv .Values.commonEnv  }}
           env:
-            {{- with .Values.mysql.statefulSet.extraEnv}}
-             {{- toYaml . | nindent 12 }}
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "portkey.mysqlSecretsName" . }}
+                  key: mysql_user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "portkey.mysqlSecretsName" . }}
+                  key: mysql_password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "portkey.mysqlSecretsName" . }}
+                  key: mysql_db
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "portkey.mysqlSecretsName" . }}
+                  key: mysql_root_password
+            {{- if or .Values.mysql.statefulSet.extraEnv .Values.commonEnv  }}
+              {{- with .Values.mysql.statefulSet.extraEnv}}
+                {{- toYaml . | nindent 12 }}
+              {{- end }}
+              {{- with .Values.commonEnv}}
+                {{- toYaml . | nindent 12 }}
+              {{- end }}
             {{- end }}
-            {{- with .Values.commonEnv}}
-             {{- toYaml . | nindent 12 }}
-            {{- end }}
-           {{- end }}
           image: "{{ .Values.images.mysqlImage.repository }}:{{ .Values.images.mysqlImage.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.mysqlImage.pullPolicy }}
           ports:
