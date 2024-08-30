@@ -31,9 +31,9 @@ images:
     pullPolicy: IfNotPresent
     tag: "ag-19"
   frontendImage:
-    repository: "docker.io/portkey/frontend"
+    repository: "docker.io/portkeyai/frontend"
     pullPolicy: IfNotPresent
-    tag: "1.0.0"
+    tag: "ag-8"
   mysqlImage:
     repository: "docker.io/mysql"
     pullPolicy: IfNotPresent
@@ -48,25 +48,26 @@ images:
     tag: "latest"
 
 ingress:
-  enabled: false
-  hostname: ""
-  subdomain: ""
-  ingressClassName: ""
+  enabled: true
+  hostname: "app.pk.ai"
+  subdomain: "app"
+  ingressClassName: "nginx"
   annotations: {}
   labels: {}
   tls: []
 
 apiIngress:
-  enabled: false
-  hostname: ""
-  subdomain: ""
-  ingressClassName: ""
+  enabled: true
+  hostname: "albus.pk.ai"
+  subdomain: "albus"
+  ingressClassName: "nginx"
   annotations: {}
   labels: {}
   tls: []
 
 config:
   existingSecretName: ""
+  defaultGatewayURL: ""
   
   noAuth:
     enabled: true
@@ -134,28 +135,28 @@ backend:
       requests:
         cpu: 200m
         memory: 500Mi
-    # startupProbe:
-    #   httpGet:
-    #     path: /health
-    #     port: 8080
-    #   initialDelaySeconds: 180
-    #   failureThreshold: 3
-    #   periodSeconds: 10
-    #   timeoutSeconds: 1
-    # livenessProbe:
-    #   httpGet:
-    #     path: /health
-    #     port: 8080
-    #   failureThreshold: 3
-    #   periodSeconds: 10
-    #   timeoutSeconds: 1
-    # readinessProbe:
-    #   httpGet:
-    #     path: /health
-    #     port: 8080
-    #   failureThreshold: 3
-    #   periodSeconds: 10
-    #   timeoutSeconds: 1
+    startupProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 60
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
     extraContainerConfig: {}
     nodeSelector: {}
     tolerations: []
@@ -258,79 +259,74 @@ clickhouse:
     labels: {}
     annotations: {}
 
-# frontend:
-#   name: "frontend"
-#   containerPort: 80
-#   existingConfigMapName: ""
-#   # Nginx Max Body Size. Refer to https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size for more information.
-#   maxBodySize: "25M"
-#   proxyReadTimeout: "300"
-#   proxyWriteTimeout: "300"
-#   proxyConnectTimeout: "60"
-#   deployment:
-#     autoRestart: true
-#     replicas: 1
-#     labels: {}
-#     annotations: {}
-#     podSecurityContext: {}
-#     securityContext: {}
-#     resources:
-#       limits:
-#         cpu: 1000m
-#         memory: 1Gi
-#       requests:
-#         cpu: 200m
-#         memory: 500Mi
-#     startupProbe:
-#       httpGet:
-#         path: /
-#         port: 80
-#       failureThreshold: 10
-#       periodSeconds: 10
-#       timeoutSeconds: 1
-#     livenessProbe:
-#       httpGet:
-#         path: /
-#         port: 80
-#       failureThreshold: 10
-#       periodSeconds: 10
-#       timeoutSeconds: 1
-#     readinessProbe:
-#       httpGet:
-#         path: /
-#         port: 80
-#       failureThreshold: 10
-#       periodSeconds: 10
-#       timeoutSeconds: 1
-#     extraContainerConfig: {}
-#     extraEnv: []
-#     sidecars: []
-#     nodeSelector: {}
-#     tolerations: []
-#     affinity: {}
-#     volumes: []
-#     volumeMounts: []
-#   autoscaling:
-#     enabled: false
-#     # If enabled, use the following values to configure the HPA. You can also use your own HPA configuration by not creating an HPA.
-#     # You may want to manage the HPA yourself if you have a custom autoscaling setup like KEDA.
-#     createHpa: true
-#     minReplicas: 1
-#     maxReplicas: 5
-#     targetCPUUtilizationPercentage: 80
-#   service:
-#     type: LoadBalancer
-#     httpPort: 80
-#     httpsPort: 443
-#     labels: {}
-#     annotations: {}
-#     loadBalancerSourceRanges: []
-#     loadBalancerIP: ""
-#   serviceAccount:
-#     create: true
-#     name: ""
-#     labels: {}
-#     annotations: {}
+frontend:
+  name: "frontend"
+  containerPort: 80
+  defaultGatewayURL: ""
+  deployment:
+    autoRestart: true
+    replicas: 1
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 200m
+        memory: 500Mi
+    startupProbe:
+      httpGet:
+        path: /
+        port: 80
+      failureThreshold: 10
+      periodSeconds: 10
+      timeoutSeconds: 1
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+      failureThreshold: 10
+      periodSeconds: 10
+      timeoutSeconds: 1
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 80
+      failureThreshold: 10
+      periodSeconds: 10
+      timeoutSeconds: 1
+    extraContainerConfig: {}
+    extraEnv: []
+    sidecars: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    volumes: []
+    volumeMounts: []
+  autoscaling:
+    enabled: false
+    # If enabled, use the following values to configure the HPA. You can also use your own HPA configuration by not creating an HPA.
+    # You may want to manage the HPA yourself if you have a custom autoscaling setup like KEDA.
+    createHpa: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+  service:
+    type: LoadBalancer
+    httpPort: 80
+    httpsPort: 443
+    labels: {}
+    annotations: {}
+    loadBalancerSourceRanges: []
+    loadBalancerIP: ""
+  serviceAccount:
+    create: true
+    name: ""
+    labels: {}
+    annotations: {}
 
 mysql:
   name: "mysql"
