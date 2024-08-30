@@ -29,11 +29,11 @@ images:
   backendImage:
     repository: "docker.io/portkeyai/backend"
     pullPolicy: IfNotPresent
-    tag: "ag-19"
+    tag: "ag-23"
   frontendImage:
     repository: "docker.io/portkeyai/frontend"
     pullPolicy: IfNotPresent
-    tag: "ag-8"
+    tag: "ag-11"
   mysqlImage:
     repository: "docker.io/mysql"
     pullPolicy: IfNotPresent
@@ -71,8 +71,8 @@ config:
   
   noAuth:
     enabled: true
-    jwtPrivateKey: "some private key"
-    jwtPublicKey: "some known public key"
+    jwtPrivateKey: "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2QUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktZd2dnU2lBZ0VBQW9JQkFRQ3p2RkpTY0FQbEFTeEMKdHdFeEVhNGdMc2puTzZjWFIweDJHSlRQSVFPNVI0Qm5jcFgyT0dNcTNYUVRMdFhaSzRjVmZXWkZIcVRMQXFMcwoxQmZ2RHFFZjNwZmlqRUkxQkVFYVV0dk1iVTE4WmdhRStKVmRrZVdBODFvT05rR3pvKzRJT01EY3preGZFdEYyClNKbkNxc0QvTG1yRHhueWZ3Yy9HNDRKdTlBRGgwTmZGaDRzZkVTNHAxOXE0UHJ6eHJUcXI0a3QxTmx3bURLQkgKazBEVXhMTGpOWWorL3VNTE1NOWZLRGZBeUJYWWpWS1FZVDJTa2JxblBUTEpsbldRZzM1UWt0cS9pYkNWbEdaOQpMRmNYNEV4WTYweVAyek9xeHZJQlVEUHRQTzJEU2pWT2FoQ2dwN1ArQ3FHT0QwNXdYd3NkU2JIVWQ4M3ZBc1JRClYxdkZQT2RGQWdNQkFBRUNnZ0VBSEtKdkZ4VWplYk9ESXFuWE5jTVVVNnBBZFo1cVUyb1hnMlVOS0NhaFdqNUsKOWJBcXRneHJ1Q09KMzVpQmwxUzQ4N0tEdlpWUk9jcVV2RmhaNjhzUDNtenZFN2Uyd0kySjliQ250ZHpnRUdhTQp1VmlGSzJBWUNVQTc0N0cvSytoOC9yQlVBWm1ZVHpsSFI2bnZYVFVwQkQ2WDRkTFlmZmM1cS8wSkJiWTRBY0duCnV0MTgrdW9MeHhWcDlhaUtZNnpNTHJnamVFMXhZYTk1b3JwUVF1TG91WlJpQUNRQWh0VmNTSDY3c3c5TkFRYlEKeVBnTXI3MGRUSDlkWkx5STh2ZWlhQXZUYVdnaTZIdXJZa2hpa05sU05FWlNCOTUvYjZDM3lmcEVqckV6Q1lhZwpnTzIzZmxIS2lZMnlXTjQwY1hBalZ4YTJjMHNRSzQwVXVSOUdXUWF5N1FLQmdRRDdNUXBxK1ZrYWhxazYrV09kCkc1MGozVFQ4RmxGZndsSjVlWUNrT2tRVFc4MVVmUyt6M0VqbG5iOWRhY1lVQjh2YmFiSEg2Rk9wcm5sS1NhUGQKdXNnSlluL29VN3VhOFYyNXduV3FucnVmT2ZUVU1VbmRScStYWnpwejJDS2pYYlc3NldXZTh0ZG5mYW1Ia0ZRcAoyMEpoeGlVRllOWkNZZnYzVFJiWXNuRWJ2d0tCZ1FDM0xSekxtTTh1VDRVQW5nTmJ3VEZkVDMyUlJDV05LMkw2CnlmUnQ4SUtMandlY2s0TURSak9UTlR4U2RsRjRnS2hRVjkrKzFZWGJMK3FISWlwT3J1ZWhYYURtTGptZHJrQ0kKMWNtME55UkNGUVVUYTlIRDQzWlVTSlZWS0VIOStVNnhkSTZNTlJPVTY5MFlXK3NlVUg2THNST2VzbEFWSW9rYwpjc21vZ1pJTit3S0JnR2kwZW5rNDB2R0JyRTBPNDN6N283YnRZRWFzTHVOUnB2dEhzRjNFZzlmbDdtTUhnN2pmClcrdUtvOWdXWFNEQVZ6TndqVkNkQVRLN3JZZFB4dVNJRlJZRVh2akMzbktwcGIzbTF4RjE5Uk5jSHpmTUM5UVcKd043Rmd0SURCLzA4OUtJTm1mUjFtV0JrT3lScy93Z3JneklxWEFndjQxL3NaQkVqcXlCTTBXVVZBb0dBT3RvRApwbVl5S203aURKQzRBNExPbVd3d3E3dDVWU0hiYXpmM2tGcjFsbUVkMFBDVDV6bG0yS1VCL0h5SE1IQWxvNnFYCitIZ2h5WXBiajQ4cWlKMHBUbThHZ3UzWEZSSW5LYytHUHFCNHhjSjdId0pGSXVxeDJlSjRHQ1FYRDhKSnhqbnMKa3A5NjZ4M2NxemJkRTZCSkNCaWNkU0JWR25VK0dDWEpKSnA4a29FQ2dZQTh2VGJlKzBiL2taT2xYd2g4RzczSApjUnVIOUdXK3BBUkNlWkp0c053S296dVp3VEhuMzlvWDVtTjIvdDZPN0hiSmUvZEdXRVN3Z3FTWUkzaXBGOW9qCkRReXIxQW9kMmNlM0xqbGpBUUZpdHdBWERXWUg1MjM2Q2JxcmFRNUtwdFFDQzdyVTVOcUVlRnRURDRpVXUwZ00KT2tFMkZ5L0V6UktUVWhVU0VuMm9hdz09Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K"
+    jwtPublicKey: "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFzN3hTVW5BRDVRRXNRcmNCTVJHdQpJQzdJNXp1bkYwZE1kaGlVenlFRHVVZUFaM0tWOWpoakt0MTBFeTdWMlN1SEZYMW1SUjZreXdLaTdOUVg3dzZoCkg5Nlg0b3hDTlFSQkdsTGJ6RzFOZkdZR2hQaVZYWkhsZ1BOYURqWkJzNlB1Q0RqQTNNNU1YeExSZGtpWndxckEKL3k1cXc4WjhuOEhQeHVPQ2J2UUE0ZERYeFllTEh4RXVLZGZhdUQ2ODhhMDZxK0pMZFRaY0pneWdSNU5BMU1TeQo0eldJL3Y3akN6RFBYeWczd01nVjJJMVNrR0U5a3BHNnB6MHl5Wloxa0lOK1VKTGF2NG13bFpSbWZTeFhGK0JNCldPdE1qOXN6cXNieUFWQXo3VHp0ZzBvMVRtb1FvS2V6L2dxaGpnOU9jRjhMSFVteDFIZk43d0xFVUZkYnhUem4KUlFJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
 
   oauth:
     enabled: false
@@ -204,11 +204,11 @@ clickhouse:
     securityContext: {}
     resources:
       limits:
-        cpu: 3000m
-        memory: 6Gi
-      requests:
         cpu: 1000m
-        memory: 4Gi
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
     command:
       - "/bin/bash"
       - "-c"
@@ -243,7 +243,8 @@ clickhouse:
     volumes: []
     # We recommend using a persistent volume and increasing the storage size to something like 50Gi when using in a production environment!
     persistence:
-      size: 50Gi
+      enabled: true
+      size: 2Gi
       storageClassName: "standard"
   service:
     type: ClusterIP
@@ -277,27 +278,27 @@ frontend:
       requests:
         cpu: 200m
         memory: 500Mi
-    startupProbe:
-      httpGet:
-        path: /
-        port: 80
-      failureThreshold: 10
-      periodSeconds: 10
-      timeoutSeconds: 1
-    livenessProbe:
-      httpGet:
-        path: /
-        port: 80
-      failureThreshold: 10
-      periodSeconds: 10
-      timeoutSeconds: 1
-    readinessProbe:
-      httpGet:
-        path: /
-        port: 80
-      failureThreshold: 10
-      periodSeconds: 10
-      timeoutSeconds: 1
+    # startupProbe:
+    #   httpGet:
+    #     path: /
+    #     port: 80
+    #   failureThreshold: 10
+    #   periodSeconds: 10
+    #   timeoutSeconds: 10
+    # livenessProbe:
+    #   httpGet:
+    #     path: /
+    #     port: 80
+    #   failureThreshold: 10
+    #   periodSeconds: 10
+    #   timeoutSeconds: 10
+    # readinessProbe:
+    #   httpGet:
+    #     path: /
+    #     port: 80
+    #   failureThreshold: 10
+    #   periodSeconds: 10
+    #   timeoutSeconds: 10
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
@@ -395,8 +396,9 @@ mysql:
     volumes: []
     volumeMounts: []
     persistence:
-      size: 8Gi
-      storageClassName: ""
+      enabled: true
+      size: 2Gi
+      storageClassName: "standard"
   service:
     type: ClusterIP
     port: 3306

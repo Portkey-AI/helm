@@ -39,9 +39,12 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Values.mysql.name }}
-          {{- with.Values.mysql.statefulSet.command }}
+          {{- if .Values.mysql.statefulSet.command }}
           command:
-            {{- toYaml . | nindent 12 }}
+            {{- toYaml .Values.mysql.statefulSet.command | nindent 4 }}
+          {{- else }}
+          args:
+            - --sql-mode=NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
           {{- end }}
           env:
             - name: MYSQL_USER
