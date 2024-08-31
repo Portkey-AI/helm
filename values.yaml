@@ -46,6 +46,10 @@ images:
     repository: "docker.io/clickhouse/clickhouse-server"
     pullPolicy: IfNotPresent
     tag: "latest"
+  gatewayImage:
+    repository: "docker.io/portkeyai/test-gateway-enterprise"
+    pullPolicy: IfNotPresent
+    tag: "1.6.6.prerelease2"
 
 ingress:
   enabled: true
@@ -65,9 +69,21 @@ apiIngress:
   labels: {}
   tls: []
 
+gatewayIngress:
+  enabled: true
+  hostname: "api.pk.ai"
+  subdomain: "api"
+  ingressClassName: "nginx"
+  annotations: {}
+  labels: {}
+  tls: []
+
+
 config:
   existingSecretName: ""
   defaultGatewayURL: ""
+  clientAuth: "TEST"
+  logStore: "wasabi"
   
   noAuth:
     enabled: true
@@ -99,24 +115,29 @@ config:
   # -- S3 specific configuration
   s3:
     enabled: true
-    AWS_ACCESS_KEY_ID: ""
-    AWS_SECRET_ACCESS_KEY: ""
-    AWS_REGION: ""
-    AWS_BUCKET_NAME: ""
+    AWS_ACCESS_KEY_ID: "D5PECTSYTFLVN6F40JAT"
+    AWS_SECRET_ACCESS_KEY: "ye0SwKnDpuy2KL5JmuuTwQV1AoONpkQwdoMFbDYp"
+    AWS_REGION: "us-east-1"
+    AWS_BUCKET_NAME: "generations-raw-dev"
   mongo:
     enabled: false
     MONGO_URI: ""
     MONGO_DB: ""
     MONGO_COLLECTION: ""
-  s3-assume:
+  s3_assume:
     enabled: false
     AWS_ACCESS_KEY_ID: ""
     AWS_SECRET_ACCESS_KEY: ""
     AWS_REGION: ""
     AWS_BUCKET_NAME: ""
-    AWS_ASSUME_ROLE_ACCESS_KEY_ID: ""
-    AWS_ASSUME_ROLE_SECRET_ACCESS_KEY: ""
+    AWS_ASSUME_ROLE_ACCESS_KEY_ID: "TEST"
+    AWS_ASSUME_ROLE_SECRET_ACCESS_KEY: "TEST"
     AWS_ASSUME_ROLE_REGION: ""
+  azure:
+    enabled: false
+    AZURE_STORAGE_ACCOUNT: "TEST"
+    AZURE_STORAGE_KEY: "TEST"
+    AZURE_STORAGE_CONTAINER: "TEST"
 
 backend:
   name: "backend"
@@ -180,6 +201,70 @@ backend:
     minReplicas: 1
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
+
+gateway:
+  name: "gateway"
+  containerPort: 8787
+  deployment:
+    autoRestart: true
+    replicas: 1
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 200m
+        memory: 500Mi
+    startupProbe:
+      httpGet:
+        path: /v1/health
+        port: 8787
+      initialDelaySeconds: 60
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    livenessProbe:
+      httpGet:
+        path: /v1/health
+        port: 8787
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    readinessProbe:
+      httpGet:
+        path: /v1/health
+        port: 8787
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    extraContainerConfig: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    volumes: []
+    volumeMounts: []
+  service:
+    type: ClusterIP
+    port: 8080
+    labels: {}
+    annotations: {}
+    loadBalancerSourceRanges: []
+    loadBalancerIP: ""
+  serviceAccount:
+    create: true
+    name: ""
+    labels: {}
+    annotations: {}
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+
 
 clickhouse:
   name: "clickhouse"

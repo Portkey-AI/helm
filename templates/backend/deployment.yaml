@@ -54,7 +54,7 @@ spec:
             {{- include "portkey.commonEnv" . | nindent 12 }}
             - name: PORT
               value: {{ .Values.backend.containerPort | quote }}
-            - name: PRIVATE_DEPLOTMENT
+            - name: PRIVATE_DEPLOYMENT
               value: "ON"
             - name: SERVICE_NAME
               value: "portkey-backend"

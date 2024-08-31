@@ -124,6 +124,13 @@ the user or some other secret provisioning mechanism
 {{- include "portkey.fullname" . }}-mysql
 {{- end }}
 {{- end }}
+{{/*
+Name of the secret containing the secrets for mysql. This can be overridden by a secrets file created by
+the user or some other secret provisioning mechanism
+*/}}
+{{- define "portkey.gatewaySecretsName" -}}
+{{- include "portkey.fullname" . }}-gateway
+{{- end }}
 
 {{/*
 Template containing common environment variables that are used by several services.
@@ -144,7 +151,7 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.redisSecretsName" . }}
       key: redis_mode
-- name: REDIS_STORE
+- name: CACHE_STORE
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.redisSecretsName" . }}
@@ -283,6 +290,135 @@ Template containing common environment variables that are used by several servic
 {{- end }}
 {{- end }}
 
+{{- define "gateway.commonEnv" -}}
+- name: ALBUS_BASEPATH
+  value: http://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}:{{ .Values.backend.containerPort }}
+- name: SERVICE_NAME
+  value: {{ .Values.gateway.serviceName }}
+- name: PORT
+  value: {{ .Values.gateway.port }}
+- name: LOG_STORE
+  value: {{ .Values.config.logStore }}
+- name: MONGO_DB_CONNECTION_URL
+  value: {{ .Values.config.mongo.MONGO_URI }}
+- name: MONGO_DATABASE
+  value: {{ .Values.config.mongo.MONGO_DB }}
+- name: MONGO_COLLECTION_NAME
+  value: {{ .Values.config.mongo.MONGO_COLLECTION }}
+- name: LOG_STORE_REGION
+  value: {{ .Values.config.s3.AWS_REGION }}
+- name: LOG_STORE_ACCESS_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.gatewaySecretsName" . }}
+      key: logStoreAccessKey
+- name: LOG_STORE_SECRET_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.gatewaySecretsName" . }}
+      key: logStoreSecretKey
+- name: LOG_STORE_GENERATIONS_BUCKET
+  value: {{ .Values.config.s3.AWS_BUCKET_NAME }}
+- name: LOG_STORE_BASEPATH
+  value: {{ .Values.config.s3.AWS_BUCKET_NAME }}
+- name: LOG_STORE_AWS_ROLE_ARN
+  value: {{ .Values.config.s3_assume.AWS_ASSUME_ROLE_ACCESS_KEY_ID }}
+- name: LOG_STORE_AWS_EXTERNAL_ID
+  value: {{ .Values.config.s3_assume.AWS_ASSUME_ROLE_EXTERNAL_ID}}
+- name: AWS_ASSUME_ROLE_ACCESS_KEY_ID
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.gatewaySecretsName" . }}
+      key: awsAssumeRoleAccessKeyId
+- name: AWS_ASSUME_ROLE_SECRET_ACCESS_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.gatewaySecretsName" . }}
+      key: awsAssumeRoleSecretAccessKey
+- name: AWS_ASSUME_ROLE_REGION
+  value: {{ .Values.config.s3_assume.AWS_ASSUME_ROLE_REGION}}
+- name: AZURE_STORAGE_ACCOUNT
+  value: {{ .Values.config.azure.AZURE_STORAGE_ACCOUNT }}
+- name: AZURE_STORAGE_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.gatewaySecretsName" . }}
+      key: azureStorageKey
+- name: AZURE_STORAGE_CONTAINER
+  value: {{ .Values.config.azure.AZURE_STORAGE_CONTAINER }}
+- name: ANALYTICS_STORE
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_db
+- name: ANALYTICS_STORE_DATABASE
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_db
+- name: ANALYTICS_STORE_ENDPOINT
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_host
+- name: ANALYTICS_STORE_PORT
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_port
+- name: ANALYTICS_STORE_NATIVE_PORT
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_native_port
+- name: ANALYTICS_STORE_USER
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_user
+- name: ANALYTICS_STORE_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_password
+- name: ANALYTICS_STORE_TLS
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_tls
+- name: ANALYTICS_LOG_TABLE
+  value: "default.generations"
+- name: ANALYTICS_FEEDBACK_TABLE
+  value: "default.feedbacks"
+- name: REDIS_URL
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.redisSecretsName" . }}
+      key: redis_connection_url
+- name: REDIS_TLS_ENABLED
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.redisSecretsName" . }}
+      key: redis_tls_enabled
+- name: REDIS_MODE
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.redisSecretsName" . }}
+      key: redis_mode
+- name: CACHE_STORE
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.redisSecretsName" . }}
+      key: redis_store
+- name: PORTKEY_CLIENT_AUTH
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.gatewaySecretsName" . }}
+      key: portkeyClientAuth
+- name: ORGANISATIONS_TO_SYNC
+  value: "{{ .Values.organisationsToSync }}"
+{{- end }}
+
 {{- define "backend.serviceAccountName" -}}
 {{- if .Values.backend.serviceAccount.create -}}
     {{ default (printf "%s-%s" (include "portkey.fullname" .) .Values.backend.name) .Values.backend.serviceAccount.name | trunc 63 | trimSuffix "-" }}
@@ -321,5 +457,13 @@ Template containing common environment variables that are used by several servic
     {{ default (printf "%s-%s" (include "portkey.fullname" .) .Values.redis.name) .Values.redis.serviceAccount.name | trunc 63 | trimSuffix "-" }}
 {{- else -}}
     {{ default "default" .Values.redis.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{- define "gateway.serviceAccountName" -}}
+{{- if .Values.redis.serviceAccount.create -}}
+    {{ default (printf "%s-%s" (include "portkey.fullname" .) .Values.redis.name) .Values.gateway.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.gateway.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
