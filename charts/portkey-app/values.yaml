@@ -82,7 +82,6 @@ gatewayIngress:
   labels: {}
   tls: []
 
-
 config:
   existingSecretName: ""
   defaultGatewayURL: ""
@@ -107,7 +106,6 @@ config:
     smtpPassword: ""
     smtpFrom: ""
 
-  
 # -- Log storage configuration
 # Used to store raw inputs & outputs of all requests going through portkey
 # We support all S3 and mongo compliant store, AWS s3, Azure blob storage, and GCS, R2, Wasabi, NetApp,etc and MongoDB, AWS DocumentDB
@@ -115,38 +113,39 @@ config:
 # logStorage:
   # -- S3 specific configuration
 logStorage:
-  logStore: ""
-  s3:
-    enabled: false
-    AWS_ACCESS_KEY_ID: ""
-    AWS_SECRET_ACCESS_KEY: ""
-    AWS_REGION: ""
-    AWS_BUCKET_NAME: ""
+  s3_compat:
+    enabled: true
+    type: ""
+    LOG_STORE_ACCESS_KEY: ""
+    LOG_STORE_SECRET_KEY: ""
+    LOG_STORE_REGION: ""
+    LOG_STORE_GENERATIONS_BUCKET: ""
+    LOG_STORE_BASEPATH: ""
   mongo:
     enabled: false
-    MONGO_URI: ""
-    MONGO_DB: ""
-    MONGO_COLLECTION: ""
+    MONGO_DB_CONNECTION_URL: ""
+    MONGO_DATABASE: ""
+    MONGO_COLLECTION_NAME: ""
+    MONGO_GENERATION_HOOKS_COLLECTION_NAME: ""
   s3_assume:
-    enabled: false
-    AWS_ACCESS_KEY_ID: ""
-    AWS_SECRET_ACCESS_KEY: ""
-    AWS_REGION: ""
-    AWS_BUCKET_NAME: ""
-    AWS_ASSUME_ROLE_ACCESS_KEY_ID: ""
-    AWS_ASSUME_ROLE_SECRET_ACCESS_KEY: ""
-    AWS_ASSUME_ROLE_REGION: ""
+    enabled: false   
+    LOG_STORE_ACCESS_KEY: ""
+    LOG_STORE_SECRET_KEY: ""
+    LOG_STORE_AWS_ROLE_ARN: ""
+    LOG_STORE_AWS_EXTERNAL_ID: ""
+    LOG_STORE_REGION: ""
+    LOG_STORE_GENERATIONS_BUCKET: ""
   azure:
     enabled: false
     AZURE_STORAGE_ACCOUNT: ""
     AZURE_STORAGE_KEY: ""
     AZURE_STORAGE_CONTAINER: ""
-  wasabi:
-    enabled: true
-    LOG_STORE_REGION: ""
-    LOG_STORE_ACCESS_KEY: ""
-    LOG_STORE_SECRET_KEY: ""
-    LOG_STORE_GENERATIONS_BUCKET: ""
+
+bedrockAssumed:
+  enabled: false
+  AWS_ASSUME_ROLE_ACCESS_KEY_ID: ""
+  AWS_ASSUME_ROLE_SECRET_ACCESS_KEY: ""
+  AWS_ASSUME_ROLE_REGION: ""
 
 backend:
   name: "backend"
