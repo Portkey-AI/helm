@@ -20,7 +20,7 @@ imageCredentials:
     create: true
     registry: https://index.docker.io/v1/
     username: <docker-user>
-    password: <docker-pwd>
+    password: <docker-password>
 imagePullSecrets: [portkeyenterpriseregistrycredentials]
 
 images:
@@ -57,8 +57,8 @@ images:
 
 ingress:
   enabled: true
-  hostname: "app.pk.ai"
-  subdomain: "app"
+  hostname: ""
+  subdomain: ""
   ingressClassName: "nginx"
   annotations: {}
   labels: {}
@@ -66,8 +66,8 @@ ingress:
 
 apiIngress:
   enabled: true
-  hostname: "albus.pk.ai"
-  subdomain: "albus"
+  hostname: ""
+  subdomain: ""
   ingressClassName: "nginx"
   annotations: {}
   labels: {}
@@ -75,8 +75,8 @@ apiIngress:
 
 gatewayIngress:
   enabled: true
-  hostname: "api.pk.ai"
-  subdomain: "api"
+  hostname: ""
+  subdomain: ""
   ingressClassName: "nginx"
   annotations: {}
   labels: {}
@@ -86,9 +86,8 @@ gatewayIngress:
 config:
   existingSecretName: ""
   defaultGatewayURL: ""
-  clientAuth: "TEST"
-  logStore: "wasabi"
-  jwtPrivateKey: ""
+  # clientAuth: "TEST"
+  jwtPrivateKey: "abcd"
   
   noAuth:
     enabled: true
@@ -114,14 +113,15 @@ config:
 # We support all S3 and mongo compliant store, AWS s3, Azure blob storage, and GCS, R2, Wasabi, NetApp,etc and MongoDB, AWS DocumentDB
 # You can also use s3 via AWS IAM Assume Role if you s3 buckets are in a different account.
 # logStorage:
-  logStorageType: ""
   # -- S3 specific configuration
+logStorage:
+  logStore: ""
   s3:
-    enabled: true
+    enabled: false
     AWS_ACCESS_KEY_ID: ""
     AWS_SECRET_ACCESS_KEY: ""
-    AWS_REGION: "us-east-1"
-    AWS_BUCKET_NAME: "generations-raw-dev"
+    AWS_REGION: ""
+    AWS_BUCKET_NAME: ""
   mongo:
     enabled: false
     MONGO_URI: ""
@@ -133,14 +133,20 @@ config:
     AWS_SECRET_ACCESS_KEY: ""
     AWS_REGION: ""
     AWS_BUCKET_NAME: ""
-    AWS_ASSUME_ROLE_ACCESS_KEY_ID: "TEST"
-    AWS_ASSUME_ROLE_SECRET_ACCESS_KEY: "TEST"
+    AWS_ASSUME_ROLE_ACCESS_KEY_ID: ""
+    AWS_ASSUME_ROLE_SECRET_ACCESS_KEY: ""
     AWS_ASSUME_ROLE_REGION: ""
   azure:
     enabled: false
-    AZURE_STORAGE_ACCOUNT: "TEST"
-    AZURE_STORAGE_KEY: "TEST"
-    AZURE_STORAGE_CONTAINER: "TEST"
+    AZURE_STORAGE_ACCOUNT: ""
+    AZURE_STORAGE_KEY: ""
+    AZURE_STORAGE_CONTAINER: ""
+  wasabi:
+    enabled: true
+    LOG_STORE_REGION: ""
+    LOG_STORE_ACCESS_KEY: ""
+    LOG_STORE_SECRET_KEY: ""
+    LOG_STORE_GENERATIONS_BUCKET: ""
 
 backend:
   name: "backend"
@@ -336,85 +342,6 @@ dataservice:
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
 
-clickhouse:
-  name: "clickhouse"
-  external:
-    # If enabled, use the following values to connect to an external database. This will also disable the
-    # creation of a clickhouse stateful-set and service.
-    enabled: false
-    host: ""
-    port: "8123"
-    nativePort: "9000"
-    user: "default"
-    password: "password"
-    database: "default"
-    tls: false
-    existingSecretName: ""
-  containerHttpPort: 8123
-  containerNativePort: 9000
-  statefulSet:
-    labels: {}
-    annotations: {}
-    podSecurityContext: {}
-    securityContext: {}
-    resources:
-      limits:
-        cpu: 1000m
-        memory: 2Gi
-      requests:
-        cpu: 500m
-        memory: 1Gi
-    command:
-      - "/bin/bash"
-      - "-c"
-      - "sed 's/id -g/id -gn/' /entrypoint.sh > /tmp/entrypoint.sh; exec bash /tmp/entrypoint.sh"
-    startupProbe:
-      httpGet:
-        path: /ping
-        port: 8123
-      failureThreshold: 6
-      periodSeconds: 10
-      timeoutSeconds: 1
-    readinessProbe:
-      httpGet:
-        path: /ping
-        port: 8123
-      failureThreshold: 6
-      periodSeconds: 10
-      timeoutSeconds: 1
-    livenessProbe:
-      httpGet:
-        path: /ping
-        port: 8123
-      failureThreshold: 6
-      periodSeconds: 10
-      timeoutSeconds: 1
-    extraContainerConfig: {}
-    extraEnv: []
-    sidecars: []
-    nodeSelector: {}
-    tolerations: []
-    affinity: {}
-    volumes: []
-    # We recommend using a persistent volume and increasing the storage size to something like 50Gi when using in a production environment!
-    persistence:
-      enabled: true
-      size: 2Gi
-      storageClassName: "standard"
-  service:
-    type: ClusterIP
-    httpPort: 8123
-    nativePort: 9000
-    labels: {}
-    annotations: {}
-    loadBalancerSourceRanges: []
-    loadBalancerIP: ""
-  serviceAccount:
-    create: true
-    name: ""
-    labels: {}
-    annotations: {}
-
 frontend:
   name: "frontend"
   containerPort: 80
@@ -490,14 +417,14 @@ mysql:
     # If enabled, use the following values to connect to an external database. This will also disable the
     # creation of a mysql stateful-set and service.
     enabled: false
-    host: ""
-    port: "3306"
-    user: "portkey"
-    password: "portkey@123"
-    database: "portkey"
+    host: "" # Only used when connecting to an external mysql instance.
+    port: "3306" 
+    user: ""
+    password: ""
+    database: ""
     existingSecretName: ""
     # Use this to set the root password for the mysql instance, only when NOT using an external Mysql.
-    rootPassword: "portkey@123"
+    rootPassword: "" # Only used when NOT using an external Mysql.
   containerHttpPort: 3306
   containerNativePort: 3306
   containerPort: 3306
@@ -573,10 +500,10 @@ redis:
     # If enabled, use the following values to connect to an external redis instance. This will also disable the
     # creation of a redis stateful-set and service.
     enabled: false
-    connectionUrl: "redis://localhost:6379"
-    tlsEnabled: "false"
-    mode: "standalone"
-    store: "redis"
+    connectionUrl: ""
+    tlsEnabled: ""
+    mode: ""
+    store: ""
     existingSecretName: ""
   containerPort: 6379
   statefulSet:
@@ -643,3 +570,83 @@ redis:
     name: ""
     labels: {}
     annotations: {}
+
+clickhouse:
+  name: "clickhouse"
+  external:
+    # If enabled, use the following values to connect to an external database. This will also disable the
+    # creation of a clickhouse stateful-set and service.
+    enabled: false
+    host: ""
+    port: "8123"
+    nativePort: "9000"
+    user: ""
+    password: ""
+    database: "default"
+    tls: false
+    existingSecretName: ""
+  containerHttpPort: 8123
+  containerNativePort: 9000
+  statefulSet:
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    command:
+      - "/bin/bash"
+      - "-c"
+      - "sed 's/id -g/id -gn/' /entrypoint.sh > /tmp/entrypoint.sh; exec bash /tmp/entrypoint.sh"
+    startupProbe:
+      httpGet:
+        path: /ping
+        port: 8123
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    readinessProbe:
+      httpGet:
+        path: /ping
+        port: 8123
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    livenessProbe:
+      httpGet:
+        path: /ping
+        port: 8123
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    extraContainerConfig: {}
+    extraEnv: []
+    sidecars: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    volumes: []
+    # We recommend using a persistent volume and increasing the storage size to something like 50Gi when using in a production environment!
+    persistence:
+      enabled: true
+      size: 2Gi
+      storageClassName: "standard"
+  service:
+    type: ClusterIP
+    httpPort: 8123
+    nativePort: 9000
+    labels: {}
+    annotations: {}
+    loadBalancerSourceRanges: []
+    loadBalancerIP: ""
+  serviceAccount:
+    create: true
+    name: ""
+    labels: {}
+    annotations: {}
+

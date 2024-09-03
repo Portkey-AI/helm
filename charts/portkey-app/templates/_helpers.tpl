@@ -292,7 +292,7 @@ Template containing common environment variables that are used by several servic
 
 {{- define "logStore.commonEnv" -}}
 - name: LOG_STORE
-  value: {{ .Values.config.logStore }}
+  value: {{ .Values.logStorage.logStore }}
 - name: MONGO_DB_CONNECTION_URL
   value: {{ .Values.config.mongo.MONGO_URI }}
 - name: MONGO_DATABASE
