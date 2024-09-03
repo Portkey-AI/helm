@@ -296,98 +296,78 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: logStore
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "mongoConnectionUrl" }}
+{{- if .Values.logStorage.mongo.enabled}}
 - name: MONGO_DB_CONNECTION_URL
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: mongoConnectionUrl
-{{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "mongoDatabase" }}
 - name: MONGO_DATABASE
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: mongoDatabase
-{{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "mongoGenerationsCollection" }}
 - name: MONGO_COLLECTION_NAME
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: mongoGenerationsCollection
-{{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "mongoHooksCollection" }}
 - name: MONGO_GENERATION_HOOKS_COLLECTION_NAME
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: mongoHooksCollection
 {{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "logStoreAccessKey" }}
+{{- if or .Values.logStorage.s3_compat.enabled .Values.logStorage.s3_assume.enabled }}
 - name: LOG_STORE_ACCESS_KEY
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: logStoreAccessKey
-{{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "logStoreSecretKey" }}
 - name: LOG_STORE_SECRET_KEY
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: logStoreSecretKey
-{{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "logStoreRegion" }}
 - name: LOG_STORE_REGION
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: logStoreRegion
-{{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "logStoreGenerationsBucket" }}
 - name: LOG_STORE_GENERATIONS_BUCKET
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: logStoreGenerationsBucket
-{{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "logStoreBasePath" }}
 - name: LOG_STORE_BASEPATH
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: logStoreBasePath
 {{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "logStoreAwsRoleArn" }}
+{{- if .Values.logStorage.s3_assume.enabled }}
 - name: LOG_STORE_AWS_ROLE_ARN
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: logStoreAwsRoleArn
-{{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "logStoreExternalId" }}
 - name: LOG_STORE_AWS_EXTERNAL_ID
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: logStoreExternalId
 {{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "azureStorageAccount" }}
+{{- if .Values.logStorage.azure.enabled}}
 - name: AZURE_STORAGE_ACCOUNT
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: azureStorageAccount
-{{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "azureStorageKey" }}
 - name: AZURE_STORAGE_KEY
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: azureStorageKey
-{{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "azureStorageContainer" }}
 - name: AZURE_STORAGE_CONTAINER
   valueFrom:
     secretKeyRef:
