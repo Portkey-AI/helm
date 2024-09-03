@@ -88,10 +88,10 @@ config:
   defaultGatewayURL: ""
   clientAuth: "TEST"
   logStore: "wasabi"
+  jwtPrivateKey: ""
   
   noAuth:
     enabled: true
-    jwtPrivateKey: ""
 
   oauth:
     enabled: false

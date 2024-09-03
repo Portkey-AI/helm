@@ -57,7 +57,9 @@ spec:
             - name: PRIVATE_DEPLOYMENT
               value: "ON"
             - name: SERVICE_NAME
-              value: "portkey-gateway"
+              value: {{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}
+            - name: GATEWAY_CACHE_MODE
+              value: SELF
             {{- with .Values.gateway.deployment.extraEnv }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
