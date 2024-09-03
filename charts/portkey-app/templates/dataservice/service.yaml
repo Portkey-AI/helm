@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "portkey.fullname" . }}-{{ .Values.dataservice.name }}
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+    {{- with.Values.dataservice.service.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- include "portkey.annotations" . | nindent 4 }}
+    {{- with.Values.dataservice.service.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.dataservice.service.type }}
+  {{- with .Values.dataservice.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  loadBalancerIP: {{ .Values.dataservice.service.loadBalancerIP }}
+  ports:
+    - name: dataservice
+      port: {{ .Values.dataservice.service.port }}
+      targetPort: dataservice
+      protocol: TCP
+  selector:
+    {{- include "portkey.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.dataservice.name }}

@@ -1,0 +1,9 @@
+apiVersion: v2
+name: portkey
+maintainers:
+  - name: Ayush
+    email: ayush@portkey.ai
+description: Helm chart to deploy the Portkey application and all services it depends on.
+type: application
+appVersion: "1.0.0"
+version: 1.0.0

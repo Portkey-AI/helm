@@ -1,0 +1,31 @@
+{{- if not .Values.mysql.external.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "portkey.fullname" . }}-{{ .Values.mysql.name }}
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+    {{- with.Values.mysql.service.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- include "portkey.annotations" . | nindent 4 }}
+    {{- with.Values.mysql.service.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.mysql.service.type }}
+  {{- with .Values.mysql.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  loadBalancerIP: {{ .Values.mysql.service.loadBalancerIP }}
+  ports:
+    - name: mysql
+      port: {{ .Values.mysql.service.port }}
+      targetPort: mysql
+      protocol: TCP
+  selector:
+    {{- include "portkey.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.mysql.name }}
+{{- end }}

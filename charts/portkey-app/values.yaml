@@ -1,0 +1,645 @@
+# Default values
+
+portkey:
+  labels: {}
+  annotations: {}
+
+# -- Provide a name in place of `portkey`
+nameOverride: ""
+# -- String to fully override `"portkey.fullname"`
+fullnameOverride: ""
+# -- Annotations that will be applied to all resources created by the chart
+commonAnnotations: {}
+# -- Labels that will be applied to all resources created by the chart
+commonLabels: {}
+# -- Common environment variables that will be applied to all deployments/statefulsets created by the chart. Be careful not to override values already specified by the chart.
+commonEnv: []
+
+imageCredentials:
+  - name: portkeyenterpriseregistrycredentials
+    create: true
+    registry: https://index.docker.io/v1/
+    username: <docker-user>
+    password: <docker-pwd>
+imagePullSecrets: [portkeyenterpriseregistrycredentials]
+
+images:
+   # -- Secrets with credentials to pull images from a private registry. Specified as name: value.
+  
+  backendImage:
+    repository: "docker.io/portkeyai/backend"
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  frontendImage:
+    repository: "docker.io/portkeyai/frontend"
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  dataserviceImage:
+    repository: "docker.io/portkeyai/data-service"
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  gatewayImage:
+    repository: "docker.io/portkeyai/gateway_enterprise"
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  mysqlImage:
+    repository: "docker.io/mysql"
+    pullPolicy: IfNotPresent
+    tag: "8.1"
+  redisImage:
+    repository: "docker.io/redis"
+    pullPolicy: IfNotPresent
+    tag: "alpine"
+  clickhouseImage:
+    repository: "docker.io/clickhouse/clickhouse-server"
+    pullPolicy: IfNotPresent
+    tag: "latest"
+
+ingress:
+  enabled: true
+  hostname: "app.pk.ai"
+  subdomain: "app"
+  ingressClassName: "nginx"
+  annotations: {}
+  labels: {}
+  tls: []
+
+apiIngress:
+  enabled: true
+  hostname: "albus.pk.ai"
+  subdomain: "albus"
+  ingressClassName: "nginx"
+  annotations: {}
+  labels: {}
+  tls: []
+
+gatewayIngress:
+  enabled: true
+  hostname: "api.pk.ai"
+  subdomain: "api"
+  ingressClassName: "nginx"
+  annotations: {}
+  labels: {}
+  tls: []
+
+
+config:
+  existingSecretName: ""
+  defaultGatewayURL: ""
+  clientAuth: "TEST"
+  logStore: "wasabi"
+  
+  noAuth:
+    enabled: true
+    jwtPrivateKey: ""
+
+  oauth:
+    enabled: false
+    oauthClientId: ""
+    oauthIssuerUrl: ""
+    oauthClientSecret: ""
+    oauthRedirectURI: ""
+
+  smtp:
+    enabled: false
+    smtpHost: ""
+    smtpPort: ""
+    smtpUser: ""
+    smtpPassword: ""
+    smtpFrom: ""
+
+  
+# -- Log storage configuration
+# Used to store raw inputs & outputs of all requests going through portkey
+# We support all S3 and mongo compliant store, AWS s3, Azure blob storage, and GCS, R2, Wasabi, NetApp,etc and MongoDB, AWS DocumentDB
+# You can also use s3 via AWS IAM Assume Role if you s3 buckets are in a different account.
+# logStorage:
+  logStorageType: ""
+  # -- S3 specific configuration
+  s3:
+    enabled: true
+    AWS_ACCESS_KEY_ID: ""
+    AWS_SECRET_ACCESS_KEY: ""
+    AWS_REGION: "us-east-1"
+    AWS_BUCKET_NAME: "generations-raw-dev"
+  mongo:
+    enabled: false
+    MONGO_URI: ""
+    MONGO_DB: ""
+    MONGO_COLLECTION: ""
+  s3_assume:
+    enabled: false
+    AWS_ACCESS_KEY_ID: ""
+    AWS_SECRET_ACCESS_KEY: ""
+    AWS_REGION: ""
+    AWS_BUCKET_NAME: ""
+    AWS_ASSUME_ROLE_ACCESS_KEY_ID: "TEST"
+    AWS_ASSUME_ROLE_SECRET_ACCESS_KEY: "TEST"
+    AWS_ASSUME_ROLE_REGION: ""
+  azure:
+    enabled: false
+    AZURE_STORAGE_ACCOUNT: "TEST"
+    AZURE_STORAGE_KEY: "TEST"
+    AZURE_STORAGE_CONTAINER: "TEST"
+
+backend:
+  name: "backend"
+  containerPort: 8080
+  deployment:
+    autoRestart: true
+    replicas: 1
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 200m
+        memory: 500Mi
+    startupProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 60
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    extraContainerConfig: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    volumes: []
+    volumeMounts: []
+  service:
+    type: ClusterIP
+    port: 8080
+    labels: {}
+    annotations: {}
+    loadBalancerSourceRanges: []
+    loadBalancerIP: ""
+  serviceAccount:
+    create: true
+    name: ""
+    labels: {}
+    annotations: {}
+  autoscaling:
+    enabled: true
+    createHpa: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+
+gateway:
+  name: "gateway"
+  containerPort: 8787
+  deployment:
+    autoRestart: true
+    replicas: 1
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 200m
+        memory: 500Mi
+    startupProbe:
+      httpGet:
+        path: /v1/health
+        port: 8787
+      initialDelaySeconds: 60
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    livenessProbe:
+      httpGet:
+        path: /v1/health
+        port: 8787
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    readinessProbe:
+      httpGet:
+        path: /v1/health
+        port: 8787
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    extraContainerConfig: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    volumes: []
+    volumeMounts: []
+  service:
+    type: ClusterIP
+    port: 8787
+    labels: {}
+    annotations: {}
+    loadBalancerSourceRanges: []
+    loadBalancerIP: ""
+  serviceAccount:
+    create: true
+    name: ""
+    labels: {}
+    annotations: {}
+  autoscaling:
+    enabled: false
+    createHpa: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+
+dataservice:
+  name: "dataservice"
+  containerPort: 8081
+  finetuneBucket: ""
+  logexportsBucket: ""
+  deployment:
+    autoRestart: true
+    replicas: 1
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 200m
+        memory: 500Mi
+    startupProbe:
+      httpGet:
+        path: /health
+        port: 8081
+      initialDelaySeconds: 60
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8081
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 8081
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    extraContainerConfig: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    volumes: []
+    volumeMounts: []
+  service:
+    type: ClusterIP
+    port: 8081
+    labels: {}
+    annotations: {}
+    loadBalancerSourceRanges: []
+    loadBalancerIP: ""
+  serviceAccount:
+    create: true
+    name: ""
+    labels: {}
+    annotations: {}
+  autoscaling:
+    enabled: false
+    createHpa: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+
+clickhouse:
+  name: "clickhouse"
+  external:
+    # If enabled, use the following values to connect to an external database. This will also disable the
+    # creation of a clickhouse stateful-set and service.
+    enabled: false
+    host: ""
+    port: "8123"
+    nativePort: "9000"
+    user: "default"
+    password: "password"
+    database: "default"
+    tls: false
+    existingSecretName: ""
+  containerHttpPort: 8123
+  containerNativePort: 9000
+  statefulSet:
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    command:
+      - "/bin/bash"
+      - "-c"
+      - "sed 's/id -g/id -gn/' /entrypoint.sh > /tmp/entrypoint.sh; exec bash /tmp/entrypoint.sh"
+    startupProbe:
+      httpGet:
+        path: /ping
+        port: 8123
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    readinessProbe:
+      httpGet:
+        path: /ping
+        port: 8123
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    livenessProbe:
+      httpGet:
+        path: /ping
+        port: 8123
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    extraContainerConfig: {}
+    extraEnv: []
+    sidecars: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    volumes: []
+    # We recommend using a persistent volume and increasing the storage size to something like 50Gi when using in a production environment!
+    persistence:
+      enabled: true
+      size: 2Gi
+      storageClassName: "standard"
+  service:
+    type: ClusterIP
+    httpPort: 8123
+    nativePort: 9000
+    labels: {}
+    annotations: {}
+    loadBalancerSourceRanges: []
+    loadBalancerIP: ""
+  serviceAccount:
+    create: true
+    name: ""
+    labels: {}
+    annotations: {}
+
+frontend:
+  name: "frontend"
+  containerPort: 80
+  defaultGatewayURL: ""
+  deployment:
+    autoRestart: true
+    replicas: 1
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 200m
+        memory: 500Mi
+    # startupProbe:
+    #   httpGet:
+    #     path: /
+    #     port: 80
+    #   failureThreshold: 10
+    #   periodSeconds: 10
+    #   timeoutSeconds: 10
+    # livenessProbe:
+    #   httpGet:
+    #     path: /
+    #     port: 80
+    #   failureThreshold: 10
+    #   periodSeconds: 10
+    #   timeoutSeconds: 10
+    # readinessProbe:
+    #   httpGet:
+    #     path: /
+    #     port: 80
+    #   failureThreshold: 10
+    #   periodSeconds: 10
+    #   timeoutSeconds: 10
+    extraContainerConfig: {}
+    extraEnv: []
+    sidecars: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    volumes: []
+    volumeMounts: []
+  autoscaling:
+    enabled: false
+    # If enabled, use the following values to configure the HPA. You can also use your own HPA configuration by not creating an HPA.
+    # You may want to manage the HPA yourself if you have a custom autoscaling setup like KEDA.
+    createHpa: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+  service:
+    type: LoadBalancer
+    httpPort: 80
+    httpsPort: 443
+    labels: {}
+    annotations: {}
+    loadBalancerSourceRanges: []
+    loadBalancerIP: ""
+  serviceAccount:
+    create: true
+    name: ""
+    labels: {}
+    annotations: {}
+
+mysql:
+  name: "mysql"
+  external:
+    # If enabled, use the following values to connect to an external database. This will also disable the
+    # creation of a mysql stateful-set and service.
+    enabled: false
+    host: ""
+    port: "3306"
+    user: "portkey"
+    password: "portkey@123"
+    database: "portkey"
+    existingSecretName: ""
+    # Use this to set the root password for the mysql instance, only when NOT using an external Mysql.
+    rootPassword: "portkey@123"
+  containerHttpPort: 3306
+  containerNativePort: 3306
+  containerPort: 3306
+  statefulSet:
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+      requests:
+        cpu: 1000m
+        memory: 2Gi
+    command: []
+    startupProbe:
+      exec:
+        command:
+          - /bin/sh
+          - -c
+          - mysqladmin ping -u${MYSQL_USER} -p${MYSQL_PASSWORD}
+      initialDelaySeconds: 10
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 5
+    readinessProbe:
+      exec:
+        command:
+          - /bin/sh
+          - -c
+          - mysqladmin ping -u${MYSQL_USER} -p${MYSQL_PASSWORD}
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    livenessProbe:
+      exec:
+        command:
+          - /bin/sh
+          - -c
+          - mysqladmin ping -u${MYSQL_USER} -p${MYSQL_PASSWORD}
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    extraContainerConfig: {}
+    extraEnv: []
+    sidecars: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    volumes: []
+    volumeMounts: []
+    persistence:
+      enabled: true
+      size: 2Gi
+      storageClassName: "standard"
+  service:
+    type: ClusterIP
+    port: 3306
+    labels: {}
+    annotations: {}
+    loadBalancerSourceRanges: []
+    loadBalancerIP: ""
+  serviceAccount:
+    create: true
+    name: ""
+    labels: {}
+    annotations: {}
+
+redis:
+  name: "redis"
+  external:
+    # If enabled, use the following values to connect to an external redis instance. This will also disable the
+    # creation of a redis stateful-set and service.
+    enabled: false
+    connectionUrl: "redis://localhost:6379"
+    tlsEnabled: "false"
+    mode: "standalone"
+    store: "redis"
+    existingSecretName: ""
+  containerPort: 6379
+  statefulSet:
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    resources:
+      limits:
+        cpu: 4000m
+        memory: 16Gi
+      requests:
+        cpu: 1000m
+        memory: 2Gi
+    command: []
+    startupProbe:
+      exec:
+        command:
+          - /bin/sh
+          - -c
+          - exec redis-cli ping
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    readinessProbe:
+      exec:
+        command:
+          - /bin/sh
+          - -c
+          - exec redis-cli ping
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    livenessProbe:
+      exec:
+        command:
+          - /bin/sh
+          - -c
+          - exec redis-cli ping
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    extraContainerConfig: {}
+    extraEnv: []
+    sidecars: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    volumes: []
+    volumeMounts: []
+    persistence:
+      enabled: false
+      size: 2Gi
+      storageClassName: ""
+  service:
+    type: ClusterIP
+    port: 6379
+    labels: {}
+    annotations: {}
+    loadBalancerSourceRanges: []
+    loadBalancerIP: ""
+  serviceAccount:
+    create: true
+    name: ""
+    labels: {}
+    annotations: {}

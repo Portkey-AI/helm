@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+    {{- with.Values.frontend.deployment.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- include "portkey.annotations" . | nindent 4 }}
+    {{- with.Values.frontend.deployment.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if not .Values.frontend.autoscaling.enabled }}
+  replicas: {{ .Values.frontend.deployment.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "portkey.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}
+  template:
+    metadata:
+      annotations:
+      {{- if .Values.frontend.deployment.autoRestart }}
+        rollme: {{ randAlphaNum 5 | quote }}
+      {{- end }}
+      {{- with .Values.frontend.deployment.annotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- with.Values.frontend.deployment.labels }}
+            {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- include "portkey.labels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}
+    spec:
+      imagePullSecrets: 
+      {{- range .Values.imageCredentials }}
+      - name: {{ .name }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.frontend.deployment.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ include "frontend.serviceAccountName" . }}
+      containers:
+        - name: {{ .Values.frontend.name }}
+          {{- with.Values.frontend.deployment.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: VITE_API_URL
+              value: {{ .Values.config.defaultGatewayURL | quote }}
+            - name: VITE_BASE_URL
+              value: "http://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}:{{ .Values.backend.containerPort }}"
+            - name: VITE_PRIVATE_DEPLOYMENT
+              value: "ON"
+            {{- if .Values.config.oauth.enabled }}
+            - name: VITE_AUTH_MODE
+              value: "SSO"
+            {{- end }}
+            {{- if .Values.config.noAuth.enabled }}
+            - name: VITE_AUTH_MODE
+              value: "NO_AUTH"
+            {{- end }}
+            {{- with .Values.frontend.deployment.extraEnv }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.commonEnv }}
+              {{ toYaml . | nindent 12 }}
+            {{- end }}
+          image: "{{ .Values.images.frontendImage.repository }}:{{ .Values.images.frontendImage.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.frontendImage.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Starting copy operations..."
+              ls -l /config
+              cp /config/nginx.conf /etc/nginx/conf.d/default.conf && echo "nginx.conf copied" || echo "Failed to copy nginx.conf"
+              cp /config/config.js /usr/share/nginx/html/config.js && echo "config.js copied" || echo "Failed to copy config.js"
+              echo "Copy operations completed"
+              echo "Starting Nginx..."
+              exec nginx -g 'daemon off;'
+          ports:
+            - name: frontend
+              containerPort: {{ .Values.frontend.containerPort }}
+              protocol: TCP
+          {{- with .Values.frontend.deployment.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.frontend.deployment.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.frontend.deployment.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.frontend.deployment.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.frontend.deployment.securityContext | nindent 12 }}
+          volumeMounts:
+            {{- with .Values.frontend.deployment.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+            - name: app-config
+              mountPath: /config
+            # - name: config-volume
+            #   mountPath: /config
+          {{- with .Values.frontend.deployment.extraContainerConfig }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- with .Values.frontend.deployment.sidecars }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.frontend.deployment.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.frontend.deployment.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.frontend.deployment.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: app-config
+          configMap:
+            name: {{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}
+            # items:
+            #   - key: nginx.conf
+            #     path: nginx.conf
+            #   - key: config.js
+            #     path: config.js

@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+    {{- with.Values.frontend.service.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- include "portkey.annotations" . | nindent 4 }}
+    {{- with.Values.frontend.service.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.frontend.service.type }}
+  {{- with .Values.frontend.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  loadBalancerIP: {{ .Values.frontend.service.loadBalancerIP }}
+  ports:
+    - name: http
+      port: {{ .Values.frontend.service.httpPort }}
+      targetPort: frontend
+      protocol: TCP
+    - name: https
+      port: {{ .Values.frontend.service.httpsPort }}
+      targetPort: frontend
+      protocol: TCP
+  selector:
+    {{- include "portkey.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}

@@ -1,0 +1,32 @@
+{{- if and .Values.dataservice.autoscaling.enabled .Values.dataservice.autoscaling.createHpa }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "portkey.fullname" . }}-{{ .Values.dataservice.name }}
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "portkey.fullname" . }}-{{ .Values.dataservice.name }}
+  minReplicas: {{ .Values.dataservice.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.dataservice.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.dataservice.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.dataservice.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.dataservice.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.dataservice.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

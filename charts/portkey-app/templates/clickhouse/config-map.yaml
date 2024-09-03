@@ -1,0 +1,40 @@
+{{- if not .Values.clickhouse.external.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+  annotations:
+    {{- include "portkey.annotations" . | nindent 4 }}
+data:
+  config.xml: |
+    <clickhouse>
+      <path>/var/lib/clickhouse/</path>
+      <tmp_path>/var/lib/clickhouse/tmp/</tmp_path>
+      <user_files_path>/var/lib/clickhouse/user_files/</user_files_path>
+      <format_schema_path>/var/lib/clickhouse/format_schemas/</format_schema_path>
+      <access_control_path>/var/lib/clickhouse/access/</access_control_path>
+    </clickhouse>
+  users.xml: |
+    <clickhouse>
+      <users>
+        <{{ .Values.clickhouse.external.user }}>
+          <access_management>1</access_management>
+          <named_collection_control>1</named_collection_control>
+          <show_named_collections>1</show_named_collections>
+          <show_named_collections_secrets>1</show_named_collections_secrets>
+          <profile>default</profile>
+        </{{ .Values.clickhouse.external.user }}>
+      </users>
+      <profiles>
+        <default>        
+          <async_insert_max_data_size>2000000</async_insert_max_data_size>
+          <wait_for_async_insert>0</wait_for_async_insert>
+          <parallel_view_processing>1</parallel_view_processing>
+          <materialize_ttl_after_modify>0</materialize_ttl_after_modify>
+          <wait_for_async_insert_timeout>25</wait_for_async_insert_timeout>
+        </default>
+      </profiles>
+    </clickhouse>
+{{- end }}
