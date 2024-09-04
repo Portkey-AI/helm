@@ -318,7 +318,7 @@ Template containing common environment variables that are used by several servic
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: mongoHooksCollection
 {{- end }}
-{{- if or .Values.logStorage.s3_compat.enabled .Values.logStorage.s3_assume.enabled }}
+{{- if or .Values.logStorage.s3Compat.enabled .Values.logStorage.s3Assume.enabled }}
 - name: LOG_STORE_ACCESS_KEY
   valueFrom:
     secretKeyRef:
@@ -345,7 +345,7 @@ Template containing common environment variables that are used by several servic
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: logStoreBasePath
 {{- end }}
-{{- if .Values.logStorage.s3_assume.enabled }}
+{{- if .Values.logStorage.s3Assume.enabled }}
 - name: LOG_STORE_AWS_ROLE_ARN
   valueFrom:
     secretKeyRef:

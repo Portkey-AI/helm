@@ -63,7 +63,7 @@ spec:
             - name: GATEWAY_BASE_URL
               value: http://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }}
             - name: GATEWAY_CACHE_MODE
-              value: SELF
+              value: "SELF"
             {{- with .Values.backend.deployment.extraEnv }}
               {{- toYaml . | nindent 12 }}
             {{- end }}

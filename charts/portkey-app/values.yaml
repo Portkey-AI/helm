@@ -113,9 +113,9 @@ config:
 # logStorage:
   # -- S3 specific configuration
 logStorage:
-  s3_compat:
-    enabled: true
-    type: ""
+  logStore: ""
+  s3Compat:
+    enabled: false
     LOG_STORE_ACCESS_KEY: ""
     LOG_STORE_SECRET_KEY: ""
     LOG_STORE_REGION: ""
@@ -127,7 +127,7 @@ logStorage:
     MONGO_DATABASE: ""
     MONGO_COLLECTION_NAME: ""
     MONGO_GENERATION_HOOKS_COLLECTION_NAME: ""
-  s3_assume:
+  s3Assume:
     enabled: false   
     LOG_STORE_ACCESS_KEY: ""
     LOG_STORE_SECRET_KEY: ""

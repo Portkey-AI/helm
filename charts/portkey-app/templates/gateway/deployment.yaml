@@ -59,7 +59,7 @@ spec:
             - name: SERVICE_NAME
               value: {{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}
             - name: GATEWAY_CACHE_MODE
-              value: SELF
+              value: "SELF"
             {{- with .Values.gateway.deployment.extraEnv }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
