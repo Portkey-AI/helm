@@ -85,7 +85,6 @@ gatewayIngress:
 config:
   existingSecretName: ""
   defaultGatewayURL: ""
-  # clientAuth: "TEST"
   jwtPrivateKey: "abcd"
   
   noAuth:

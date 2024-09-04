@@ -52,6 +52,7 @@ spec:
           {{- end }}
           env:
             {{- include "portkey.commonEnv" . | nindent 12 }}
+            {{- include "logStore.commonEnv" . | nindent 12 }}
             - name: PORT
               value: {{ .Values.backend.containerPort | quote }}
             - name: PRIVATE_DEPLOYMENT
