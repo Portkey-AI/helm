@@ -19,8 +19,8 @@ imageCredentials:
   - name: portkeyenterpriseregistrycredentials
     create: true
     registry: https://index.docker.io/v1/
-    username: <docker-user>
-    password: <docker-password>
+    username: ""
+    password: ""
 imagePullSecrets: [portkeyenterpriseregistrycredentials]
 
 images:
@@ -28,19 +28,19 @@ images:
   
   backendImage:
     repository: "docker.io/portkeyai/backend"
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
     tag: "latest"
   frontendImage:
     repository: "docker.io/portkeyai/frontend"
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
     tag: "latest"
   dataserviceImage:
     repository: "docker.io/portkeyai/data-service"
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
     tag: "latest"
   gatewayImage:
     repository: "docker.io/portkeyai/gateway_enterprise"
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
     tag: "latest"
   mysqlImage:
     repository: "docker.io/mysql"
@@ -156,13 +156,13 @@ backend:
     annotations: {}
     podSecurityContext: {}
     securityContext: {}
-    resources:
-      limits:
-        cpu: 1000m
-        memory: 1Gi
-      requests:
-        cpu: 200m
-        memory: 500Mi
+    # resources:
+    #   limits:
+    #     cpu: 1000m
+    #     memory: 1Gi
+    #   requests:
+    #     cpu: 200m
+    #     memory: 500Mi
     startupProbe:
       httpGet:
         path: /health
@@ -286,13 +286,13 @@ dataservice:
     annotations: {}
     podSecurityContext: {}
     securityContext: {}
-    resources:
-      limits:
-        cpu: 1000m
-        memory: 1Gi
-      requests:
-        cpu: 200m
-        memory: 500Mi
+    # resources:
+    #   limits:
+    #     cpu: 1000m
+    #     memory: 1Gi
+    #   requests:
+    #     cpu: 200m
+    #     memory: 500Mi
     startupProbe:
       httpGet:
         path: /health
@@ -351,13 +351,13 @@ frontend:
     annotations: {}
     podSecurityContext: {}
     securityContext: {}
-    resources:
-      limits:
-        cpu: 1000m
-        memory: 1Gi
-      requests:
-        cpu: 200m
-        memory: 500Mi
+    # resources:
+    #   limits:
+    #     cpu: 1000m
+    #     memory: 1Gi
+    #   requests:
+    #     cpu: 200m
+    #     memory: 500Mi
     # startupProbe:
     #   httpGet:
     #     path: /
@@ -431,13 +431,13 @@ mysql:
     annotations: {}
     podSecurityContext: {}
     securityContext: {}
-    resources:
-      limits:
-        cpu: 2000m
-        memory: 4Gi
-      requests:
-        cpu: 1000m
-        memory: 2Gi
+    # resources:
+    #   limits:
+    #     cpu: 2000m
+    #     memory: 4Gi
+    #   requests:
+    #     cpu: 1000m
+    #     memory: 2Gi
     command: []
     startupProbe:
       exec:
@@ -509,13 +509,13 @@ redis:
     annotations: {}
     podSecurityContext: {}
     securityContext: {}
-    resources:
-      limits:
-        cpu: 4000m
-        memory: 16Gi
-      requests:
-        cpu: 1000m
-        memory: 2Gi
+    # resources:
+    #   limits:
+    #     cpu: 4000m
+    #     memory: 16Gi
+    #   requests:
+    #     cpu: 1000m
+    #     memory: 2Gi
     command: []
     startupProbe:
       exec:
@@ -590,13 +590,13 @@ clickhouse:
     annotations: {}
     podSecurityContext: {}
     securityContext: {}
-    resources:
-      limits:
-        cpu: 1000m
-        memory: 2Gi
-      requests:
-        cpu: 500m
-        memory: 1Gi
+    # resources:
+    #   limits:
+    #     cpu: 1000m
+    #     memory: 16Gi
+    #   requests:
+    #     cpu: 500m
+    #     memory: 8Gi
     command:
       - "/bin/bash"
       - "-c"

@@ -19,29 +19,6 @@ imageCredentials:
     registry: https://index.docker.io/v1/
     username: <your_username>
     password: <your_password>
-
-images:
-  backendImage:
-    repository: "docker.io/portkeyai/backend"
-    tag: "latest"
-  frontendImage:
-    repository: "docker.io/portkeyai/frontend"
-    tag: "latest"
-  dataserviceImage:
-    repository: "docker.io/portkeyai/data-service"
-    tag: "latest"
-  gatewayImage:
-    repository: "docker.io/portkeyai/gateway-enterprise"
-    tag: "latest"
-  mysqlImage:
-    repository: "docker.io/mysql"
-    tag: "8.1"
-  redisImage:
-    repository: "docker.io/redis"
-    tag: "alpine"
-  clickhouseImage:
-    repository: "docker.io/clickhouse/clickhouse-server"
-    tag: "latest"
 ```
 
 Ensure you replace `your_username` and `your_password` with your actual Docker registry credentials. Its safe to use latest tag for all Portkey images (unless there is a specific tag shared with you).
@@ -50,46 +27,27 @@ Ensure you replace `your_username` and `your_password` with your actual Docker r
 
 ```yaml
 config:
-  existingSecretName: ""
-  defaultGatewayURL: ""
   logStore: "s3"
-  jwtPrivateKey: "some_random_string"
-```
-Log store can be set to s3 or any other supported blob storage. 
-JWT Private Key is required for session management.
-
-### Authentication Configuration
-Portkey supports 2 types of authentication:
-1. No Authentication (not recommended for production)
-2. OIDC OAuth Authentication
-
-**Only one of the authentication methods can be enabled**
-
-JWT Private Key is required for both authentication modes for session management.
-
-```yaml
-config:
+  jwtPrivateKey: "some-string-here"
   noAuth:
     enabled: true
-  oauth:
-    enabled: false
-    # Configure if using OAuth
 ```
-
-If you are installing for the first time you should set noAuth.enabled true. This will allow you to access the application without any authentication, post which you can configure OAuth and switch it on.
-
-Strongly recommended to use OAuth for authentication in production.
+-  Set the log store as s3
+- JWT Private Key is required for session management.
+- If you are installing for the first time you should set noAuth.enabled true. This will allow you to access the application without any authentication, post which you can configure OAuth and switch it on.
+- Strongly recommended to use OAuth for authentication in production.
 
 ### Blob Storage Configuration
 
 ```yaml
 logStorage:
-  s3:
+  logStore: "s3"
+  s3Compat:
     enabled: true
-    AWS_ACCESS_KEY_ID: "your_access_key"
-    AWS_SECRET_ACCESS_KEY: "your_secret_key"
-    AWS_REGION: "your_region"
-    AWS_BUCKET_NAME: "your_bucket_name"
+    LOG_STORE_ACCESS_KEY: ""
+    LOG_STORE_SECRET_KEY: ""
+    LOG_STORE_REGION: ""
+    LOG_STORE_GENERATIONS_BUCKET: ""
 ```
 
 Replace the AWS credentials and bucket information with your actual S3 storage details.
