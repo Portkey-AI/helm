@@ -10,9 +10,8 @@ Welcome to Portkey, end to end LLM Ops Platform. This documentation will guide y
 2. [Configuration](./configuration.md)
 3. [Installation](./installation.md)
 4. [Usage](./usage.md)
-5. [Upgrades](./upgrades.md)
-6. [Best Practices](./best-practices.md)
-7. [Community and Support](./community-and-support.md)
+5. [Best Practices](./best-practices.md)
+6. [Community and Support](./community-and-support.md)
 
 ### Key Features of Portkey Private Deployment:
 

@@ -104,5 +104,6 @@ backend:
 ```
 
 Similar resource configurations can be set for other components like frontend, gateway, and databases.
-
 Remember to adjust these configurations based on your specific requirements and infrastructure capabilities. It's recommended to start with these settings and fine-tune based on your usage and performance needs.
+
+NEXT: [Installation](./installation.md)

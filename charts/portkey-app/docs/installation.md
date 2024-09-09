@@ -8,6 +8,8 @@ This guide will walk you through the process of deploying Portkey to your Kubern
 1. A Kubernetes cluster (we recommend using a dedicated namespace for Portkey)
 2. Helm 3.x installed on your local machine
 3. `kubectl` configured to communicate with your cluster
+4. A configured values.yaml file (see [Configuration Guide](./configuration.md))
+5. A sample config file is provided [here](./sample-config.yaml)
 
 ### Step 1: Prepare Your Kubernetes Environment
 
@@ -71,7 +73,7 @@ To access Portkey services:
 
 3. Check the health of the backend:
    ```bash
-   curl http://<EXTERNAL-IP>/api/health
+   curl http://<EXTERNAL-IP>/
    ```
    You should receive a response indicating the service is healthy.
 
@@ -93,4 +95,6 @@ If you encounter issues:
 
 3. Ensure all config values in `portkey_config.yaml` are correct for your environment.
 
-For persistent issues, please contact our support team or consult the Portkey documentation for more advanced troubleshooting steps.
+For persistent issues, please contact our support team (support@portkey.ai) or consult the Portkey documentation.
+
+NEXT: [Usage](./usage.md)
