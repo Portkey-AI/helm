@@ -21,13 +21,13 @@ kubectl get nodes
 
 If this command returns a list of nodes, you're good to go. If not, check your Kubernetes configuration.
 
-### Step 2: Add the Portkey Helm Repository
+### Step 2: Get the Portkey Helm Chart
 
-Unless you're using local charts, add the Portkey Helm repository:
+Pull the Portkey Helm repository
 
 ```bash
-helm repo add portkey https://portkey-ai.github.io/helm/
-helm repo update
+git clone https://github.com/Portkey-AI/helm.git portkey-helm
+cd portkey-helm
 ```
 
 ### Step 3: Install Portkey
@@ -35,19 +35,14 @@ helm repo update
 Now, let's deploy Portkey using Helm:
 
 ```bash
-helm install portkey portkey/portkey \
-  --values portkey_config.yaml \
-  --namespace <your-namespace> \
-  --create-namespace \
-  --version <version> \
-  --wait
+helm install portkey ./charts/portkey-app --values /path/to/values.yaml --namespace portkey --create-namespace
 ```
 
-Replace `<your-namespace>` with your desired namespace and `<version>` with the Portkey version you want to deploy.
+Replace `<your-namespace>` with your desired namespace
 
 This command will:
 - Create the specified namespace if it doesn't exist
-- Install Portkey with the configurations from `portkey_config.yaml`
+- Install Portkey with the configurations from `values.yaml`
 - Wait for all resources to be ready before completing
 
 ### Step 4: Verify the Deployment
