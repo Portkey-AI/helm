@@ -8,6 +8,9 @@ Portkey's architecture is designed to provide a comprehensive AI application pla
 ### Multi-Gateway Deployment
 ![Multi-Gateway Deployment](./multiple-gateway-deployment.png)
 
+### Data Flow Diagram
+![Data Flow](./data-flow.png)
+
 Here's an overview of the key components:
 
 ## Services
