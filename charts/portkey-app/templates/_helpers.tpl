@@ -225,26 +225,26 @@ Template containing common environment variables that are used by several servic
 {{- if .Values.config.oauth.enabled }}
 - name: AUTH_MODE
   value: "SSO"
-- name: OAUTH_CLIENT_ID
+- name: OIDC_ISSUER
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
-      key: oauth_client_id
-- name: OAUTH_ISSUER_URL
+      key: oauthIssuerUrl
+- name: OIDC_CLIENTID
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
-      key: oauth_issuer_url
-- name: OAUTH_CLIENT_SECRET
+      key: oauthClientId
+- name: OIDC_CLIENT_SECRET
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
-      key: oauth_client_secret
-- name: OAUTH_REDIRECT_URI
+      key: oauthClientSecret
+- name: OIDC_REDIRECT_URI
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
-      key: oauth_redirect_uri
+      key: oauthRedirectURI
 - name: JWT_PRIVATE_KEY
   valueFrom:
     secretKeyRef:
@@ -358,6 +358,16 @@ Template containing common environment variables that are used by several servic
       key: logStoreExternalId
 {{- end }}
 {{- if .Values.logStorage.azure.enabled}}
+- name: AZURE_AUTH_MODE
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.gatewaySecretsName" . }}
+      key: azureAuthMode
+- name: AZURE_MANAGED_CLIENT_ID
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.gatewaySecretsName" . }}
+      key: azureManagedClientId
 - name: AZURE_STORAGE_ACCOUNT
   valueFrom:
     secretKeyRef:

@@ -85,6 +85,7 @@ gatewayIngress:
 config:
   existingSecretName: ""
   defaultGatewayURL: ""
+  defaultGatewayClientAuth: ""
   jwtPrivateKey: "abcd"
   
   noAuth:
@@ -136,6 +137,8 @@ logStorage:
     LOG_STORE_GENERATIONS_BUCKET: ""
   azure:
     enabled: false
+    AZURE_AUTH_MODE: ""
+    AZURE_MANAGED_CLIENT_ID: ""
     AZURE_STORAGE_ACCOUNT: ""
     AZURE_STORAGE_KEY: ""
     AZURE_STORAGE_CONTAINER: ""
@@ -212,6 +215,7 @@ backend:
 
 gateway:
   name: "gateway"
+  enabled: true
   containerPort: 8787
   deployment:
     autoRestart: true
@@ -343,7 +347,6 @@ dataservice:
 frontend:
   name: "frontend"
   containerPort: 80
-  defaultGatewayURL: ""
   deployment:
     autoRestart: true
     replicas: 1

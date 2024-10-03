@@ -5,12 +5,12 @@ metadata:
   name: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
   labels:
     {{- include "portkey.labels" . | nindent 4 }}
-    {{- with.Values.clickhouse.statefulSet.labels }}
+    {{- with .Values.clickhouse.statefulSet.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
     {{- include "portkey.annotations" . | nindent 4 }}
-    {{- with.Values.clickhouse.statefulSet.annotations }}
+    {{- with .Values.clickhouse.statefulSet.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
@@ -27,7 +27,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- with.Values.clickhouse.statefulSet.labels }}
+        {{- with .Values.clickhouse.statefulSet.labels }}
             {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- include "portkey.labels" . | nindent 8 }}
@@ -44,7 +44,7 @@ spec:
         - name: {{ .Values.clickhouse.name }}
           image: "{{ .Values.images.clickhouseImage.repository }}:{{ .Values.images.clickhouseImage.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.clickhouseImage.pullPolicy }}
-          {{- with.Values.clickhouse.statefulSet.command }}
+          {{- with .Values.clickhouse.statefulSet.command }}
           command:
              {{- toYaml . | nindent 12 }}
           {{- end }}

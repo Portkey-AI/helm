@@ -5,12 +5,12 @@ metadata:
   name: {{ include "portkey.fullname" . }}-{{ .Values.redis.name }}
   labels:
     {{- include "portkey.labels" . | nindent 4 }}
-    {{- with.Values.redis.statefulSet.labels }}
+    {{- with .Values.redis.statefulSet.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
     {{- include "portkey.annotations" . | nindent 4 }}
-    {{- with.Values.redis.statefulSet.annotations }}
+    {{- with .Values.redis.statefulSet.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
@@ -27,7 +27,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- with.Values.redis.statefulSet.labels }}
+        {{- with .Values.redis.statefulSet.labels }}
             {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- include "portkey.labels" . | nindent 8 }}
@@ -42,7 +42,7 @@ spec:
       serviceAccountName: {{ include "redis.serviceAccountName" . }}
       containers:
         - name: {{ .Values.redis.name }}
-          {{- with.Values.redis.statefulSet.command }}
+          {{- with .Values.redis.statefulSet.command }}
           command:
             {{- toYaml . | nindent 12 }}
           {{- end }}

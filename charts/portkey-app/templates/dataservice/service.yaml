@@ -4,12 +4,12 @@ metadata:
   name: {{ include "portkey.fullname" . }}-{{ .Values.dataservice.name }}
   labels:
     {{- include "portkey.labels" . | nindent 4 }}
-    {{- with.Values.dataservice.service.labels }}
+    {{- with .Values.dataservice.service.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
     {{- include "portkey.annotations" . | nindent 4 }}
-    {{- with.Values.dataservice.service.annotations }}
+    {{- with .Values.dataservice.service.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:

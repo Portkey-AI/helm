@@ -4,12 +4,12 @@ metadata:
   name: {{ include "portkey.fullname" . }}-{{ .Values.backend.name }}
   labels:
     {{- include "portkey.labels" . | nindent 4 }}
-    {{- with.Values.backend.service.labels }}
+    {{- with .Values.backend.service.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
     {{- include "portkey.annotations" . | nindent 4 }}
-    {{- with.Values.backend.service.annotations }}
+    {{- with .Values.backend.service.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
