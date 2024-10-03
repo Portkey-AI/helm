@@ -55,7 +55,7 @@ data:
             # Don't buffer proxied requests
             proxy_buffering off;
         }
-
+        {{- if .Values.gateway.enabled -}}
         location /api/ {
             rewrite ^/api(.*)$ $1 break;
             proxy_pass http://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }};
@@ -89,6 +89,7 @@ data:
             # Don't buffer proxied requests
             proxy_buffering off;
         }
+        {{- end}}
 
         error_page 404 /index.html;
 

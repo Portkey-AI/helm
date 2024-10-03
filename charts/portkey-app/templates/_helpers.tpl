@@ -358,6 +358,16 @@ Template containing common environment variables that are used by several servic
       key: logStoreExternalId
 {{- end }}
 {{- if .Values.logStorage.azure.enabled}}
+- name: AZURE_AUTH_MODE
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.gatewaySecretsName" . }}
+      key: azureAuthMode
+- name: AZURE_MANAGED_CLIENT_ID
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.gatewaySecretsName" . }}
+      key: azureManagedClientId
 - name: AZURE_STORAGE_ACCOUNT
   valueFrom:
     secretKeyRef:

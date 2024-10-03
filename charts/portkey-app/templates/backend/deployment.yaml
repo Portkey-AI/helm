@@ -61,10 +61,17 @@ spec:
               value: {{ include "portkey.fullname" . }}-{{ .Values.backend.name }}
             - name: POLYJUICE_FINETUNE_ENDPOINT
               value: http://{{ include "portkey.fullname" . }}-{{ .Values.dataservice.name }}:{{ .Values.dataservice.containerPort }}
+            {{- if .Values.gateway.enabled}}  
             - name: GATEWAY_BASE_URL
               value: http://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }}
             - name: GATEWAY_CACHE_MODE
               value: "SELF"
+            {{- else }}
+            - name: GATEWAY_BASE_URL
+              value: {{ .Values.config.defaultGatewayURL | quote }}
+            - name: PRIVATE_CLIENT_AUTH
+              value: {{ .Values.config.defaultGatewayClientAuth | quote }}
+            {{- end }}
             {{- with .Values.backend.deployment.extraEnv }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
