@@ -5,12 +5,12 @@ metadata:
   name: {{ include "portkey.fullname" . }}-{{ .Values.mysql.name }}
   labels:
     {{- include "portkey.labels" . | nindent 4 }}
-    {{- with.Values.mysql.service.labels }}
+    {{- with .Values.mysql.service.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
     {{- include "portkey.annotations" . | nindent 4 }}
-    {{- with.Values.mysql.service.annotations }}
+    {{- with .Values.mysql.service.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:

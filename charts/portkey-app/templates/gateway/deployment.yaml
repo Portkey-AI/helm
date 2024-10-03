@@ -4,12 +4,12 @@ metadata:
   name: {{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}
   labels:
     {{- include "portkey.labels" . | nindent 4 }}
-    {{- with.Values.gateway.deployment.labels }}
+    {{- with .Values.gateway.deployment.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
     {{- include "portkey.annotations" . | nindent 4 }}
-    {{- with.Values.gateway.deployment.annotations }}
+    {{- with .Values.gateway.deployment.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
@@ -30,7 +30,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- with.Values.gateway.deployment.labels }}
+        {{- with .Values.gateway.deployment.labels }}
             {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- include "portkey.labels" . | nindent 8 }}
@@ -46,7 +46,7 @@ spec:
       serviceAccountName: {{ include "gateway.serviceAccountName" . }}
       containers:
         - name: {{ .Values.gateway.name }}
-          {{- with.Values.gateway.deployment.command }}
+          {{- with .Values.gateway.deployment.command }}
           command:
             {{- toYaml . | nindent 12 }}
           {{- end }}

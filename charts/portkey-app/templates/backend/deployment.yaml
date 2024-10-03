@@ -4,12 +4,12 @@ metadata:
   name: {{ include "portkey.fullname" . }}-{{ .Values.backend.name }}
   labels:
     {{- include "portkey.labels" . | nindent 4 }}
-    {{- with.Values.backend.deployment.labels }}
+    {{- with .Values.backend.deployment.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
     {{- include "portkey.annotations" . | nindent 4 }}
-    {{- with.Values.backend.deployment.annotations }}
+    {{- with .Values.backend.deployment.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
@@ -30,7 +30,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- with.Values.backend.deployment.labels }}
+        {{- with .Values.backend.deployment.labels }}
             {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- include "portkey.labels" . | nindent 8 }}
@@ -46,7 +46,7 @@ spec:
       serviceAccountName: {{ include "backend.serviceAccountName" . }}
       containers:
         - name: {{ .Values.backend.name }}
-          {{- with.Values.backend.deployment.command }}
+          {{- with .Values.backend.deployment.command }}
           command:
             {{- toYaml . | nindent 12 }}
           {{- end }}
