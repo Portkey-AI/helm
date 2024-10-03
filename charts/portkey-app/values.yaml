@@ -215,7 +215,7 @@ backend:
 
 gateway:
   name: "gateway"
-  enabled: false
+  enabled: true
   containerPort: 8787
   deployment:
     autoRestart: true
