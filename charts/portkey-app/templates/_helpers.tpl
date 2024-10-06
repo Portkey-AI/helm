@@ -451,10 +451,15 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.clickhouseSecretsName" . }}
       key: clickhouse_tls
+- name: ANALYTICS_DB
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_db
 - name: ANALYTICS_LOG_TABLE
-  value: "default.generations"
+  value: "$(ANALYTICS_DB).generations"
 - name: ANALYTICS_FEEDBACK_TABLE
-  value: "default.feedbacks"
+  value: "$(ANALYTICS_DB).feedbacks"
 - name: REDIS_URL
   valueFrom:
     secretKeyRef:
