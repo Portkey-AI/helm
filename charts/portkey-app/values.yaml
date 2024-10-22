@@ -280,6 +280,7 @@ gateway:
 
 dataservice:
   name: "dataservice"
+  enabled: true
   containerPort: 8081
   finetuneBucket: ""
   logexportsBucket: ""
@@ -434,6 +435,7 @@ mysql:
     annotations: {}
     podSecurityContext: {}
     securityContext: {}
+    replicas: 1
     # resources:
     #   limits:
     #     cpu: 2000m
@@ -512,6 +514,7 @@ redis:
     annotations: {}
     podSecurityContext: {}
     securityContext: {}
+    replicas: 1
     # resources:
     #   limits:
     #     cpu: 4000m
@@ -593,6 +596,7 @@ clickhouse:
     annotations: {}
     podSecurityContext: {}
     securityContext: {}
+    replicas: 1
     # resources:
     #   limits:
     #     cpu: 1000m

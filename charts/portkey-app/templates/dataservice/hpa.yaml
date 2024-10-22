@@ -1,4 +1,4 @@
-{{- if and .Values.dataservice.autoscaling.enabled .Values.dataservice.autoscaling.createHpa }}
+{{- if and .Values.dataservice.enabled .Values.dataservice.autoscaling.enabled .Values.dataservice.autoscaling.createHpa }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:

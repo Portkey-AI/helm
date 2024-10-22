@@ -15,7 +15,7 @@ metadata:
     {{- end }}
 spec:
   serviceName: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
-  replicas: 1
+  replicas: {{ .Values.clickhouse.statefulSet.replicas | default 1 }}
   selector:
     matchLabels:
       {{- include "portkey.selectorLabels" . | nindent 6 }}
