@@ -15,7 +15,7 @@ metadata:
     {{- end }}
 spec:
   serviceName: {{ include "portkey.fullname" . }}-{{ .Values.redis.name }}
-  replicas: 1
+  replicas: {{ .Values.redis.statefulSet.replicas | default 1 }}
   selector:
     matchLabels:
       {{- include "portkey.selectorLabels" . | nindent 6 }}

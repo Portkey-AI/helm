@@ -1,3 +1,4 @@
+{{- if .Values.dataservice.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -27,3 +28,4 @@ spec:
   selector:
     {{- include "portkey.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.dataservice.name }}
+{{- end}}
