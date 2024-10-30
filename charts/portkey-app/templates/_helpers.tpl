@@ -417,7 +417,7 @@ Template containing common environment variables that are used by several servic
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.clickhouseSecretsName" . }}
-      key: clickhouse_db
+      key: store
 - name: ANALYTICS_STORE_DATABASE
   valueFrom:
     secretKeyRef:
@@ -534,8 +534,8 @@ Template containing common environment variables that are used by several servic
 {{- end -}}
 
 {{- define "gateway.serviceAccountName" -}}
-{{- if .Values.redis.serviceAccount.create -}}
-    {{ default (printf "%s-%s" (include "portkey.fullname" .) .Values.redis.name) .Values.gateway.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- if .Values.gateway.serviceAccount.create -}}
+    {{ default (printf "%s-%s" (include "portkey.fullname" .) .Values.gateway.name) .Values.gateway.serviceAccount.name | trunc 63 | trimSuffix "-" }}
 {{- else -}}
     {{ default "default" .Values.gateway.serviceAccount.name }}
 {{- end -}}
