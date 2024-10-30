@@ -6,4 +6,4 @@ maintainers:
 description: Helm chart to deploy the Portkey application and all services it depends on.
 type: application
 appVersion: "1.0.0"
-version: 1.0.0
+version: 1.0.1
