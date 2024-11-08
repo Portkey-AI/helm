@@ -506,7 +506,7 @@ redis:
     connectionUrl: ""
     tlsEnabled: ""
     mode: ""
-    store: ""
+    store: "redis"
     existingSecretName: ""
   containerPort: 6379
   statefulSet:
