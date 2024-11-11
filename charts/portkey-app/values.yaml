@@ -504,8 +504,8 @@ redis:
     # creation of a redis stateful-set and service.
     enabled: false
     connectionUrl: ""
-    tlsEnabled: ""
-    mode: ""
+    tlsEnabled: "false"
+    mode: "standalone"
     store: "redis"
     existingSecretName: ""
   containerPort: 6379
