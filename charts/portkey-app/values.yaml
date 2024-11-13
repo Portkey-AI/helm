@@ -21,6 +21,9 @@ imageCredentials:
     registry: https://index.docker.io/v1/
     username: ""
     password: ""
+    email: ""  # Optional
+    # Or use direct auth token
+    auth: ""  # Base64 encoded auth token
 imagePullSecrets: [portkeyenterpriseregistrycredentials]
 
 images:
@@ -504,8 +507,8 @@ redis:
     # creation of a redis stateful-set and service.
     enabled: false
     connectionUrl: ""
-    tlsEnabled: ""
-    mode: ""
+    tlsEnabled: "false"
+    mode: "standalone"
     store: "redis"
     existingSecretName: ""
   containerPort: 6379
