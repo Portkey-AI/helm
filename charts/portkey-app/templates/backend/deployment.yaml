@@ -72,6 +72,14 @@ spec:
             - name: PRIVATE_CLIENT_AUTH
               value: {{ .Values.config.defaultGatewayClientAuth | quote }}
             {{- end }}
+            {{- if .Values.config.controlPlaneURL }}
+            - name: CONTROL_PLANE_URL
+              value: {{ .Values.config.controlPlaneURL | quote }}
+            - name: CONTROL_PANEL_URL
+              value: {{ .Values.config.controlPlaneURL | quote }}
+            - name: ALBUS_BASE_URL
+              value: {{ .Values.config.controlPlaneURL }}/albus
+            {{- end }}
             {{- with .Values.backend.deployment.extraEnv }}
               {{- toYaml . | nindent 12 }}
             {{- end }}

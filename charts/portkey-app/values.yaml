@@ -90,16 +90,19 @@ config:
   defaultGatewayURL: ""
   defaultGatewayClientAuth: ""
   jwtPrivateKey: "abcd"
+  controlPlaneURL: ""
   
   noAuth:
     enabled: true
 
   oauth:
     enabled: false
+    oauthType: ""
     oauthClientId: ""
     oauthIssuerUrl: ""
     oauthClientSecret: ""
     oauthRedirectURI: ""
+    oauthMetadataXml: ""
 
   smtp:
     enabled: false

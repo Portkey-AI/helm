@@ -59,8 +59,7 @@ spec:
             {{- if .Values.config.oauth.enabled }}
             - name: VITE_AUTH_MODE
               value: "SSO"
-            {{- end }}
-            {{- if .Values.config.noAuth.enabled }}
+            {{- else if .Values.config.noAuth.enabled }}
             - name: VITE_AUTH_MODE
               value: "NO_AUTH"
             {{- end }}
