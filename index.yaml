@@ -1,0 +1,18 @@
+apiVersion: v1
+entries:
+  portkey:
+  - apiVersion: v2
+    appVersion: 1.0.3
+    created: "2025-01-16T12:29:24.34912992Z"
+    description: Helm chart to deploy the Portkey application and all services it
+      depends on.
+    digest: 19d1cd3cc78f47e8acf7daef26909837730098877a796271de59c7b161be74c6
+    maintainers:
+    - email: ayush@portkey.ai
+      name: Ayush
+    name: portkey
+    type: application
+    urls:
+    - https://github.com/Portkey-AI/helm/releases/download/portkey-1.0.3/portkey-1.0.3.tgz
+    version: 1.0.3
+generated: "2025-01-16T12:29:24.349138917Z"
