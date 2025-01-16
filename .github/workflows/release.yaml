@@ -7,6 +7,7 @@ on:
       - chart_releaser
     paths:
       - 'charts/**'
+  workflow_dispatch:
 
 jobs:
   release:
