@@ -1,6 +1,12 @@
 apiVersion: v2
 name: gateway
-description: Deploy Portkey Gateway
+home: https://portkey.ai/
+icon: https://avatars.githubusercontent.com/u/131141116?s=200&v=4
+description: Helm chart to deploy the Portkey AI Gateway application in a hybrid cloud environment.
 type: application
 version: 1.0.3
 appVersion: "1.0.3"
+maintainers:
+  - name: Ayush
+    email: ayush@portkey.ai
+    url: https://github.com/ayush-portkey
