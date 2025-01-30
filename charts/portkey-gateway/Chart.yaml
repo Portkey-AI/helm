@@ -1,5 +1,5 @@
 apiVersion: v2
-name: portkey-gateway
+name: gateway
 description: Deploy Portkey Gateway
 type: application
 version: 1.0.3
