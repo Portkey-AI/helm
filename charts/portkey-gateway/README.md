@@ -488,15 +488,32 @@ The following are mandatory
 ```
 
 ## Installation
-- Install the portkeyenterprise chart:
-  ``` bash
-  helm install portkey-app ./helm/enterprise --namespace portkeyai --create-namespace  
-  ```
+If this command returns a list of nodes, you're good to go. If not, check your Kubernetes configuration.
+
+1. Add the helm repo 
+   ```bash
+   helm repo add portkey-ai https://portkeyai.github.io/helm
+   ```
+
+2. Update the helm repo 
+   ```bash
+   helm repo update
+   ```
+
+3. Install the chart 
+   ```bash
+   helm upgrade --install portkey-ai portkey-ai/gateway -f ./chart/values.yaml -n portkeyai --create-namespace
+   ```
+
+4. Check the deployment 
+   ```bash
+   kubectl get pods -n portkeyai
+   ```
 
 ## Uninsatallation
 - Uninstall the chart:
   ``` bash
-  helm uninstall portkey-app --namespace portkeyai 
+  helm uninstall portkey-gateway --namespace portkeyai 
   ```
 
 ## Port Tunnel
