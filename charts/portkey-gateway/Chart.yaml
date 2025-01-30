@@ -1,11 +1,11 @@
 apiVersion: v2
-name: app
-description: Helm chart to deploy the Portkey Full Stack application and all dependent services.
+name: gateway
+description: Helm chart to deploy the Portkey AI Gateway application in a hybrid cloud environment.
 home: https://portkey.ai/
 icon: https://avatars.githubusercontent.com/u/131141116?s=200&v=4
 type: application
-appVersion: "1.0.4"
-version: 1.0.4
+version: 1.0.3
+appVersion: "1.0.3"
 maintainers:
   - name: Ayush
     email: ayush@portkey.ai

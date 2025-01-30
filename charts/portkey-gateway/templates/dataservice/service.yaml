@@ -1,0 +1,30 @@
+{{- if .Values.dataservice.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "portkeyenterprise.fullname" . }}-{{ .Values.dataservice.name }}
+  labels:
+    {{- include "dataservice.labels" . | nindent 4 }}
+    {{- with .Values.dataservice.deployment.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- include "portkeyenterprise.annotations" . | nindent 4 }}
+    {{- with .Values.dataservice.service.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.dataservice.service.type }}
+  {{- with .Values.dataservice.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  loadBalancerIP: {{ .Values.dataservice.service.loadBalancerIP }}
+  ports:
+    - name: dataservice
+      port: {{ .Values.dataservice.service.port }}
+      targetPort: dataservice
+      protocol: TCP
+  selector:
+    {{- include "dataservice.selectorLabels" . | nindent 4 }}
+{{- end -}}

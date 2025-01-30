@@ -24,7 +24,7 @@ If this command returns a list of nodes, you're good to go. If not, check your K
 
 1. Add the helm repo 
    ```bash
-   helm repo add portkey-ai https://portkeyai.github.io/portkey-app
+   helm repo add portkey-ai https://portkeyai.github.io/helm
    ```
 
 2. Update the helm repo 
@@ -34,7 +34,7 @@ If this command returns a list of nodes, you're good to go. If not, check your K
 
 3. Install the chart 
    ```bash
-   helm upgrade --install portkey-ai portkey-ai/portkey-app -f ./chart/values.yaml -n portkeyai --create-namespace
+   helm upgrade --install portkey-ai portkey-ai/app -f ./chart/values.yaml -n portkeyai --create-namespace
    ```
 
 4. Check the deployment 
