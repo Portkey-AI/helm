@@ -3,7 +3,7 @@ name: portkey
 maintainers:
   - name: Ayush
     email: ayush@portkey.ai
-description: Helm chart to deploy the Portkey application and all services it depends on.
+description: Helm chart to deploy the Portkey Full Stack application and all dependent services.
 type: application
-appVersion: "1.0.3"
-version: 1.0.3
+appVersion: "1.0.4"
+version: 1.0.4
