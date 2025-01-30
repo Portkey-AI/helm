@@ -24,7 +24,7 @@ If this command returns a list of nodes, you're good to go. If not, check your K
 
 1. Add the helm repo 
    ```bash
-   helm repo add portkey-ai https://portkeyai.github.io/helm
+   helm repo add portkey-ai https://portkey-ai.github.io/helm
    ```
 
 2. Update the helm repo 
