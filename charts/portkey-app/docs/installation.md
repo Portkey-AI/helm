@@ -11,7 +11,7 @@ This guide will walk you through the process of deploying Portkey to your Kubern
 4. A configured values.yaml file (see [Configuration Guide](./configuration.md))
 5. A sample config file is provided [here](./sample-config.yaml)
 
-### Step 1: Prepare Your Kubernetes Environment
+### Prepare Your Kubernetes Environment
 
 First, ensure you have access to your Kubernetes cluster:
 
@@ -19,49 +19,43 @@ First, ensure you have access to your Kubernetes cluster:
 kubectl get nodes
 ```
 
+## Install Chart 
 If this command returns a list of nodes, you're good to go. If not, check your Kubernetes configuration.
 
-### Step 2: Get the Portkey Helm Chart
+1. Add the helm repo 
+   ```bash
+   helm repo add portkey-ai https://portkeyai.github.io/portkey-app
+   ```
 
-Pull the Portkey Helm repository
+2. Update the helm repo 
+   ```bash
+   helm repo update
+   ```
 
-```bash
-git clone https://github.com/Portkey-AI/helm.git portkey-helm
-cd portkey-helm
-```
+3. Install the chart 
+   ```bash
+   helm upgrade --install portkey-ai portkey-ai/portkey-app -f ./chart/values.yaml -n portkeyai --create-namespace
+   ```
 
-### Step 3: Install Portkey
-
-Now, let's deploy Portkey using Helm:
-
-```bash
-helm install portkey ./charts/portkey-app --values /path/to/values.yaml --namespace portkey --create-namespace
-```
-
-Replace `<your-namespace>` with your desired namespace
+4. Check the deployment 
+   ```bash
+   kubectl get pods -n portkeyai
+   ```
 
 This command will:
 - Create the specified namespace if it doesn't exist
 - Install Portkey with the configurations from `values.yaml`
 - Wait for all resources to be ready before completing
 
-### Step 4: Verify the Deployment
-
-After installation, verify that all Portkey components are running:
-
-```bash
-kubectl get pods -n <your-namespace>
-```
-
 You should see pods for components like backend, frontend, gateway, and databases (MySQL, Redis, ClickHouse) in a "Running" state.
 
-### Step 5: Access Portkey Services
+## Access Portkey Services
 
 To access Portkey services:
 
 1. List the services:
    ```bash
-   kubectl get services -n <your-namespace>
+   kubectl get services -n portkeyai
    ```
 
 2. Note the EXTERNAL-IP for the `portkey-frontend` service. This is your entry point to the Portkey UI.
@@ -80,12 +74,12 @@ If you encounter issues:
 
 1. Check pod status:
    ```bash
-   kubectl describe pods -n <your-namespace>
+   kubectl describe pods -n portkeyai
    ```
 
 2. View logs for a specific pod:
    ```bash
-   kubectl logs <pod-name> -n <your-namespace>
+   kubectl logs <pod-name> -n portkeyai
    ```
 
 3. Ensure all config values in `portkey_config.yaml` are correct for your environment.
