@@ -1,0 +1,246 @@
+# Default values for portkeyenterprise.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+images:
+  gatewayImage:
+    repository: "docker.io/portkeyai/gateway_enterprise"
+    pullPolicy: IfNotPresent
+    tag: "1.10.0"
+  dataserviceImage:
+    repository: "docker.io/portkeyai/data-service"
+    pullPolicy: IfNotPresent
+    tag: "1.0.6"
+
+imagePullSecrets: [portkeyenterpriseregistrycredentials]
+nameOverride: ""
+fullnameOverride: ""
+
+imageCredentials:
+- name: portkeyenterpriseregistrycredentials
+  create: true
+  registry: https://index.docker.io/v1/
+  username: <docker-user>
+  password: <docker-pwd>
+  email: ""  # Optional
+  # Or use direct auth token
+  auth: ""  # Base64 encoded auth token
+
+useVaultInjection: false  # Set this to true to use Vault injection
+
+vaultConfig:
+  vaultHost: vault.hashicorp.com
+  secretPath: "path/to/your/secret"
+  role: "your-vault-role"
+
+environment:
+  # Specify whether environment configuration should be deployed
+  create: true
+  # Specify whether environment configuration should be deployed as a Secret or a ConfigMap
+  secret: true
+  # Specify the parameters required by Portkey Enterprise
+  data:
+    SERVICE_NAME: portkeyenterprise
+    PORT: "8787"
+    LOG_STORE: 
+    MONGO_DB_CONNECTION_URL: 
+    MONGO_DATABASE: 
+    MONGO_COLLECTION_NAME:
+    MONGO_GENERATIONS_HOOKS_COLLECTION_NAME:
+    LOG_STORE_REGION: 
+    LOG_STORE_ACCESS_KEY: 
+    LOG_STORE_SECRET_KEY: 
+    LOG_STORE_GENERATIONS_BUCKET: 
+    LOG_STORE_BASEPATH: 
+    LOG_STORE_AWS_ROLE_ARN:
+    LOG_STORE_AWS_EXTERNAL_ID:
+    AWS_ASSUME_ROLE_ACCESS_KEY_ID:
+    AWS_ASSUME_ROLE_SECRET_ACCESS_KEY:
+    AWS_ASSUME_ROLE_REGION:
+    AZURE_AUTH_MODE: 
+    AZURE_MANAGED_CLIENT_ID: 
+    AZURE_STORAGE_ACCOUNT: 
+    AZURE_STORAGE_KEY: 
+    AZURE_STORAGE_CONTAINER:
+    ANALYTICS_STORE: clickhouse
+    ANALYTICS_STORE_ENDPOINT: 
+    ANALYTICS_STORE_USER: 
+    ANALYTICS_STORE_PASSWORD: 
+    ANALYTICS_LOG_TABLE: 
+    ANALYTICS_FEEDBACK_TABLE: 
+    CACHE_STORE: redis
+    REDIS_URL: redis://redis:6379
+    REDIS_TLS_ENABLED: "false"
+    REDIS_MODE: 
+    PORTKEY_CLIENT_AUTH: 
+    ORGANISATIONS_TO_SYNC: 
+    FINETUNES_BUCKET: 
+    LOG_EXPORTS_BUCKET: 
+    FINETUNES_AWS_ROLE_ARN: 
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: NodePort
+  port: 8787
+  additionalLabels: {}
+  annotations: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: /v1/health
+    port: 8787
+  initialDelaySeconds: 30
+  periodSeconds: 60
+  timeoutSeconds: 5
+  failureThreshold: 5
+readinessProbe:
+  httpGet:
+    path: /v1/health
+    port: 8787
+  initialDelaySeconds: 30
+  periodSeconds: 60
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: shared-folder
+#   configMap:
+#     name: resource-config
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: shared-folder
+#   mountPath: /etc/shared/document_db.pem
+#   subPath: document_db.pem
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# if you want to restart instance automatically
+autoRestart: false
+
+dataservice:
+  name: "dataservice"
+  enabled: false
+  containerPort: 8081
+  finetuneBucket: ""
+  logexportsBucket: ""
+  deployment:
+    autoRestart: true
+    replicas: 1
+    labels: {}
+    selectorLabels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    resources: {}
+    startupProbe:
+      httpGet:
+        path: /health
+        port: 8081
+      initialDelaySeconds: 60
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8081
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 8081
+      failureThreshold: 3
+      periodSeconds: 10
+      timeoutSeconds: 1
+    extraContainerConfig: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    volumes: []
+    volumeMounts: []
+  service:
+    type: ClusterIP
+    port: 8081
+    labels: {}
+    annotations: {}
+    loadBalancerSourceRanges: []
+    loadBalancerIP: ""
+  serviceAccount:
+    create: true
+    name: ""
+    labels: {}
+    annotations: {}
+  autoscaling:
+    enabled: false
+    createHpa: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80

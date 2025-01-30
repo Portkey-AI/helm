@@ -1,0 +1,6 @@
+apiVersion: v2
+name: portkey-gateway
+description: Deploy Portkey Gateway
+type: application
+version: 1.0.3
+appVersion: "1.0.3"
