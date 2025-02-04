@@ -61,6 +61,8 @@ spec:
               value: {{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}
             - name: GATEWAY_CACHE_MODE
               value: "SELF"
+            - name: DATASERVICE_BASEPATH
+              value: http://{{ include "portkey.fullname" . }}-{{ .Values.dataservice.name }}:{{ .Values.dataservice.containerPort }}
             {{- with .Values.gateway.deployment.extraEnv }}
               {{- toYaml . | nindent 12 }}
             {{- end }}

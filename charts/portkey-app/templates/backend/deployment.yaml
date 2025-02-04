@@ -69,7 +69,7 @@ spec:
             {{- else }}
             - name: GATEWAY_BASE_URL
               value: {{ .Values.config.defaultGatewayURL | quote }}
-            - name: PRIVATE_CLIENT_AUTH
+            - name: PORTKEY_CLIENT_AUTH
               value: {{ .Values.config.defaultGatewayClientAuth | quote }}
             {{- end }}
             {{- if .Values.config.controlPlaneURL }}
