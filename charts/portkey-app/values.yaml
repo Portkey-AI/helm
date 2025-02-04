@@ -52,11 +52,11 @@ images:
   redisImage:
     repository: "docker.io/redis"
     pullPolicy: IfNotPresent
-    tag: "alpine"
+    tag: "7.2-alpine"
   clickhouseImage:
     repository: "docker.io/clickhouse/clickhouse-server"
     pullPolicy: IfNotPresent
-    tag: "latest"
+    tag: "24.10-alpine"
 
 ingress:
   enabled: true
