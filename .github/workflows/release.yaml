@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'charts/portkey-app/Chart.yaml'
+      - 'charts/portkey-gateway/Chart.yaml'
 
 jobs:
   release:
@@ -35,7 +36,8 @@ jobs:
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
         with:
-          charts_dir: charts/portkey-app
+          skip_existing: true
+          charts_dir: charts
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           CR_GENERATE_RELEASE_NOTES: true
