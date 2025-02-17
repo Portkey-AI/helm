@@ -272,6 +272,10 @@ Common Environment Env as Map
 {{- end -}}
 {{- include "portkeyenterprise.renderEnvVar" (list "NODE_ENV" "production") | nindent 0 }}
 {{- include "portkeyenterprise.renderEnvVar" (list "HYBRID_DEPLOYMENT" "ON") | nindent 0 }}
+{{- if .Values.dataservice.env.DEBUG_ENABLED }}
+{{- include "portkeyenterprise.renderEnvVar" (list "NODE_DEBUG" "dataservice:*") | nindent 0 }}
+{{- end }}
+{{- include "portkeyenterprise.renderEnvVar" (list "SERVICE_NAME" .Values.dataservice.env.SERVICE_NAME) | nindent 0 }}
 {{- range $key, $value := $commonEnv }}
 {{- if has $key (list "ANALYTICS_STORE" "ANALYTICS_STORE_ENDPOINT" "ANALYTICS_STORE_USER" "ANALYTICS_STORE_PASSWORD" "ANALYTICS_LOG_TABLE" "FINETUNES_BUCKET" "FINETUNES_AWS_ROLE_ARN" "LOG_EXPORTS_BUCKET") }}
 {{- include "portkeyenterprise.renderEnvVar" (list $key $value) | nindent 0 }}

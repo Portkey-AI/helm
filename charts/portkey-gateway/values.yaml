@@ -189,6 +189,9 @@ dataservice:
   containerPort: 8081
   finetuneBucket: ""
   logexportsBucket: ""
+  env:
+    DEBUG_ENABLED: false
+    SERVICE_NAME: "portkeyenterprise-dataservice"
   deployment:
     autoRestart: true
     replicas: 1
