@@ -53,7 +53,7 @@ spec:
           {{- end }}
           env:
             - name: GATEWAY_BASE_URL
-              value: http://{{ include "portkeyenterprise.fullname" . }}:{{ .Values.service.port }}
+              value: {{ include "portkey.containerProtocol" . }}://{{ include "portkeyenterprise.fullname" . }}:{{ .Values.service.port }}
             {{- include "dataservice.commonEnv" . | nindent 12 }}
             {{- include "controlPlane.commonEnv" . | nindent 12 }}
             {{- include "cacheStore.commonEnv" . | nindent 12 }}

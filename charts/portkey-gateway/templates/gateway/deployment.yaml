@@ -59,7 +59,7 @@ spec:
           env:
             {{- if .Values.dataservice.enabled }}
               - name: DATASERVICE_BASEPATH
-                value: http://{{ include "portkeyenterprise.fullname" . }}-{{ .Values.dataservice.name }}:{{ .Values.dataservice.service.port }}
+                value: {{ include "portkey.containerProtocol" . }}://{{ include "portkeyenterprise.fullname" . }}-{{ .Values.dataservice.name }}:{{ .Values.dataservice.service.port }}
             {{- end }}
             {{- include "portkeyenterprise.commonEnv" . | nindent 12 }}
           livenessProbe:
