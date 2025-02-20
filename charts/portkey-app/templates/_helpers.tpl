@@ -571,3 +571,30 @@ Template containing common environment variables that are used by several servic
     {{ default "default" .Values.gateway.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+{{- define "apm.commonEnv" -}}
+- name: ENABLE_APM
+  value: {{ if .Values.apm.enabled }} "true" {{ else }} "false" {{ end }}
+- name: ENABLE_GRAFANA
+  value: {{ if .Values.apm.grafana.enabled }} "true" {{ else }} "false" {{ end }}
+- name: ENABLE_PROMETHEUS
+  value: {{ if .Values.apm.grafana.prometheus.enabled }} "true" {{ else }} "false" {{ end }}
+{{- if .Values.apm.grafana.prometheus.enabled }}
+- name: PROMETHEUS_GATEWAY_URL
+  value: {{ .Values.apm.grafana.prometheus.host }}
+- name: PROMETHEUS_GATEWAY_AUTH
+  value: {{ .Values.apm.grafana.prometheus.auth }}
+{{- end }}
+- name: PROMETHEUS_PUSH_ENABLED
+  value: {{ if .Values.apm.grafana.prometheus.pushEnabled }} "true" {{ else }} "false" {{ end }}
+- name: ENABLE_LOKI
+  value: {{ if .Values.apm.grafana.loki.enabled }} "true" {{ else }} "false" {{ end }}
+{{- if .Values.apm.grafana.loki.enabled }}
+- name: LOKI_HOST
+  value: {{ .Values.apm.grafana.loki.host }}
+- name: LOKI_AUTH
+  value: {{ .Values.apm.grafana.loki.auth }}
+{{- end }}
+- name: LOKI_PUSH_ENABLED
+  value: {{ if .Values.apm.grafana.loki.pushEnabled }} "true" {{ else }} "false" {{ end }}
+{{- end }}

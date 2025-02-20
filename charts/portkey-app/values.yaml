@@ -665,3 +665,16 @@ clickhouse:
     labels: {}
     annotations: {}
 
+apm:
+  grafana: 
+    enabled: false
+    prometheus: 
+      enabled: false
+      host: ""
+      auth: ""
+      pushEnabled: false
+    loki:
+      enabled: false
+      host: ""
+      auth: ""
+      pushEnabled: false
