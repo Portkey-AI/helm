@@ -78,6 +78,7 @@ spec:
             {{- with .Values.commonEnv }}
               {{ toYaml . | nindent 12 }}
             {{- end }}
+            {{- include "apm.commonEnv" . | nindent 12 }}
           image: "{{ .Values.images.dataserviceImage.repository }}:{{ .Values.images.dataserviceImage.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.dataserviceImage.pullPolicy }}
           ports:

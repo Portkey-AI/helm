@@ -69,6 +69,7 @@ spec:
             {{- with .Values.commonEnv }}
               {{ toYaml . | nindent 12 }}
             {{- end }}
+            {{- include "apm.commonEnv" . | nindent 12 }}
           image: "{{ .Values.images.frontendImage.repository }}:{{ .Values.images.frontendImage.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.frontendImage.pullPolicy }}
           command: ["/bin/sh", "-c"]
