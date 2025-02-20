@@ -228,6 +228,13 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.mysqlSecretsName" . }}
       key: mysql_password
+{{- if .Values.mysql.external.ssl.enabled }}
+- name: DB_SSL
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.mysqlSecretsName" . }}
+      key: mysql_ssl_mode
+{{- end }}
 {{ if not .Values.mysql.external.enabled }}
 - name: MYSQL_ROOT_PASSWORD
   valueFrom:

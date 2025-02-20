@@ -423,6 +423,9 @@ mysql:
     password: ""
     database: ""
     existingSecretName: ""
+    ssl: 
+      enabled: false
+      mode: "Amazon RDS"
     # Use this to set the root password for the mysql instance, only when NOT using an external Mysql.
     rootPassword: "" # Only used when NOT using an external Mysql.
   containerHttpPort: 3306
