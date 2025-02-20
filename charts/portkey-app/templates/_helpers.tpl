@@ -83,6 +83,13 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+HTTP/HTTPS protocol
+*/}}
+{{- define "portkey.containerProtocol" -}}
+{{ default "http" .Values.config.containerProtocol }}
+{{- end }}
+
+{{/*
 Name of the secret containing the secrets for this chart. This can be overridden by a secrets file created by
 the user or some other secret provisioning mechanism
 */}}
@@ -436,7 +443,7 @@ Template containing common environment variables that are used by several servic
       key: bedrockAssumedRegion
 {{- end }}
 - name: ALBUS_BASEPATH
-  value: http://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}:{{ .Values.backend.containerPort }}
+  value: {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}:{{ .Values.backend.containerPort }}
 - name: ANALYTICS_STORE
   valueFrom:
     secretKeyRef:

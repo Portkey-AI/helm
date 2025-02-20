@@ -24,7 +24,7 @@ data:
 
         location /albus/ {
             rewrite ^/albus(.*)$ $1 break;
-            proxy_pass http://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}:{{ .Values.backend.containerPort }};
+            proxy_pass {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}:{{ .Values.backend.containerPort }};
              # Pass the original host header
             proxy_set_header Host $http_host;
             
@@ -58,7 +58,7 @@ data:
         {{- if .Values.gateway.enabled -}}
         location /api/ {
             rewrite ^/api(.*)$ $1 break;
-            proxy_pass http://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }};
+            proxy_pass {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }};
              # Pass the original host header
             proxy_set_header Host $http_host;
             
@@ -99,4 +99,4 @@ data:
         add_header X-Content-Type-Options "nosniff";
     }
   config.js: |
-    window.APP_CONFIG = { VITE_API_URL: "http://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }}", VITE_BASE_URL: "/albus", VITE_PRIVATE_DEPLOYMENT: "ON", VITE_AUTH_MODE: "{{- if .Values.config.oauth.enabled }}SSO{{- end }}{{- if .Values.config.noAuth.enabled }}NO_AUTH{{- end }}" };
+    window.APP_CONFIG = { VITE_API_URL: "{{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }}", VITE_BASE_URL: "/albus", VITE_PRIVATE_DEPLOYMENT: "ON", VITE_AUTH_MODE: "{{- if .Values.config.oauth.enabled }}SSO{{- end }}{{- if .Values.config.noAuth.enabled }}NO_AUTH{{- end }}" };

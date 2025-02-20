@@ -91,6 +91,7 @@ config:
   defaultGatewayClientAuth: ""
   jwtPrivateKey: "abcd"
   controlPlaneURL: ""
+  containerProtocol: "http"
   
   noAuth:
     enabled: true
