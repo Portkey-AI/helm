@@ -67,15 +67,6 @@ ingress:
   labels: {}
   tls: []
 
-apiIngress:
-  enabled: true
-  hostname: ""
-  subdomain: ""
-  ingressClassName: "nginx"
-  annotations: {}
-  labels: {}
-  tls: []
-
 gatewayIngress:
   enabled: true
   hostname: ""

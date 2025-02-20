@@ -1,0 +1,30 @@
+{{- if .Values.gatewayIngress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+  annotations:
+    {{- include "portkey.annotations" . | nindent 4 }}
+    {{- with .Values.gatewayIngress.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.gatewayIngress.ingressClassName }}
+  rules:
+    - host: {{ .Values.gatewayIngress.hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}
+                port:
+                  number: {{ .Values.gateway.service.port }}
+  {{- if .Values.gatewayIngress.tls }}
+  tls:
+    {{- toYaml .Values.gatewayIngress.tls | nindent 4 }}
+  {{- end }}
+{{- end }} 
