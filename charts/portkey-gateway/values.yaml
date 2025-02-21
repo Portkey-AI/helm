@@ -168,6 +168,8 @@ volumeMounts: []
 #   mountPath: /etc/shared/document_db.pem
 #   subPath: document_db.pem
 
+extraContainerConfig: {}
+
 nodeSelector: {}
 
 tolerations: []
