@@ -196,6 +196,8 @@ backend:
       periodSeconds: 10
       timeoutSeconds: 1
     extraContainerConfig: {}
+    extraEnv: []
+    sidecars: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -261,6 +263,8 @@ gateway:
       periodSeconds: 10
       timeoutSeconds: 1
     extraContainerConfig: {}
+    extraEnv: []
+    sidecars: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -328,6 +332,8 @@ dataservice:
       periodSeconds: 10
       timeoutSeconds: 1
     extraContainerConfig: {}
+    extraEnv: []
+    sidecars: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
