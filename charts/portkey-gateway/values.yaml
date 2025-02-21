@@ -113,17 +113,11 @@ service:
 
 ingress:
   enabled: false
-  className: ""
+  hostname: ""
+  ingressClassName: "nginx"
   annotations: {}
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
+  labels: {}
   tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
