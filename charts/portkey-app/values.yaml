@@ -140,6 +140,15 @@ logStorage:
     AZURE_STORAGE_ACCOUNT: ""
     AZURE_STORAGE_KEY: ""
     AZURE_STORAGE_CONTAINER: ""
+  encryptionSettings:
+    enabled: false
+    SSE_ENCRYPTION_TYPE: "aws:kms" # AES256, aws:kms, aws:kms:dsse
+    KMS_KEY_ID: ""
+    KMS_BUCKET_KEY_ENABLED: ""
+    KMS_ENCRYPTION_CONTEXT: ""
+    KMS_ENCRYPTION_ALGORITHM: ""
+    KMS_ENCRYPTION_CUSTOMER_KEY: ""
+    KMS_ENCRYPTION_CUSTOMER_KEY_MD5: ""
 
 bedrockAssumed:
   enabled: false

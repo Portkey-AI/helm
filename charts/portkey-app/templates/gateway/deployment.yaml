@@ -70,6 +70,9 @@ spec:
               {{ toYaml . | nindent 12 }}
             {{- end }}
             {{- include "apm.commonEnv" . | nindent 12 }}
+            {{- if .Values.logStorage.encryptionSettings.enabled }}
+            {{- include "logStorage.encryptionSettings.commonEnv" . | nindent 12 }}
+            {{- end }}
           image: "{{ .Values.images.gatewayImage.repository }}:{{ .Values.images.gatewayImage.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.gatewayImage.pullPolicy }}
           ports:
