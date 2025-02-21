@@ -606,21 +606,21 @@ Template containing common environment variables that are used by several servic
   value: {{ if .Values.apm.grafana.loki.pushEnabled }} "true" {{ else }} "false" {{ end }}
 {{- end }}
 
-{{- define "logStorage.encryption.commonEnv" -}}
-{{- if .Values.logStorage.encryption.enabled }}
+{{- define "logStorage.encryptionSettings.commonEnv" -}}
+{{- if .Values.logStorage.encryptionSettings.enabled }}
 - name: SSE_ENCRYPTION_TYPE
-  value: {{ .Values.logStorage.encryption.SSE_ENCRYPTION_TYPE }}
+  value: {{ .Values.logStorage.encryptionSettings.SSE_ENCRYPTION_TYPE }}
 - name: KMS_KEY_ID
-  value: {{ .Values.logStorage.encryption.KMS_KEY_ID }}
+  value: {{ .Values.logStorage.encryptionSettings.KMS_KEY_ID }}
 - name: KMS_BUCKET_KEY_ENABLED
-  value: {{ .Values.logStorage.encryption.KMS_BUCKET_KEY_ENABLED }}
+  value: {{ .Values.logStorage.encryptionSettings.KMS_BUCKET_KEY_ENABLED }}
 - name: KMS_ENCRYPTION_CONTEXT
-  value: {{ .Values.logStorage.encryption.KMS_ENCRYPTION_CONTEXT }}
+  value: {{ .Values.logStorage.encryptionSettings.KMS_ENCRYPTION_CONTEXT }}
 - name: KMS_ENCRYPTION_ALGORITHM
-  value: {{ .Values.logStorage.encryption.KMS_ENCRYPTION_ALGORITHM }}  
+  value: {{ .Values.logStorage.encryptionSettings.KMS_ENCRYPTION_ALGORITHM }}  
 - name: KMS_ENCRYPTION_CUSTOMER_KEY
-  value: {{ .Values.logStorage.encryption.KMS_ENCRYPTION_CUSTOMER_KEY }}
+  value: {{ .Values.logStorage.encryptionSettings.KMS_ENCRYPTION_CUSTOMER_KEY }}
 - name: KMS_ENCRYPTION_CUSTOMER_KEY_MD5
-  value: {{ .Values.logStorage.encryption.KMS_ENCRYPTION_CUSTOMER_KEY_MD5 }}
+  value: {{ .Values.logStorage.encryptionSettings.KMS_ENCRYPTION_CUSTOMER_KEY_MD5 }}
 {{- end }}
 {{- end }}
