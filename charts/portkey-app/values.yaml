@@ -219,6 +219,7 @@ backend:
     minReplicas: 1
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
 
 gateway:
   name: "gateway"
@@ -286,7 +287,8 @@ gateway:
     minReplicas: 1
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
-
+    targetMemoryUtilizationPercentage: 80
+    
 dataservice:
   name: "dataservice"
   enabled: true
@@ -354,7 +356,8 @@ dataservice:
     createHpa: false
     minReplicas: 1
     maxReplicas: 5
-    targetCPUUtilizationPercentage: 80
+    targetCPUUtilizationPercentage: 80  
+    targetMemoryUtilizationPercentage: 80
 
 frontend:
   name: "frontend"
@@ -410,6 +413,8 @@ frontend:
     minReplicas: 1
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
   service:
     type: LoadBalancer
     httpPort: 80
