@@ -29,4 +29,20 @@ spec:
           type: Utilization
           averageUtilization: {{ .Values.gateway.autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: {{ .Values.gateway.autoscaling.behavior.scaleUp.stabilizationWindowSeconds | default 0 }}
+      policies:
+      - type: Pods
+        value: {{ .Values.gateway.autoscaling.behavior.scaleUp.podScaleUpValue | default 4 }}
+        periodSeconds: {{ .Values.gateway.autoscaling.behavior.scaleUp.periodSeconds | default 15 }}
+      - type: Percent
+        value: {{ .Values.gateway.autoscaling.behavior.scaleUp.percentScaleUpValue | default 100 }}
+        periodSeconds: {{ .Values.gateway.autoscaling.behavior.scaleUp.periodSeconds | default 15 }}
+    scaleDown:
+      stabilizationWindowSeconds: {{ .Values.gateway.autoscaling.behavior.scaleDown.stabilizationWindowSeconds | default 300 }}
+      policies:
+      - type: Pods
+        value: {{ .Values.gateway.autoscaling.behavior.scaleDown.podScaleDownValue | default 1 }}
+        periodSeconds: {{ .Values.gateway.autoscaling.behavior.scaleDown.periodSeconds | default 60 }}
 {{- end }}
