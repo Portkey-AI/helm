@@ -243,7 +243,7 @@ gateway:
       httpGet:
         path: /v1/health
         port: 8787
-      initialDelaySeconds: 5
+      initialDelaySeconds: 3
       failureThreshold: 3
       periodSeconds: 10
       timeoutSeconds: 1
@@ -282,8 +282,8 @@ gateway:
     labels: {}
     annotations: {}
   autoscaling:
-    enabled: false
-    createHpa: false
+    enabled: true
+    createHpa: true
     minReplicas: 2
     maxReplicas: 20
     targetCPUUtilizationPercentage: 60
