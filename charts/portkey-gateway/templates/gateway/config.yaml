@@ -1,4 +1,4 @@
-{{- if and .Values.environment.create -}}
+{{- if .Values.environment.create -}}
 {{- if .Values.environment.secret -}}
 apiVersion: v1
 kind: Secret

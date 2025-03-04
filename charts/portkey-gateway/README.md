@@ -6,7 +6,7 @@ Helm's [documentation](https://helm.sh/docs) to get started.
 ## Setup
 Update the following details in `values.yaml`
 1. Use Docker token details shared
-```
+```yaml
 imageCredentials:
 - name: portkeyenterpriseregistrycredentials
   create: true
@@ -510,7 +510,7 @@ If this command returns a list of nodes, you're good to go. If not, check your K
    kubectl get pods -n portkeyai
    ```
 
-## Uninsatallation
+## Uninstalling
 - Uninstall the chart:
   ``` bash
   helm uninstall portkey-gateway --namespace portkeyai 
