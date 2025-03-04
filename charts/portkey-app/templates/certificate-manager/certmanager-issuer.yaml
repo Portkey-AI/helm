@@ -1,0 +1,11 @@
+{{- if and .Values.certManager.enabled .Values.certManager.tls.issuer.create }}
+apiVersion: cert-manager.io/v1
+kind: {{ .Values.certManager.tls.issuer.kind }}
+metadata:
+  name: {{ .Values.certManager.tls.issuer.name | quote }}
+  {{- if eq .Values.certManager.tls.issuer.kind "Issuer" }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+spec:
+  selfSigned: {}
+{{- end }} 

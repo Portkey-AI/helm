@@ -624,3 +624,12 @@ Template containing common environment variables that are used by several servic
   value: {{ .Values.logStorage.encryptionSettings.KMS_ENCRYPTION_CUSTOMER_KEY_MD5 }}
 {{- end }}
 {{- end }}
+
+{{- define "certmanager.tls.env" -}}
+{{- if and .Values.certManager.enabled .Values.certManager.tls.enabled }}
+ - name: TLS_CERT_PATH
+    value: "{{ .Values.certManager.tls.secret.mountPath }}/{{ .Values.certManager.tls.secret.certFile }}"
+ - name: TLS_KEY_PATH
+    value: "{{ .Values.certManager.tls.secret.mountPath }}/{{ .Values.certManager.tls.secret.keyFile }}"
+{{- end }}
+{{- end }}

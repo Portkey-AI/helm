@@ -1,1 +1,2 @@
 portkey_config*.yaml
+charts/portkey-app/charts/*

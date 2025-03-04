@@ -104,9 +104,14 @@ spec:
             {{- toYaml .Values.dataservice.deployment.resources | nindent 12 }}
           securityContext:
             {{- toYaml .Values.dataservice.deployment.securityContext | nindent 12 }}
-          {{- with .Values.dataservice.deployment.volumeMounts }}
           volumeMounts:
-              {{- toYaml . | nindent 12 }}
+          {{- with .Values.dataservice.deployment.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if and .Values.certManager.enabled .Values.certManager.tls.enabled }}
+            - name: tls-certs
+              mountPath: {{ .Values.certManager.tls.secret.mountPath | quote }}
+              readOnly: true
           {{- end }}
           {{- with .Values.dataservice.deployment.extraContainerConfig }}
             {{- toYaml . | nindent 10 }}
@@ -126,8 +131,13 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.dataservice.deployment.volumes }}
       volumes:
+      {{- with .Values.dataservice.deployment.volumes }}
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if and .Values.certManager.enabled .Values.certManager.tls.enabled }}
+        - name: tls-certs
+          secret:
+            secretName: {{ .Values.certManager.tls.certificate.secretName | quote }}
       {{- end }}
 {{- end -}}

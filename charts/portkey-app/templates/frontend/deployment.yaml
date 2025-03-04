@@ -106,10 +106,13 @@ spec:
             {{- with .Values.frontend.deployment.volumeMounts }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
+            {{- if and .Values.certManager.enabled .Values.certManager.tls.enabled }}
+            - name: tls-certs
+              mountPath: {{ .Values.certManager.tls.secret.mountPath | quote }}
+              readOnly: true
+            {{- end }}
             - name: app-config
               mountPath: /config
-            # - name: config-volume
-            #   mountPath: /config
           {{- with .Values.frontend.deployment.extraContainerConfig }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -137,3 +140,11 @@ spec:
             #     path: nginx.conf
             #   - key: config.js
             #     path: config.js
+        {{- with .Values.frontend.deployment.volumes }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- if and .Values.certManager.enabled .Values.certManager.tls.enabled }}
+        - name: tls-certs
+          secret:
+            secretName: {{ .Values.certManager.tls.certificate.secretName | quote }}
+      {{- end }}

@@ -690,3 +690,24 @@ apm:
       host: ""
       auth: ""
       pushEnabled: false
+
+# Automatic certificate configuration for internal HTTPS pod communication using cert-manager.
+certManager:
+  enabled: true   # Set to true to enable automatic certificate issuance (requires cert-manager dependency)
+  installCRDs: true
+  tls:
+    enabled: true
+    issuer:
+      create: true
+      name: "portkey-app-ca"    # Name of the issuer or cluster issuer to request certificates from
+      kind: "Issuer"  # Typically "Issuer" or "ClusterIssuer" based on your cert-manager setup
+    certificate:
+      name: "portkey-app-tls"
+      secretName: "portkey-app-tls-certs"  # Secret name to store the TLS certificate and key
+      duration: 365d
+      renewBefore: 15d
+      dnsNames: []  # List any additional DNS names to include (e.g., ["portkey-app", "portkey-app.namespace.svc"])
+    secret:
+      mountPath: "/etc/portkey-app/tls"
+      certFile: "tls.crt"
+      keyFile: "tls.key"

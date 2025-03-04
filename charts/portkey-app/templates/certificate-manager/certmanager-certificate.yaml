@@ -1,0 +1,23 @@
+{{- if and .Values.certManager.enabled .Values.certManager.tls.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Values.certManager.tls.certificate.name | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  secretName: {{ .Values.certManager.tls.certificate.secretName | quote }}
+  duration: {{ .Values.certManager.tls.certificate.duration | quote }}
+  renewBefore: {{ .Values.certManager.tls.certificate.renewBefore | quote }}
+  dnsNames:
+{{- if .Values.certManager.tls.certificate.dnsNames }}
+{{ toYaml .Values.certManager.tls.certificate.dnsNames | indent 4 }}
+{{- else }}
+    - {{ include "portkey.fullname" . }}.svc
+{{- end }}
+  issuerRef:
+    name: {{ .Values.certManager.tls.issuer.name | quote }}
+    kind: {{ .Values.certManager.tls.issuer.kind | quote }}
+  usages:
+    - digital signature
+    - key encipherment
+{{- end }} 
