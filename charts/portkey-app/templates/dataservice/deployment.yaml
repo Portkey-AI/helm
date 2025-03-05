@@ -82,6 +82,7 @@ spec:
             {{- if .Values.logStorage.encryptionSettings.enabled }}
             {{- include "logStorage.encryptionSettings.commonEnv" . | nindent 12 }}
             {{- end }}
+            {{- include "appTLSCerts.env" . | nindent 12 }}
           image: "{{ .Values.images.dataserviceImage.repository }}:{{ .Values.images.dataserviceImage.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.dataserviceImage.pullPolicy }}
           ports:
@@ -104,10 +105,11 @@ spec:
             {{- toYaml .Values.dataservice.deployment.resources | nindent 12 }}
           securityContext:
             {{- toYaml .Values.dataservice.deployment.securityContext | nindent 12 }}
-          {{- with .Values.dataservice.deployment.volumeMounts }}
           volumeMounts:
-              {{- toYaml . | nindent 12 }}
+          {{- with .Values.dataservice.deployment.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "appTLSCerts.volumeMounts" . | nindent 12 }}
           {{- with .Values.dataservice.deployment.extraContainerConfig }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -126,8 +128,9 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.dataservice.deployment.volumes }}
       volumes:
+      {{- with .Values.dataservice.deployment.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "appTLSCerts.volumes" . | nindent 8 }}
 {{- end -}}

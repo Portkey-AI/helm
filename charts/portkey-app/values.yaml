@@ -700,3 +700,24 @@ apm:
       host: ""
       auth: ""
       pushEnabled: false
+
+
+certmanager:
+  enabled: true   
+  installCRDs: true
+  serviceAccount:
+    name: "cert-manager"
+
+appTLSCerts:
+  name: "app-tls"
+  issuer:
+    name: "app-tls-issuer"
+    kind: "Issuer"
+  certificate:
+    name: "app-tls-certificate"
+    duration: 2160h
+    renewBefore: 360h
+    dnsNames: []
+    mountPath: "/config/tls"
+    certFile: "tls.crt"
+    keyFile: "tls.key"

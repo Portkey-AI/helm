@@ -624,3 +624,28 @@ Template containing common environment variables that are used by several servic
   value: {{ .Values.logStorage.encryptionSettings.KMS_ENCRYPTION_CUSTOMER_KEY_MD5 }}
 {{- end }}
 {{- end }}
+
+{{- define "appTLSCerts.env" -}}
+{{- if .Values.certmanager.enabled }}
+- name: TLS_CERT_PATH
+  value: "{{ .Values.appTLSCerts.certificate.mountPath }}/{{ .Values.appTLSCerts.certificate.certFile }}"
+- name: TLS_KEY_PATH
+  value: "{{ .Values.appTLSCerts.certificate.mountPath }}/{{ .Values.appTLSCerts.certificate.keyFile }}"
+{{- end }}
+{{- end }}
+
+{{- define "appTLSCerts.volumes" -}}
+{{- if .Values.certmanager.enabled }}
+- name: {{ .Values.appTLSCerts.certificate.name }}
+  secret:
+    secretName: {{ .Release.Name }}-certmanager-webhook-ca
+{{- end }}
+{{- end }}
+
+{{- define "appTLSCerts.volumeMounts" -}}
+{{- if .Values.certmanager.enabled }}
+- name: {{ .Values.appTLSCerts.certificate.name }}
+  mountPath: {{ .Values.appTLSCerts.certificate.mountPath | quote }}
+  readOnly: true
+{{- end }}
+{{- end }}
