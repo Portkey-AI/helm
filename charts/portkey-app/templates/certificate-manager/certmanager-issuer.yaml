@@ -1,11 +1,15 @@
-{{- if and .Values.certManager.enabled .Values.certManager.tls.issuer.create }}
+{{- if and .Values.certmanager.enabled }}
 apiVersion: cert-manager.io/v1
-kind: {{ .Values.certManager.tls.issuer.kind }}
+kind: Issuer
 metadata:
-  name: {{ .Values.certManager.tls.issuer.name | quote }}
-  {{- if eq .Values.certManager.tls.issuer.kind "Issuer" }}
-  namespace: {{ .Release.Namespace | quote }}
-  {{- end }}
+  name: {{ include "portkey.fullname" . }}-{{ .Values.appTLSCerts.issuer.name }}
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+  annotations:
+    {{- include "portkey.annotations" . | nindent 4 }}
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": "hook-succeeded"
 spec:
   selfSigned: {}
-{{- end }} 
+{{- end }}

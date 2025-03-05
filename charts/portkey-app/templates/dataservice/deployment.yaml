@@ -82,6 +82,7 @@ spec:
             {{- if .Values.logStorage.encryptionSettings.enabled }}
             {{- include "logStorage.encryptionSettings.commonEnv" . | nindent 12 }}
             {{- end }}
+            {{- include "appTLSCerts.env" . | nindent 12 }}
           image: "{{ .Values.images.dataserviceImage.repository }}:{{ .Values.images.dataserviceImage.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.dataserviceImage.pullPolicy }}
           ports:
@@ -108,11 +109,7 @@ spec:
           {{- with .Values.dataservice.deployment.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if and .Values.certManager.enabled .Values.certManager.tls.enabled }}
-            - name: tls-certs
-              mountPath: {{ .Values.certManager.tls.secret.mountPath | quote }}
-              readOnly: true
-          {{- end }}
+          {{- include "appTLSCerts.volumeMounts" . | nindent 12 }}
           {{- with .Values.dataservice.deployment.extraContainerConfig }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -135,9 +132,5 @@ spec:
       {{- with .Values.dataservice.deployment.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if and .Values.certManager.enabled .Values.certManager.tls.enabled }}
-        - name: tls-certs
-          secret:
-            secretName: {{ .Values.certManager.tls.certificate.secretName | quote }}
-      {{- end }}
+      {{- include "appTLSCerts.volumes" . | nindent 8 }}
 {{- end -}}
