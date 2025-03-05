@@ -81,6 +81,7 @@ config:
   jwtPrivateKey: "abcd"
   controlPlaneURL: ""
   containerProtocol: "http"
+  disableOrgCreation: false
   
   noAuth:
     enabled: true
