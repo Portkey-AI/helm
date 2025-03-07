@@ -300,31 +300,33 @@ Template containing common environment variables that are used by several servic
       key: jwtPrivateKey
 
 {{- if .Values.config.smtp.enabled }}
+- name: SMTP_MAIL
+  value: "ON"
 - name: SMTP_HOST
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
-      key: smtp_host
+      key: smtpHost
 - name: SMTP_PORT
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
-      key: smtp_port
+      key: smtpPort
 - name: SMTP_USER
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
-      key: smtp_user
+      key: smtpUser
 - name: SMTP_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
-      key: smtp_password
+      key: smtpPassword
 - name: SMTP_FROM
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
-      key: smtp_from
+      key: smtpFrom
 {{- end }}
 {{- end }}
 
