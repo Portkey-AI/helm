@@ -1,0 +1,27 @@
+{{- if .Values.config.certManager.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ include "portkey.fullname" . }}-selfsigned-issuer
+  namespace: {{.Release.Namespace}}
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "portkey.fullname" . }}-selfsigned-cert
+  namespace: {{.Release.Namespace}}
+spec:
+  dnsNames:
+    - "*.{{.Release.Namespace}}.svc.cluster.local"
+  secretName: selfsigned-cert-tls
+  duration: 24h
+  renewBefore: 23h
+  issuerRef:
+    name: {{ include "portkey.fullname" . }}-selfsigned-issuer
+    kind: Issuer
+  usages:
+    - server auth
+    - client auth
+{{- end }}

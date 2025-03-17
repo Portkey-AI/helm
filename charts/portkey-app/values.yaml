@@ -82,7 +82,14 @@ config:
   controlPlaneURL: ""
   containerProtocol: "http"
   disableOrgCreation: false
-  
+
+  aws:
+    acm:
+      enabled: false
+
+  certManager:
+    enabled: false
+
   noAuth:
     enabled: true
 
