@@ -62,8 +62,11 @@ environment:
 ```
 ### Analytics Store
 
-Supported `ANALYTICS_STORE` is `clickhouse`.
-The following values are needed for storing analytics data.
+Supported `ANALYTICS_STORE` is `clickhouse` or `control_plane` .
+
+If `ANALYTICS_STORE` is `control_plane`, no additional details are needed.
+
+If `ANALYTICS_STORE` is `clickhouse`, the following values are needed for storing analytics data.
 
 ``` yaml
   ANALYTICS_STORE_ENDPOINT: 
