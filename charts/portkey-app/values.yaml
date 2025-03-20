@@ -84,7 +84,7 @@ config:
   disableOrgCreation: false
 
   aws:
-    acm:
+    secretsManager:
       enabled: false
 
   certManager:
