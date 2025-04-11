@@ -33,9 +33,9 @@ spec:
         {{- include "portkey.labels" . | nindent 8 }}
         app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
     spec:
-      {{- with .Values.images.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
+      imagePullSecrets: 
+      {{- range .Values.imageCredentials }}
+      - name: {{ .name }}
       {{- end }}
       securityContext:
         {{- toYaml .Values.clickhouse.statefulSet.podSecurityContext | nindent 8 }}
