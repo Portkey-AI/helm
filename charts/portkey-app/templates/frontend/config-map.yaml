@@ -25,41 +25,28 @@ data:
         location /albus/ {
             rewrite ^/albus(.*)$ $1 break;
             proxy_pass {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}:{{ .Values.backend.containerPort }};
-             # Pass the original host header
+            # Pass the original host header
             proxy_set_header Host $http_host;
             
             # Pass the real IP of the client
             proxy_set_header X-Real-IP $remote_addr;
-            
-            # Pass the original protocol (http or https)
             proxy_set_header X-Forwarded-Proto $scheme;
-            
-            # Pass all headers
-            proxy_pass_request_headers on;
-            
-            # Pass the original request method
-            proxy_method $request_method;
-            
-            # Pass the original request body
-            proxy_pass_request_body on;
-
-            # Preserve the original URI
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Original-URI $request_uri;
 
-            # Pass the full original URL
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass_request_headers on;
+            proxy_pass_request_body on;
 
-            # Don't change anything in the request body
-            proxy_set_body $request_body;
-
-            # Don't buffer proxied requests
             proxy_buffering off;
+            # Optional: Increase limits if body gets truncated or dropped
+            client_max_body_size 100m;
+            proxy_request_buffering off;
         }
         {{- if .Values.gateway.enabled -}}
         location /api/ {
             rewrite ^/api(.*)$ $1 break;
             proxy_pass {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }};
-             # Pass the original host header
+            # Pass the original host header
             proxy_set_header Host $http_host;
             
             # Pass the real IP of the client
