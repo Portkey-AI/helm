@@ -73,4 +73,4 @@ data:
         add_header X-Content-Type-Options "nosniff";
     }
   config.js: |
-    window.APP_CONFIG = { VITE_API_URL: "{{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }}", VITE_BASE_URL: "/albus", VITE_PRIVATE_DEPLOYMENT: "ON", VITE_AUTH_MODE: "{{- if .Values.config.oauth.enabled }}SSO{{- end }}{{- if .Values.config.noAuth.enabled }}NO_AUTH{{- end }}" , VITE_DISABLE_TESTIMONIAL: "{{- if .Values.config.disableTestimonial }}ON{{- end }}"};
+    window.APP_CONFIG = { VITE_API_URL: "{{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }}", VITE_BASE_URL: "/albus", VITE_PRIVATE_DEPLOYMENT: "ON", VITE_AUTH_MODE: "{{- if .Values.config.oauth.enabled }}SSO{{- end }}{{- if .Values.config.noAuth.enabled }}NO_AUTH{{- end }}" , VITE_DISABLE_TESTIMONIAL: "{{- if .Values.config.disableTestimonial }}ON{{- else }}OFF{{- end }}"};
