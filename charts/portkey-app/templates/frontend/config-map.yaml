@@ -42,10 +42,14 @@ data:
             client_max_body_size 100m;
             proxy_request_buffering off;
         }
-        {{- if .Values.gateway.enabled -}}
+        {{- if or .Values.gateway.enabled .Values.config.defaultGatewayURL }}
         location /api/ {
             rewrite ^/api(.*)$ $1 break;
+            {{- if .Values.config.defaultGatewayURL }}
+            proxy_pass {{ .Values.config.defaultGatewayURL }};
+            {{- else }}
             proxy_pass {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }};
+            {{- end }}
             # Pass the original host header
             proxy_set_header Host $http_host;
             
@@ -73,4 +77,10 @@ data:
         add_header X-Content-Type-Options "nosniff";
     }
   config.js: |
-    window.APP_CONFIG = { VITE_API_URL: "{{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }}", VITE_BASE_URL: "/albus", VITE_PRIVATE_DEPLOYMENT: "ON", VITE_AUTH_MODE: "{{- if .Values.config.oauth.enabled }}SSO{{- end }}{{- if .Values.config.noAuth.enabled }}NO_AUTH{{- end }}" , VITE_DISABLE_TESTIMONIAL: "{{- if .Values.config.disableTestimonial }}ON{{- else }}OFF{{- end }}"};
+    window.APP_CONFIG = { 
+      VITE_API_URL: "{{- if .Values.config.defaultGatewayURL }}{{ .Values.config.defaultGatewayURL }}{{- else }}{{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }}{{- end }}", 
+      VITE_BASE_URL: "/albus", 
+      VITE_PRIVATE_DEPLOYMENT: "ON", 
+      VITE_AUTH_MODE: "{{- if .Values.config.oauth.enabled }}SSO{{- end }}{{- if .Values.config.noAuth.enabled }}NO_AUTH{{- end }}", 
+      VITE_DISABLE_TESTIMONIAL: "{{- if .Values.config.disableTestimonial }}ON{{- else }}OFF{{- end }}"
+    };
