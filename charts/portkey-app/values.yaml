@@ -82,6 +82,7 @@ config:
   controlPlaneURL: ""
   containerProtocol: "http"
   disableOrgCreation: false
+  disableTestimonial: false
   
   noAuth:
     enabled: true
