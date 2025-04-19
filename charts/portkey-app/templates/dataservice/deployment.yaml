@@ -84,6 +84,15 @@ spec:
             {{- end }}
           image: "{{ .Values.images.dataserviceImage.repository }}:{{ .Values.images.dataserviceImage.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.dataserviceImage.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              # Source the secret-reading script
+              if [ -f "/scripts/read-secrets.sh" ]; then
+                source /scripts/read-secrets.sh
+              fi
+              # Let the Docker CMD execute
+              exec node src/server.js
           ports:
             - name: dataservice
               containerPort: {{ .Values.dataservice.containerPort }}
@@ -104,10 +113,17 @@ spec:
             {{- toYaml .Values.dataservice.deployment.resources | nindent 12 }}
           securityContext:
             {{- toYaml .Values.dataservice.deployment.securityContext | nindent 12 }}
-          {{- with .Values.dataservice.deployment.volumeMounts }}
           volumeMounts:
+          {{- with .Values.dataservice.deployment.volumeMounts }}
               {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- include "portkey.smtpVolumeMounts" . | indent 10 }}
+          {{- include "portkey.oauthVolumeMounts" . | indent 10 }}
+          {{- include "portkey.mysqlVolumeMounts" . | indent 10 }}
+          {{- include "portkey.redisVolumeMounts" . | indent 10 }}
+          {{- include "portkey.clickhouseVolumeMounts" . | indent 10 }}
+          - name: scripts-volume
+            mountPath: /scripts
           {{- with .Values.dataservice.deployment.extraContainerConfig }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -126,8 +142,17 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.dataservice.deployment.volumes }}
       volumes:
+      {{- with .Values.dataservice.deployment.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "portkey.smtpVolumes" . | indent 6 }}
+      {{- include "portkey.oauthVolumes" . | indent 6 }}
+      {{- include "portkey.mysqlVolumes" . | indent 6 }}
+      {{- include "portkey.redisVolumes" . | indent 6 }}
+      {{- include "portkey.clickhouseVolumes" . | indent 6 }}
+      - name: scripts-volume
+        configMap:
+          name: {{ include "portkey.fullname" . }}-scripts
+          defaultMode: 0755
 {{- end -}}

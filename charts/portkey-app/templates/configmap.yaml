@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "portkey.fullname" . }}-scripts
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+data:
+  read-secrets.sh: |
+    #!/bin/sh
+    
+    # Function to read a secret from a file or fallback to environment variable
+    read_secret() {
+      local dir=$1
+      local file=$2
+      local env_var=$3
+      
+      if [ -f "${dir}/${file}" ]; then
+        echo "Reading secret from file: ${dir}/${file}" >&2
+        cat "${dir}/${file}"
+      else
+        echo "Using environment variable: ${env_var}" >&2
+        # Already set by kubernetes from the secrets
+        # Just echo the current value
+        echo "${!env_var:-""}"
+      fi
+    }
+    
+    # SMTP Configuration
+    if [ ! -z "$SMTP_CONFIG_DIR" ] && [ -d "$SMTP_CONFIG_DIR" ]; then
+      echo "Loading SMTP configuration from ${SMTP_CONFIG_DIR}" >&2
+      export SMTP_HOST=$(read_secret "$SMTP_CONFIG_DIR" "{{.Values.config.smtp.secretMount.keys.host}}" "SMTP_HOST")
+      export SMTP_PORT=$(read_secret "$SMTP_CONFIG_DIR" "{{.Values.config.smtp.secretMount.keys.port}}" "SMTP_PORT")
+      export SMTP_USER=$(read_secret "$SMTP_CONFIG_DIR" "{{.Values.config.smtp.secretMount.keys.user}}" "SMTP_USER")
+      export SMTP_PASSWORD=$(read_secret "$SMTP_CONFIG_DIR" "{{.Values.config.smtp.secretMount.keys.password}}" "SMTP_PASSWORD")
+      export SMTP_FROM=$(read_secret "$SMTP_CONFIG_DIR" "{{.Values.config.smtp.secretMount.keys.from}}" "SMTP_FROM")
+    fi
+    
+    # OAuth Configuration
+    if [ ! -z "$OAUTH_CONFIG_DIR" ] && [ -d "$OAUTH_CONFIG_DIR" ]; then
+      echo "Loading OAuth configuration from ${OAUTH_CONFIG_DIR}" >&2
+      export AUTH_SSO_TYPE=$(read_secret "$OAUTH_CONFIG_DIR" "{{.Values.config.oauth.secretMount.keys.type}}" "AUTH_SSO_TYPE")
+      export OIDC_CLIENTID=$(read_secret "$OAUTH_CONFIG_DIR" "{{.Values.config.oauth.secretMount.keys.clientId}}" "OIDC_CLIENTID")
+      export OIDC_ISSUER=$(read_secret "$OAUTH_CONFIG_DIR" "{{.Values.config.oauth.secretMount.keys.issuerUrl}}" "OIDC_ISSUER")
+      export OIDC_CLIENT_SECRET=$(read_secret "$OAUTH_CONFIG_DIR" "{{.Values.config.oauth.secretMount.keys.clientSecret}}" "OIDC_CLIENT_SECRET")
+      export OIDC_REDIRECT_URI=$(read_secret "$OAUTH_CONFIG_DIR" "{{.Values.config.oauth.secretMount.keys.redirectUri}}" "OIDC_REDIRECT_URI")
+      export SAML_METADATA_XML=$(read_secret "$OAUTH_CONFIG_DIR" "{{.Values.config.oauth.secretMount.keys.metadataXml}}" "SAML_METADATA_XML")
+    fi
+    
+    # MySQL Configuration
+    if [ ! -z "$MYSQL_CONFIG_DIR" ] && [ -d "$MYSQL_CONFIG_DIR" ]; then
+      echo "Loading MySQL configuration from ${MYSQL_CONFIG_DIR}" >&2
+      export DB_USER=$(read_secret "$MYSQL_CONFIG_DIR" "{{.Values.mysql.external.secretMount.keys.user}}" "DB_USER")
+      export DB_PASS=$(read_secret "$MYSQL_CONFIG_DIR" "{{.Values.mysql.external.secretMount.keys.password}}" "DB_PASS")
+      export DB_NAME=$(read_secret "$MYSQL_CONFIG_DIR" "{{.Values.mysql.external.secretMount.keys.database}}" "DB_NAME")
+      export MYSQL_ROOT_PASSWORD=$(read_secret "$MYSQL_CONFIG_DIR" "{{.Values.mysql.external.secretMount.keys.rootPassword}}" "MYSQL_ROOT_PASSWORD")
+    fi
+    
+    # Redis Configuration
+    if [ ! -z "$REDIS_CONFIG_DIR" ] && [ -d "$REDIS_CONFIG_DIR" ]; then
+      echo "Loading Redis configuration from ${REDIS_CONFIG_DIR}" >&2
+      export REDIS_URL=$(read_secret "$REDIS_CONFIG_DIR" "{{.Values.redis.external.secretMount.keys.connectionUrl}}" "REDIS_URL")
+      export REDIS_TLS_ENABLED=$(read_secret "$REDIS_CONFIG_DIR" "{{.Values.redis.external.secretMount.keys.tlsEnabled}}" "REDIS_TLS_ENABLED")
+      export REDIS_MODE=$(read_secret "$REDIS_CONFIG_DIR" "{{.Values.redis.external.secretMount.keys.mode}}" "REDIS_MODE")
+      export CACHE_STORE=$(read_secret "$REDIS_CONFIG_DIR" "{{.Values.redis.external.secretMount.keys.store}}" "CACHE_STORE")
+    fi
+    
+    # Clickhouse Configuration
+    if [ ! -z "$CLICKHOUSE_CONFIG_DIR" ] && [ -d "$CLICKHOUSE_CONFIG_DIR" ]; then
+      echo "Loading Clickhouse configuration from ${CLICKHOUSE_CONFIG_DIR}" >&2
+      export CLICKHOUSE_STORE=$(read_secret "$CLICKHOUSE_CONFIG_DIR" "{{.Values.clickhouse.external.secretMount.keys.store}}" "CLICKHOUSE_STORE")
+      export CLICKHOUSE_HOST=$(read_secret "$CLICKHOUSE_CONFIG_DIR" "{{.Values.clickhouse.external.secretMount.keys.host}}" "CLICKHOUSE_HOST")
+      export CLICKHOUSE_PORT=$(read_secret "$CLICKHOUSE_CONFIG_DIR" "{{.Values.clickhouse.external.secretMount.keys.port}}" "CLICKHOUSE_PORT")
+      export CLICKHOUSE_NATIVE_PORT=$(read_secret "$CLICKHOUSE_CONFIG_DIR" "{{.Values.clickhouse.external.secretMount.keys.nativePort}}" "CLICKHOUSE_NATIVE_PORT")
+      export CLICKHOUSE_USER=$(read_secret "$CLICKHOUSE_CONFIG_DIR" "{{.Values.clickhouse.external.secretMount.keys.user}}" "CLICKHOUSE_USER")
+      export CLICKHOUSE_PASSWORD=$(read_secret "$CLICKHOUSE_CONFIG_DIR" "{{.Values.clickhouse.external.secretMount.keys.password}}" "CLICKHOUSE_PASSWORD")
+      export CLICKHOUSE_DATABASE=$(read_secret "$CLICKHOUSE_CONFIG_DIR" "{{.Values.clickhouse.external.secretMount.keys.database}}" "CLICKHOUSE_DATABASE")
+      export CLICKHOUSE_TLS=$(read_secret "$CLICKHOUSE_CONFIG_DIR" "{{.Values.clickhouse.external.secretMount.keys.tls}}" "CLICKHOUSE_TLS")
+    fi
+    
+    # Execute the original command
+    echo "Starting application..." >&2

@@ -46,6 +46,17 @@ spec:
           command:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if .Values.redis.external.secretMount.enabled }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              # Source the secret-reading script
+              if [ -f "/scripts/read-secrets.sh" ]; then
+                source /scripts/read-secrets.sh
+              fi
+              # Execute the original Redis command
+              exec redis-server
+          {{- end }}
           env:
             - name: REDIS_DATABASE_URI
               valueFrom:
@@ -89,10 +100,21 @@ spec:
             {{- with .Values.redis.statefulSet.volumeMounts }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
+            {{- if .Values.redis.external.secretMount.enabled }}
+            - name: scripts-volume
+              mountPath: /scripts
+            {{- include "portkey.redisVolumeMounts" . | indent 12 }}
+            {{- end }}
           {{- else }}
           {{- with .Values.redis.statefulSet.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.redis.external.secretMount.enabled }}
+          volumeMounts:
+            - name: scripts-volume
+              mountPath: /scripts
+            {{- include "portkey.redisVolumeMounts" . | indent 12 }}
           {{- end }}
           {{- end }}
         {{- with .Values.redis.statefulSet.extraContainerConfig }}
@@ -116,6 +138,14 @@ spec:
       {{- with .Values.redis.statefulSet.volumes }}
       volumes:
           {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.redis.external.secretMount.enabled }}
+      volumes:
+        {{- include "portkey.redisVolumes" . | indent 8 }}
+        - name: scripts-volume
+          configMap:
+            name: {{ include "portkey.fullname" . }}-scripts
+            defaultMode: 0755
       {{- end }}
   {{- if .Values.redis.statefulSet.persistence.enabled }}
   volumeClaimTemplates:
