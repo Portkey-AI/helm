@@ -168,6 +168,11 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.redisSecretsName" . }}
       key: redis_store
+{{- if and (not .Values.redis.external.enabled) .Values.redis.external.secretMount.enabled }}
+- name: REDIS_CONFIG_DIR
+  value: {{ .Values.redis.external.secretMount.mountPath | quote }}
+{{- end }}
+
 - name: CLICKHOUSE_DATABASE
   valueFrom:
     secretKeyRef:
@@ -203,6 +208,11 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.clickhouseSecretsName" . }}
       key: clickhouse_tls
+{{- if and (not .Values.clickhouse.external.enabled) .Values.clickhouse.external.secretMount.enabled }}
+- name: CLICKHOUSE_CONFIG_DIR
+  value: {{ .Values.clickhouse.external.secretMount.mountPath | quote }}
+{{- end }}
+
 - name: DB_NAME
   valueFrom:
     secretKeyRef:
@@ -241,6 +251,10 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.mysqlSecretsName" . }}
       key: mysql_root_password
+{{- end }}
+{{- if and (not .Values.mysql.external.enabled) .Values.mysql.external.secretMount.enabled }}
+- name: MYSQL_CONFIG_DIR
+  value: {{ .Values.mysql.external.secretMount.mountPath | quote }}
 {{- end }}
 
 {{- if .Values.config.oauth.enabled }}
@@ -288,6 +302,10 @@ Template containing common environment variables that are used by several servic
       name: {{ include "portkey.secretsName" . }}
       key: oauthMetadataXml
 {{- end }}
+{{- if .Values.config.oauth.secretMount.enabled }}
+- name: OAUTH_CONFIG_DIR
+  value: {{ .Values.config.oauth.secretMount.mountPath | quote }}
+{{- end }}
 {{- end }}
 {{- if .Values.config.noAuth.enabled }}
 - name: AUTH_MODE
@@ -327,6 +345,10 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: smtpFrom
+{{- if .Values.config.smtp.secretMount.enabled }}
+- name: SMTP_CONFIG_DIR
+  value: {{ .Values.config.smtp.secretMount.mountPath | quote }}
+{{- end }}
 {{- end }}
 {{- end }}
 
@@ -624,5 +646,115 @@ Template containing common environment variables that are used by several servic
   value: {{ .Values.logStorage.encryptionSettings.KMS_ENCRYPTION_CUSTOMER_KEY }}
 - name: KMS_ENCRYPTION_CUSTOMER_KEY_MD5
   value: {{ .Values.logStorage.encryptionSettings.KMS_ENCRYPTION_CUSTOMER_KEY_MD5 }}
+{{- end }}
+{{- end }}
+
+{{/*
+Define SMTP volume mounts
+*/}}
+{{- define "portkey.smtpVolumeMounts" -}}
+{{- if and .Values.config.smtp.enabled .Values.config.smtp.secretMount.enabled }}
+- name: smtp-secrets
+  mountPath: {{ .Values.config.smtp.secretMount.mountPath }}
+  readOnly: true
+{{- end }}
+{{- end }}
+
+{{/*
+Define SMTP volumes
+*/}}
+{{- define "portkey.smtpVolumes" -}}
+{{- if and .Values.config.smtp.enabled .Values.config.smtp.secretMount.enabled }}
+- name: smtp-secrets
+  secret:
+    secretName: {{ .Values.config.smtp.secretMount.existingSecret | default (printf "%s-smtp" (include "portkey.fullname" .)) }}
+{{- end }}
+{{- end }}
+
+{{/*
+Define OAuth volume mounts
+*/}}
+{{- define "portkey.oauthVolumeMounts" -}}
+{{- if and .Values.config.oauth.enabled .Values.config.oauth.secretMount.enabled }}
+- name: oauth-secrets
+  mountPath: {{ .Values.config.oauth.secretMount.mountPath }}
+  readOnly: true
+{{- end }}
+{{- end }}
+
+{{/*
+Define OAuth volumes
+*/}}
+{{- define "portkey.oauthVolumes" -}}
+{{- if and .Values.config.oauth.enabled .Values.config.oauth.secretMount.enabled }}
+- name: oauth-secrets
+  secret:
+    secretName: {{ .Values.config.oauth.secretMount.existingSecret | default (printf "%s-oauth" (include "portkey.fullname" .)) }}
+{{- end }}
+{{- end }}
+
+{{/*
+Define MySQL volume mounts
+*/}}
+{{- define "portkey.mysqlVolumeMounts" -}}
+{{- if and (not .Values.mysql.external.enabled) .Values.mysql.external.secretMount.enabled }}
+- name: mysql-secrets
+  mountPath: {{ .Values.mysql.external.secretMount.mountPath }}
+  readOnly: true
+{{- end }}
+{{- end }}
+
+{{/*
+Define MySQL volumes
+*/}}
+{{- define "portkey.mysqlVolumes" -}}
+{{- if and (not .Values.mysql.external.enabled) .Values.mysql.external.secretMount.enabled }}
+- name: mysql-secrets
+  secret:
+    secretName: {{ .Values.mysql.external.secretMount.existingSecret | default (printf "%s-mysql" (include "portkey.fullname" .)) }}
+{{- end }}
+{{- end }}
+
+{{/*
+Define Redis volume mounts
+*/}}
+{{- define "portkey.redisVolumeMounts" -}}
+{{- if and (not .Values.redis.external.enabled) .Values.redis.external.secretMount.enabled }}
+- name: redis-secrets
+  mountPath: {{ .Values.redis.external.secretMount.mountPath }}
+  readOnly: true
+{{- end }}
+{{- end }}
+
+{{/*
+Define Redis volumes
+*/}}
+{{- define "portkey.redisVolumes" -}}
+{{- if and (not .Values.redis.external.enabled) .Values.redis.external.secretMount.enabled }}
+- name: redis-secrets
+  secret:
+    secretName: {{ .Values.redis.external.secretMount.existingSecret | default (printf "%s-redis" (include "portkey.fullname" .)) }}
+{{- end }}
+{{- end }}
+
+{{/*
+Define ClickHouse volume mounts
+*/}}
+{{- define "portkey.clickhouseVolumeMounts" -}}
+{{- if and (not .Values.clickhouse.external.enabled) .Values.clickhouse.external.secretMount.enabled }}
+- name: clickhouse-secrets
+  mountPath: {{ .Values.clickhouse.external.secretMount.mountPath }}
+  readOnly: true
+{{- end }}
+{{- end }}
+
+{{/*
+Define ClickHouse volumes
+*/}}
+{{- define "portkey.clickhouseVolumes" -}}
+{{- if and (not .Values.clickhouse.external.enabled) .Values.clickhouse.external.secretMount.enabled }}
+- name: clickhouse-secrets
+  secret:
+    secretName: {{ .Values.clickhouse.external.secretMount.existingSecret | default (printf "%s-clickhouse" (include "portkey.fullname" .)) }}
 {{- end }}
 {{- end }}

@@ -95,14 +95,48 @@ config:
     oauthClientSecret: ""
     oauthRedirectURI: ""
     oauthMetadataXml: ""
+    # -- Use volume mounts to load OAuth credentials
+    secretMount:
+      enabled: false
+      # -- Existing secret containing OAuth credentials (if not provided, values from oauth.* will be used)
+      existingSecret: ""
+      # -- Path where OAuth secret files will be mounted
+      mountPath: "/etc/portkey/oauth"
+      # -- Keys in the secret for each credential
+      keys:
+        oauthType: "oauth-type"
+        oauthClientId: "oauth-client-id"
+        oauthIssuerUrl: "oauth-issuer-url"
+        oauthClientSecret: "oauth-client-secret"
+        oauthRedirectURI: "oauth-redirect-uri"
+        oauthMetadataXml: "oauth-metadata-xml"
 
   smtp:
     enabled: false
+    # -- SMTP host address
     smtpHost: ""
+    # -- SMTP port
     smtpPort: ""
+    # -- SMTP username
     smtpUser: ""
+    # -- SMTP password
     smtpPassword: ""
+    # -- SMTP from address
     smtpFrom: ""
+    # -- Use volume mounts to load SMTP credentials
+    secretMount:
+      enabled: false
+      # -- Existing secret containing SMTP credentials (if not provided, values from smtp.* will be used)
+      existingSecret: ""
+      # -- Path where SMTP secret files will be mounted
+      mountPath: "/etc/portkey/smtp"
+      # -- Keys in the secret for each credential
+      keys:
+        host: "smtp-host"
+        port: "smtp-port"
+        user: "smtp-user"
+        password: "smtp-password"
+        from: "smtp-from"
 
 # -- Log storage configuration
 # Used to store raw inputs & outputs of all requests going through portkey
@@ -453,6 +487,19 @@ mysql:
     password: ""
     database: ""
     existingSecretName: ""
+    # -- Use volume mounts to load MySQL credentials
+    secretMount:
+      enabled: false
+      # -- Existing secret containing MySQL credentials (if not provided, values from mysql.external.* will be used)
+      existingSecret: ""
+      # -- Path where MySQL secret files will be mounted
+      mountPath: "/etc/portkey/mysql"
+      # -- Keys in the secret for each credential
+      keys:
+        user: "mysql-user"
+        password: "mysql-password"
+        database: "mysql-database"
+        rootPassword: "mysql-root-password"
     ssl: 
       enabled: false
       mode: "Amazon RDS"
@@ -539,6 +586,19 @@ redis:
     mode: "standalone"
     store: "redis"
     existingSecretName: ""
+    # -- Use volume mounts to load Redis credentials
+    secretMount:
+      enabled: false
+      # -- Existing secret containing Redis credentials (if not provided, values from redis.external.* will be used)
+      existingSecret: ""
+      # -- Path where Redis secret files will be mounted
+      mountPath: "/etc/portkey/redis"
+      # -- Keys in the secret for each credential
+      keys:
+        connectionUrl: "redis-connection-url"
+        tlsEnabled: "redis-tls-enabled"
+        mode: "redis-mode"
+        store: "redis-store"
   containerPort: 6379
   statefulSet:
     labels: {}
@@ -621,6 +681,23 @@ clickhouse:
     database: "default"
     tls: false
     existingSecretName: ""
+    # -- Use volume mounts to load Clickhouse credentials
+    secretMount:
+      enabled: false
+      # -- Existing secret containing Clickhouse credentials (if not provided, values from clickhouse.external.* will be used)
+      existingSecret: ""
+      # -- Path where Clickhouse secret files will be mounted
+      mountPath: "/etc/portkey/clickhouse"
+      # -- Keys in the secret for each credential
+      keys:
+        store: "clickhouse-store"
+        host: "clickhouse-host"
+        port: "clickhouse-port"
+        nativePort: "clickhouse-native-port"
+        user: "clickhouse-user"
+        password: "clickhouse-password"
+        database: "clickhouse-database"
+        tls: "clickhouse-tls"
   containerHttpPort: 8123
   containerNativePort: 9000
   statefulSet:

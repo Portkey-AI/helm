@@ -45,6 +45,21 @@ spec:
           {{- if .Values.mysql.statefulSet.command }}
           command:
             {{- toYaml .Values.mysql.statefulSet.command | nindent 4 }}
+          {{- else if .Values.mysql.external.secretMount.enabled }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              # Source the secret-reading script
+              if [ -f "/scripts/read-secrets.sh" ]; then
+                source /scripts/read-secrets.sh
+                # Map our variable names to what MySQL container expects
+                export MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+                export MYSQL_DATABASE=${DB_NAME}
+                export MYSQL_USER=${DB_USER}
+                export MYSQL_PASSWORD=${DB_PASS}
+              fi
+              # Execute the original MySQL entrypoint
+              exec docker-entrypoint.sh mysqld
           {{- else }}
           args:
             - --sql-mode=NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
@@ -110,10 +125,21 @@ spec:
             {{- with .Values.mysql.statefulSet.volumeMounts }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
+            {{- if .Values.mysql.external.secretMount.enabled }}
+            - name: scripts-volume
+              mountPath: /scripts
+            {{- include "portkey.mysqlVolumeMounts" . | indent 12 }}
+            {{- end }}
           {{- else }}
           {{- with .Values.mysql.statefulSet.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.mysql.external.secretMount.enabled }}
+          volumeMounts:
+            - name: scripts-volume
+              mountPath: /scripts
+            {{- include "portkey.mysqlVolumeMounts" . | indent 12 }}
           {{- end }}
           {{- end }}
         {{- with .Values.mysql.statefulSet.extraContainerConfig }}
@@ -137,6 +163,14 @@ spec:
       {{- with .Values.mysql.statefulSet.volumes }}
       volumes:
           {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.mysql.external.secretMount.enabled }}
+      volumes:
+        {{- include "portkey.mysqlVolumes" . | indent 8 }}
+        - name: scripts-volume
+          configMap:
+            name: {{ include "portkey.fullname" . }}-scripts
+            defaultMode: 0755
       {{- end }}
   {{- if .Values.mysql.statefulSet.persistence.enabled }}
   volumeClaimTemplates:

@@ -48,6 +48,20 @@ spec:
           command:
              {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if .Values.clickhouse.external.secretMount.enabled }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              # Source the secret-reading script
+              if [ -f "/scripts/read-secrets.sh" ]; then
+                source /scripts/read-secrets.sh
+                # Map to ClickHouse environment variables
+                export CLICKHOUSE_DB=${CLICKHOUSE_DATABASE}
+              fi
+              # Execute the original ClickHouse entrypoint
+              sed 's/id -g/id -gn/' /entrypoint.sh > /tmp/entrypoint.sh
+              exec bash /tmp/entrypoint.sh
+          {{- end }}
           env:
             - name: CLICKHOUSE_DB
               valueFrom:
@@ -102,6 +116,11 @@ spec:
             - mountPath: /etc/clickhouse-server/users.d/users.xml
               name: clickhouse-conf
               subPath: users.xml
+            {{- if .Values.clickhouse.external.secretMount.enabled }}
+            - name: scripts-volume
+              mountPath: /scripts
+            {{- include "portkey.clickhouseVolumeMounts" . | indent 12 }}
+            {{- end }}
           {{- with .Values.clickhouse.statefulSet.extraContainerConfig }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -129,6 +148,13 @@ spec:
                 path: users.xml
       {{- with .Values.clickhouse.statefulSet.volumes }}
           {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.clickhouse.external.secretMount.enabled }}
+        - name: scripts-volume
+          configMap:
+            name: {{ include "portkey.fullname" . }}-scripts
+            defaultMode: 0755
+        {{- include "portkey.clickhouseVolumes" . | indent 8 }}
       {{- end }}
   {{- if .Values.clickhouse.statefulSet.persistence.enabled }}
   volumeClaimTemplates:
