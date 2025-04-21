@@ -430,21 +430,17 @@ Template containing common environment variables that are used by several servic
 
 {{- define "gateway.commonEnv" -}}
 {{- include "logStore.commonEnv" . }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "bedrockAssumedAccessKey" }}
+{{- if .Values.bedrockAssumed.enabled }}
 - name: AWS_ASSUME_ROLE_ACCESS_KEY_ID
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: bedrockAssumedAccessKey
-{{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "bedrockAssumedSecretKey" }}
 - name: AWS_ASSUME_ROLE_SECRET_ACCESS_KEY
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: bedrockAssumedSecretKey
-{{- end }}
-{{- if hasKey (include "portkey.gatewaySecretsName" . | fromYaml) "bedrockAssumedRegion" }}
 - name: AWS_ASSUME_ROLE_REGION
   valueFrom:
     secretKeyRef:
