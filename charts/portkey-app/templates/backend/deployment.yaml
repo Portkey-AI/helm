@@ -66,6 +66,8 @@ spec:
               value: {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }}
             - name: GATEWAY_CACHE_MODE
               value: "SELF"
+            - name: INTERNAL_GATEWAY_URL
+              value: {{ .Values.config.internalGatewayURL | quote }}
             {{- else }}
             - name: GATEWAY_BASE_URL
               value: {{ .Values.config.defaultGatewayURL | quote }}
