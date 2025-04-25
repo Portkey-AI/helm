@@ -129,6 +129,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        {{- with .Values.frontend.deployment.volumes }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         - name: app-config
           configMap:
             name: {{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}
