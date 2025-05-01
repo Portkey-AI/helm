@@ -1,0 +1,114 @@
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: portkey-app-aws-secrets
+spec:
+  provider: aws
+  secretObjects:
+  - secretName: portkey-app-aws-secrets-final
+    type: Opaque
+    data:
+    - objectName: oauthType
+      key: oauthType
+    - objectName: oauthIssuerUrl
+      key: oauthIssuerUrl
+    - objectName: oauthClientId
+      key: oauthClientId
+    - objectName: oauthClientSecret
+      key: oauthClientSecret
+    - objectName: oauthRedirectURI
+      key: oauthRedirectURI
+    - objectName: oauthMetadataXml
+      key: oauthMetadataXml
+    - objectName: jwtPrivateKey
+      key: jwtPrivateKey
+    - objectName: smtpHost
+      key: smtpHost
+    - objectName: smtpPort
+      key: smtpPort
+    - objectName: smtpUser
+      key: smtpUser
+    - objectName: smtpPassword
+      key: smtpPassword
+    - objectName: smtpFrom
+      key: smtpFrom
+  - secretName: portkey-app-aws-secrets-redis-final
+    type: Opaque
+    data:
+    - objectName: redis_connection_url
+      key: redis_connection_url
+    - objectName: redis_tls_enabled
+      key: redis_tls_enabled
+    - objectName: redis_mode
+      key: redis_mode
+    - objectName: redis_store
+      key: redis_store
+  - secretName: portkey-app-aws-secrets-mysql-final
+    type: Opaque
+    data:
+    - objectName: mysql_db
+      key: mysql_db
+    - objectName: mysql_host
+      key: mysql_host
+    - objectName: mysql_password
+      key: mysql_password
+    - objectName: mysql_port
+      key: mysql_port
+    - objectName: mysql_user
+      key: mysql_user
+    - objectName: mysql_ssl_mode
+      key: mysql_ssl_mode
+    - objectName: mysql_root_password
+      key: mysql_root_password
+  parameters:
+    objects: |
+      - objectName: "<secret arn>"
+        objectType: "secretsmanager"
+        jmesPath:
+          - path: oauthType
+            objectAlias: oauthType
+          - path: oauthIssuerUrl
+            objectAlias: oauthIssuerUrl
+          - path: oauthClientId
+            objectAlias: oauthClientId
+          - path: oauthClientSecret
+            objectAlias: oauthClientSecret
+          - path: oauthRedirectURI
+            objectAlias: oauthRedirectURI
+          - path: oauthMetadataXml
+            objectAlias: oauthMetadataXml
+          - path: jwtPrivateKey
+            objectAlias: jwtPrivateKey
+          - path: smtpHost
+            objectAlias: smtpHost
+          - path: smtpPort
+            objectAlias: smtpPort
+          - path: smtpUser
+            objectAlias: smtpUser
+          - path: smtpPassword
+            objectAlias: smtpPassword
+          - path: smtpFrom
+            objectAlias: smtpFrom
+          - path: redis_connection_url
+            objectAlias: redis_connection_url
+          - path: redis_tls_enabled
+            objectAlias: redis_tls_enabled
+          - path: redis_mode
+            objectAlias: redis_mode
+          - path: redis_store
+            objectAlias: redis_store
+          - path: mysql_db
+            objectAlias: mysql_db
+          - path: mysql_host
+            objectAlias: mysql_host
+          - path: mysql_password
+            objectAlias: mysql_password
+          - path: mysql_port
+            objectAlias: mysql_port
+          - path: mysql_user
+            objectAlias: mysql_user
+          - path: mysql_ssl_mode
+            objectAlias: mysql_ssl_mode
+          - path: mysql_root_password
+            objectAlias: mysql_root_password
+{{- end }}

@@ -1,0 +1,126 @@
+imageCredentials:
+    - name: portkeyenterpriseregistrycredentials
+      create: true
+      registry: https://index.docker.io/v1/
+      username: <dockerhub username>
+      password: <dockerhub password>
+  imagePullSecrets: [portkeyenterpriseregistrycredentials]
+  
+  images:
+    backendImage:
+      repository: "docker.io/portkeyai/backend"
+      pullPolicy: Always
+      tag: "1.0.15"
+    frontendImage:
+      repository: "docker.io/portkeyai/frontend"
+      pullPolicy: Always
+      tag: "1.0.10"
+    dataserviceImage:
+      repository: "docker.io/portkeyai/data-service"
+      pullPolicy: Always
+      tag: "1.1.10"
+    gatewayImage:
+      repository: "docker.io/portkeyai/gateway_enterprise"
+      pullPolicy: Always
+      tag: "1.10.20"
+    clickhouseImage:
+      repository: "docker.io/clickhouse/clickhouse-server"
+      pullPolicy: IfNotPresent
+      tag: "24.10-alpine"
+  
+  config:
+    jwtPrivateKey: "some_random_string"
+    disableOrgCreation: false
+    existingSecretName: "portkey-app-aws-secrets-final"
+    noAuth:
+      enabled: true
+    
+  logStorage:
+    logStore: "s3_assume"
+    s3Assume:
+      enabled: true
+      LOG_STORE_REGION: "us-west-2"
+  
+  ingress:
+    enabled: true
+    hostname: "portkey.ai"
+    subdomain: "app"
+    ingressClassName: "nginx"
+    annotations: {}
+    labels: {}
+    tls: []
+  
+  gateway:
+    enabled: true
+    serviceAccount:
+      create: false
+      name: "test-irsa"
+    deployment:
+      autoRestart: true
+      
+  backend:
+    serviceAccount:
+        create: false
+        name: "test-irsa"
+    deployment:
+      autoRestart: true
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "portkey-app-aws-secrets"
+      volumeMounts:
+        - name: secrets-store-inline
+          mountPath: "/config/secrets"
+          readOnly: true
+
+  frontend:
+    serviceAccount:
+      create: false
+      name: "test-irsa"
+    deployment:
+      autoRestart: true
+  
+  dataservice:
+    serviceAccount:
+      create: false
+      name: "test-irsa"
+    deployment:
+      autoRestart: true
+  
+  mysql:
+    external:
+      enabled: false
+      user: ""
+      password: ""
+      database: ""
+      rootPassword: ""
+      existingSecretName: "portkey-app-aws-secrets-mysql-final"
+    statefulSet:
+      persistence: 
+        enabled: false
+  
+  redis:
+    external:
+      enabled: false
+      connectionUrl: ""
+      tlsEnabled: ""
+      mode: ""
+      store: ""
+      existingSecretName: "portkey-app-aws-secrets-redis-final"
+  
+  clickhouse:
+    external:
+      enabled: false
+      # host: "https://oekbmt8c4f.us-east-1.aws.clickhouse.cloud:8443"
+      user: "elsevier_enterprise_user"
+      password: "3jkna3380__93j@4m<pDcv=Ac9ka9j"
+      database: "default"
+      containerNativePort: 9000
+    statefulSet:
+      persistence:
+        enabled: false
+        size: 2Gi
+        storageClassName: "gp2"
