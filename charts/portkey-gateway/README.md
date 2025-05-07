@@ -77,6 +77,14 @@ If `ANALYTICS_STORE` is `clickhouse`, the following values are needed for storin
   ANALYTICS_GENERATION_HOOKS_TABLE:
 ```
 
+Portkey also supports pushing your analytics data to an OTEL compatible endpoint,
+the following values are needed for pushing to OTEL
+```yaml
+  OTEL_PUSH_ENABLED: true
+  OTEL_ENDPOINT: http://localhost:4318
+```
+Additionally you can configure arbitrary resource attributes of the otel logs by setting a comma separated value for `OTEL_RESOURCE_ATTRIBUTES` like `ApplicationShortName=gateway,AssetId=12323,deployment.service=production`
+
 ### Log Storage
 
 `LOG_STORE` can be `mongo`, `s3`, `s3_assume`, `wasabi`, `gcs`, `azure`, or `netapp`.
