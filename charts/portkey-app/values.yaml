@@ -622,6 +622,14 @@ clickhouse:
     database: "default"
     tls: false
     existingSecretName: ""
+  https:
+    enabled: false
+    port: 8443
+    certs:
+      crt: ""
+      key: ""
+      ca: ""
+      verificationMode: "strict"
   containerHttpPort: 8123
   containerNativePort: 9000
   statefulSet:

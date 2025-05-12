@@ -15,15 +15,17 @@ data:
       <user_files_path>/var/lib/clickhouse/user_files/</user_files_path>
       <format_schema_path>/var/lib/clickhouse/format_schemas/</format_schema_path>
       <access_control_path>/var/lib/clickhouse/access/</access_control_path>
-      <https_port>8443</https_port>
+      {{ if .Values.clickhouse.https.enabled }}
+      <https_port>{{ .Values.clickhouse.https.port }}</https_port>
       <openSSL>
         <server>
-          <certificateFile>/certs/tls.crt</certificateFile>
-          <privateKeyFile>/certs/tls.key</privateKeyFile>
-          <caConfig>/certs/ca.crt</caConfig>
-          <verificationMode>strict</verificationMode>
+          <certificateFile>{{ .Values.clickhouse.https.certs.crt }}</certificateFile>
+          <privateKeyFile>{{ .Values.clickhouse.https.certs.key }}</privateKeyFile>
+          <caConfig>{{ .Values.clickhouse.https.certs.ca }}</caConfig>
+          <verificationMode>{{ .Values.clickhouse.https.certs.verificationMode }}</verificationMode>
         </server>
       </openSSL>
+      {{ end }}
     </clickhouse>
   users.xml: |
     <clickhouse>
