@@ -15,6 +15,15 @@ data:
       <user_files_path>/var/lib/clickhouse/user_files/</user_files_path>
       <format_schema_path>/var/lib/clickhouse/format_schemas/</format_schema_path>
       <access_control_path>/var/lib/clickhouse/access/</access_control_path>
+      <https_port>8443</https_port>
+      <openSSL>
+        <server>
+          <certificateFile>/certs/tls.crt</certificateFile>
+          <privateKeyFile>/certs/tls.key</privateKeyFile>
+          <caConfig>/certs/ca.crt</caConfig>
+          <verificationMode>strict</verificationMode>
+        </server>
+      </openSSL>
     </clickhouse>
   users.xml: |
     <clickhouse>
