@@ -8,11 +8,15 @@ images:
   gatewayImage:
     repository: "docker.io/portkeyai/gateway_enterprise"
     pullPolicy: IfNotPresent
-    tag: "1.10.20"
+    tag: "1.10.21"
   dataserviceImage:
     repository: "docker.io/portkeyai/data-service"
     pullPolicy: IfNotPresent
     tag: "1.1.10"
+  redisImage:
+    repository: "redis"
+    pullPolicy: IfNotPresent
+    tag: "alpine"
 
 imagePullSecrets: [portkeyenterpriseregistrycredentials]
 nameOverride: ""
@@ -136,7 +140,7 @@ livenessProbe:
     path: /v1/health
     port: 8787
   initialDelaySeconds: 5
-  periodSeconds: 60
+  periodSeconds: 10
   timeoutSeconds: 3
   failureThreshold: 3
 readinessProbe:
@@ -144,7 +148,7 @@ readinessProbe:
     path: /v1/health
     port: 8787
   initialDelaySeconds: 5
-  periodSeconds: 60
+  periodSeconds: 10
   timeoutSeconds: 3
   successThreshold: 1
   failureThreshold: 3
@@ -253,3 +257,73 @@ dataservice:
     minReplicas: 1
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
+
+# Add dynamic Redis configuration section
+redis:
+  name: "redis"
+  containerPort: 6379
+  statefulSet:
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    replicas: 1
+    # resources:
+    #   limits:
+    #     cpu: 4000m
+    #     memory: 16Gi
+    #   requests:
+    #     cpu: 1000m
+    #     memory: 2Gi
+    command: []
+    startupProbe:
+      exec:
+        command:
+          - /bin/sh
+          - -c
+          - exec redis-cli ping
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    readinessProbe:
+      exec:
+        command:
+          - /bin/sh
+          - -c
+          - exec redis-cli ping
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    livenessProbe:
+      exec:
+        command:
+          - /bin/sh
+          - -c
+          - exec redis-cli ping
+      failureThreshold: 6
+      periodSeconds: 10
+      timeoutSeconds: 1
+    extraContainerConfig: {}
+    extraEnv: []
+    sidecars: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    volumes: []
+    volumeMounts: []
+    persistence:
+      enabled: false
+      size: 2Gi
+      storageClassName: ""
+  service:
+    type: NodePort
+    port: 6379
+    labels: {}
+    annotations: {}
+    loadBalancerSourceRanges: []
+    loadBalancerIP: ""
+  serviceAccount:
+    create: true
+    name: ""
+    labels: {}
+    annotations: {}

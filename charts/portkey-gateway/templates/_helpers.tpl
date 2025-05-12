@@ -145,9 +145,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "redis.selectorLabels" -}}
-app.kubernetes.io/name: redis
+app.kubernetes.io/name: {{ .Values.redis.name }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{- define "redis.serviceAccountName" -}}
+{{- if .Values.redis.serviceAccount.create -}}
+    {{ default (printf "%s" .Values.redis.name) .Values.redis.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.redis.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
 
 {{/*
 Vault Annotations
