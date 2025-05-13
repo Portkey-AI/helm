@@ -448,7 +448,7 @@ Template containing common environment variables that are used by several servic
       key: bedrockAssumedRegion
 {{- end }}
 - name: ALBUS_BASEPATH
-  value: {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}:{{ .Values.backend.containerPort }}
+  value: {{ include "portkey.backendURL" . }}
 - name: ANALYTICS_STORE
   valueFrom:
     secretKeyRef:
@@ -622,3 +622,19 @@ Template containing common environment variables that are used by several servic
   value: {{ .Values.logStorage.encryptionSettings.KMS_ENCRYPTION_CUSTOMER_KEY_MD5 }}
 {{- end }}
 {{- end }}
+
+{{- define "portkey.backendURL" -}}
+{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.backend.containerPort }}
+{{- end -}}
+
+{{- define "portkey.frontendURL" -}}
+{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.backend.service.httpPort }}
+{{- end -}}
+
+{{- define "portkey.dataserviceURL" -}}
+{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.dataservice.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.dataservice.containerPort }}
+{{- end -}}
+
+{{- define "portkey.gatewayURL" -}}
+{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.gateway.containerPort }}
+{{- end -}}

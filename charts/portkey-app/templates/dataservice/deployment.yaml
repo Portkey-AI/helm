@@ -61,11 +61,11 @@ spec:
             - name: PORTKEY_CLIENT_AUTH
               value: {{ .Values.config.defaultGatewayClientAuth | quote }}
             - name: ALBUS_BASEPATH
-              value: {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}:{{ .Values.backend.containerPort }}
+              value: {{ include "portkey.backendURL" . }}
             - name: ALBUS_ENDPOINT
-              value: {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}:{{ .Values.backend.containerPort }}
+              value: {{ include "portkey.backendURL" . }}
             - name: GATEWAY_BASE_URL
-              value: {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }}
+              value: {{ include "portkey.gatewayURL" . }}
             - name: SERVICE_NAME
               value: {{ include "portkey.fullname" . }}-{{ .Values.dataservice.name }}
             - name: FINETUNES_BUCKET
