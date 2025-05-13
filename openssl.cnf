@@ -1,0 +1,21 @@
+[ req ]
+default_bits        = 2048
+default_keyfile     = server.key
+distinguished_name  = req_distinguished_name
+req_extensions      = v3_req
+prompt              = no  # Disable prompt to make it non-interactive
+
+[ req_distinguished_name ]
+C = US
+ST = State
+L = City
+O = YourCompany
+OU = YourOrg
+CN = localhost  # You can also use *.example.com or any other CN
+
+[ v3_req ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = *.portkey.svc.cluster.local  # Wildcard domain for subdomains
+DNS.2 = localhost      # Explicit localhost entry
