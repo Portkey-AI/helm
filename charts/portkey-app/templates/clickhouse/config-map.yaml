@@ -21,7 +21,9 @@ data:
         <server>
           <certificateFile>{{ .Values.clickhouse.https.certs.crt }}</certificateFile>
           <privateKeyFile>{{ .Values.clickhouse.https.certs.key }}</privateKeyFile>
+          {{ if .Values.clickhouse.https.certs.ca }}
           <caConfig>{{ .Values.clickhouse.https.certs.ca }}</caConfig>
+          {{ end }}
           <verificationMode>{{ .Values.clickhouse.https.certs.verificationMode }}</verificationMode>
         </server>
       </openSSL>
