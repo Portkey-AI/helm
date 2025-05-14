@@ -53,7 +53,7 @@ spec:
             - name: VITE_API_URL
               value: {{ .Values.config.defaultGatewayURL | quote }}
             - name: VITE_BASE_URL
-              value: "{{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}:{{ .Values.backend.containerPort }}"
+              value: "{{ include "portkey.backendURL" . }}"
             - name: VITE_PRIVATE_DEPLOYMENT
               value: "ON"
             {{- if .Values.config.oauth.enabled }}

@@ -24,7 +24,7 @@ data:
 
         location /albus/ {
             rewrite ^/albus(.*)$ $1 break;
-            proxy_pass {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}:{{ .Values.backend.containerPort }};
+            proxy_pass {{ include "portkey.backendURL" . }};
             # Pass the original host header
             proxy_set_header Host $http_host;
             
@@ -48,7 +48,7 @@ data:
             {{- if .Values.config.defaultGatewayURL }}
             proxy_pass {{ .Values.config.defaultGatewayURL }};
             {{- else }}
-            proxy_pass {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }};
+            proxy_pass {{ include "portkey.gatewayURL" . }};
             {{- end }}
             # Pass the original host header
             proxy_set_header Host $http_host;
@@ -78,7 +78,7 @@ data:
     }
   config.js: |
     window.APP_CONFIG = { 
-      VITE_API_URL: "{{- if .Values.config.defaultGatewayURL }}{{ .Values.config.defaultGatewayURL }}{{- else }}{{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }}{{- end }}", 
+      VITE_API_URL: "{{- if .Values.config.defaultGatewayURL }}{{ .Values.config.defaultGatewayURL }}{{- else }}{{ include "portkey.gatewayURL" . }}{{- end }}", 
       VITE_BASE_URL: "/albus", 
       VITE_PRIVATE_DEPLOYMENT: "ON", 
       VITE_AUTH_MODE: "{{- if .Values.config.oauth.enabled }}SSO{{- end }}{{- if .Values.config.noAuth.enabled }}NO_AUTH{{- end }}", 

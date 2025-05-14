@@ -60,10 +60,10 @@ spec:
             - name: SERVICE_NAME
               value: {{ include "portkey.fullname" . }}-{{ .Values.backend.name }}
             - name: POLYJUICE_FINETUNE_ENDPOINT
-              value: {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.dataservice.name }}:{{ .Values.dataservice.containerPort }}
+              value: {{ include "portkey.dataserviceURL" . }}
             {{- if .Values.gateway.enabled}}  
             - name: GATEWAY_BASE_URL
-              value: {{ include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}:{{ .Values.gateway.containerPort }}
+              value: {{ include "portkey.gatewayURL" . }}
             - name: GATEWAY_CACHE_MODE
               value: "SELF"
             - name: INTERNAL_GATEWAY_URL
