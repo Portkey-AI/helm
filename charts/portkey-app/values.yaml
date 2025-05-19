@@ -178,7 +178,7 @@ backend:
       httpGet:
         path: /health
         port: 8080
-      initialDelaySeconds: 60
+      initialDelaySeconds: 10
       failureThreshold: 3
       periodSeconds: 10
       timeoutSeconds: 1
@@ -246,7 +246,7 @@ gateway:
       httpGet:
         path: /v1/health
         port: 8787
-      initialDelaySeconds: 3
+      initialDelaySeconds: 10
       failureThreshold: 3
       periodSeconds: 10
       timeoutSeconds: 1
@@ -326,7 +326,7 @@ dataservice:
       httpGet:
         path: /health
         port: 8081
-      initialDelaySeconds: 60
+      initialDelaySeconds: 10
       failureThreshold: 3
       periodSeconds: 10
       timeoutSeconds: 1
@@ -622,6 +622,14 @@ clickhouse:
     database: "default"
     tls: false
     existingSecretName: ""
+  https:
+    enabled: false
+    port: 8443
+    certs:
+      crt: ""
+      key: ""
+      ca: ""
+      verificationMode: "strict"
   containerHttpPort: 8123
   containerNativePort: 9000
   statefulSet:
