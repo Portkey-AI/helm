@@ -34,6 +34,7 @@ vaultConfig:
   vaultHost: vault.hashicorp.com
   secretPath: "path/to/your/secret"
   role: "your-vault-role"
+  kubernetesSecret: ""
 
 environment:
   # Specify whether environment configuration should be deployed
