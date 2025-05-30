@@ -112,12 +112,13 @@ LOG_STORE_AWS_EXTERNAL_ID: "<external id from trust relationship>"
 ```
 
 **Setup Steps:**
-1. Create IAM role with S3 permissions
+1. Create IAM role with S3 permissions (LOG_STORE_AWS_ROLE_ARN)
 2. Set trust relationship with Portkey account
 3. Use external ID for security
 
 **AWS Role Setup**
 
+IAM Policy for S3 Access:
 ```json
 {
   "Version": "2012-10-17",
@@ -125,7 +126,28 @@ LOG_STORE_AWS_EXTERNAL_ID: "<external id from trust relationship>"
     {
       "Effect": "Allow",
       "Action": ["s3:GetObject", "s3:PutObject"],
-      "Resource": ["arn:aws:s3:::bucket", "arn:aws:s3:::bucket/*"]
+      "Resource": ["arn:aws:s3:::<LOG_STORE_GENERATIONS_BUCKET>", "arn:aws:s3:::<LOG_STORE_GENERATIONS_BUCKET>/*"]
+    }
+  ]
+}
+```
+
+Trust Relationship:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "<arn_shared_by_portkey>"
+      },
+      "Action": "sts:AssumeRole",
+      "Condition": {
+        "StringEquals": {
+          "sts:ExternalId": "<LOG_STORE_AWS_EXTERNAL_ID>"
+        }
+      }
     }
   ]
 }
@@ -193,7 +215,7 @@ LOG_STORE_BASEPATH: "<Netapp Base Path Including Bucket Name>"
 </details>
 
 ### Custom S3
-For Self hosted S3 storage solutions
+For Self hosted S3 compliant storage solutions
 <details>
 <summary>Detailed Custom S3 Setup</summary>
 
