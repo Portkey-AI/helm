@@ -92,6 +92,7 @@ When creating Virtual Keys in Portkey, provide:
 - **Bedrock AWS Role ARN**: The ARN of the role with Bedrock permissions (Principal or Separate role)
 - **Bedrock AWS External ID**: (Optional) The external ID for additional security
 - **Bedrock AWS Region**: The AWS region where your Bedrock models are available
+![alt text](../resources/bedrock.png)
 
 ## Important Notes
 
