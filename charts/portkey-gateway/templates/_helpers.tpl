@@ -162,11 +162,12 @@ Vault Annotations
 Vault Environment Variables
 */}}
 {{- define "portkeyenterprise.vaultEnv" -}}
+{{- $secretFile := .Values.vaultConfig.kubernetesSecret | default .Chart.Name }}
 {{- range $key, $value := .Values.environment.data }}
 - name: {{ $key }}
   valueFrom:
     secretKeyRef:
-      name: {{ $.Chart.Name }}
+      name: {{ $secretFile }}
       key: {{ $key }}
 {{- end }}
 {{- end }}
