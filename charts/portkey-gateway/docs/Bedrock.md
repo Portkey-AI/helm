@@ -94,6 +94,31 @@ When creating Virtual Keys in Portkey, provide:
 - **Bedrock AWS Region**: The AWS region where your Bedrock models are available
 ![alt text](../resources/bedrock.png)
 
+
+## Additional configurations
+
+### Using Inference Profiles
+To use inference profiles (ex: arn:aws:bedrock:us-east-1:51711235636:application-inference-profile/jovk7oauswit) in model field instead of foundation models (ex: anthropic.claude-3-7-sonnet-20250219-v1:0),
+the assumed role additionally needs to have access to the following Actions and resources
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:GetInferenceProfile"
+            ],
+            "Resource": [
+                "arn:aws:bedrock:*:*:inference-profile/*",
+                "arn:aws:bedrock:*:*:application-inference-profile/*"
+            ]
+        }
+    ]
+}
+```
+
 ## Important Notes
 
 - Ensure the role ARN used in Virtual Key creation matches the role with Bedrock policy attached
