@@ -8,11 +8,11 @@ images:
   gatewayImage:
     repository: "docker.io/portkeyai/gateway_enterprise"
     pullPolicy: IfNotPresent
-    tag: "1.10.20"
+    tag: "1.11.4"
   dataserviceImage:
     repository: "docker.io/portkeyai/data-service"
     pullPolicy: IfNotPresent
-    tag: "1.1.10"
+    tag: "1.2.4"
 
 imagePullSecrets: [portkeyenterpriseregistrycredentials]
 nameOverride: ""
@@ -230,6 +230,7 @@ dataservice:
       failureThreshold: 3
       periodSeconds: 10
       timeoutSeconds: 1
+    extraEnv: []
     extraContainerConfig: {}
     nodeSelector: {}
     tolerations: []

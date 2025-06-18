@@ -58,6 +58,9 @@ spec:
             {{- include "controlPlane.commonEnv" . | nindent 12 }}
             {{- include "cacheStore.commonEnv" . | nindent 12 }}
             {{- include "logStore.commonEnv" . | nindent 12 }}
+            {{- with .Values.dataservice.deployment.extraEnv }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
           image: "{{ .Values.images.dataserviceImage.repository }}:{{ .Values.images.dataserviceImage.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.images.dataserviceImage.pullPolicy }}
           ports:
