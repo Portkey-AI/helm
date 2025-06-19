@@ -177,7 +177,7 @@ Common Environment Env
 */}}
 {{- define "portkeyenterprise.commonEnv" -}}
 {{- if .Values.useVaultInjection }}
-  {{- include "portkeyenterprise.vaultEnv" .}}
+{{- include "portkeyenterprise.vaultEnv" . | nindent 2}}
 {{- else }}
 {{- if .Values.environment.create }}
 {{- range $key, $value := .Values.environment.data }}
