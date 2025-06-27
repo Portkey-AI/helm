@@ -29,6 +29,9 @@ spec:
       {{- if .Values.dataservice.deployment.autoRestart }}
         rollme: {{ randAlphaNum 5 | quote }}
       {{- end }}
+      {{- if .Values.useVaultInjection }}
+        {{- include "portkeyenterprise.vaultAnnotations" . | nindent 8 }}
+      {{- end }}
       {{- with .Values.dataservice.deployment.annotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
