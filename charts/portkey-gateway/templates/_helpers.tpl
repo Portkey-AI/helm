@@ -201,7 +201,11 @@ Common Environment Env as Map
 {{- define "portkeyenterprise.commonEnvMap" -}}
 {{- $envMap := dict -}}
 {{- if .Values.useVaultInjection }}
-  {{- include "portkeyenterprise.vaultEnv" . | fromYaml | merge $envMap -}}
+  {{- $secretFile := .Values.vaultConfig.kubernetesSecret | default .Chart.Name }}
+  {{- range $key, $value := .Values.environment.data }}
+    {{- $envValue := dict "valueFrom" (dict "secretKeyRef" (dict "name" $secretFile "key" $key)) }}
+    {{- $_ := set $envMap $key $envValue }}
+  {{- end }}
 {{- else if .Values.environment.create }}
   {{- range $key, $value := .Values.environment.data }}
     {{- $envValue := dict -}}
