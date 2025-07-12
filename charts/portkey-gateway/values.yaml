@@ -13,6 +13,10 @@ images:
     repository: "docker.io/portkeyai/data-service"
     pullPolicy: IfNotPresent
     tag: "1.2.4"
+  testImage:
+    repository: "busybox"
+    pullPolicy: IfNotPresent
+    tag: "latest"
 
 imagePullSecrets: [portkeyenterpriseregistrycredentials]
 nameOverride: ""

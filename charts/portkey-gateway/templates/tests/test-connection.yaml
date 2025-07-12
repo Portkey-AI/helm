@@ -9,7 +9,8 @@ metadata:
 spec:
   containers:
     - name: wget
-      image: busybox
+      image: "{{ .Values.images.testImage.repository }}:{{ .Values.images.testImage.tag }}"
+      imagePullPolicy: {{ .Values.images.testImage.pullPolicy }}
       command: ['wget']
       args: ['{{ include "portkeyenterprise.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
