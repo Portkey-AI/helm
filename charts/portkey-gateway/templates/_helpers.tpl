@@ -196,7 +196,7 @@ Common Environment Env
   - name: {{ $key }}
     valueFrom:
       secretKeyRef:
-        name: {{ .Values.environment.existingSecret }}
+        name: {{ $.Values.environment.existingSecret }}
         key: {{ $key }}
 {{- end }}
 {{- end }}
@@ -226,7 +226,7 @@ Common Environment Env as Map
   {{- end }}
 {{- else if .Values.environment.existingSecret }}
   {{- range $key, $value := .Values.environment.data }}
-    {{- $envValue := dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.environment.existingSecret "key" $key)) }}
+    {{- $envValue := dict "valueFrom" (dict "secretKeyRef" (dict "name" $.Values.environment.existingSecret "key" $key)) }}
     {{- $_ := set $envMap $key $envValue }}
   {{- end }}
 {{- end }}
