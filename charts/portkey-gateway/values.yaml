@@ -41,6 +41,8 @@ environment:
   create: true
   # Specify whether environment configuration should be deployed as a Secret or a ConfigMap
   secret: true
+  # Specify the name of an existing Secret to use (when create is false)
+  existingSecret: ""
   # Specify the parameters required by Portkey Enterprise
   data:
     SERVICE_NAME: portkeyenterprise

@@ -191,6 +191,14 @@ Common Environment Env
         name: {{ include "portkeyenterprise.fullname" $ }}
         key: {{ $key }}
 {{- end }}
+{{- else if .Values.environment.existingSecret }}
+{{- range $key, $value := .Values.environment.data }}
+  - name: {{ $key }}
+    valueFrom:
+      secretKeyRef:
+        name: {{ .Values.environment.existingSecret }}
+        key: {{ $key }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -215,6 +223,11 @@ Common Environment Env as Map
       {{- $_ := set $envValue "valueFrom" (dict "configMapKeyRef" (dict "name" (include "portkeyenterprise.fullname" $) "key" $key)) -}}
     {{- end }}
     {{- $_ := set $envMap $key $envValue -}}
+  {{- end }}
+{{- else if .Values.environment.existingSecret }}
+  {{- range $key, $value := .Values.environment.data }}
+    {{- $envValue := dict "valueFrom" (dict "secretKeyRef" (dict "name" .Values.environment.existingSecret "key" $key)) }}
+    {{- $_ := set $envMap $key $envValue }}
   {{- end }}
 {{- end }}
 {{- $envMap | toYaml -}}
