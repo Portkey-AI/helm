@@ -19,8 +19,14 @@ spec:
         {{- end }}
     spec:
       containers:
-        - image: redis:alpine
-          name: redis
-          resources: {}
+        - name: redis
+          image: "{{ .Values.images.redisImage.repository }}:{{ .Values.images.redisImage.tag }}"
+          imagePullPolicy: {{ .Values.images.redisImage.pullPolicy }}
+          ports:
+            - name: redis
+              containerPort: {{ .Values.redis.containerPort }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.redis.resources | nindent 12 }}
       restartPolicy: Always
 {{- end -}}
