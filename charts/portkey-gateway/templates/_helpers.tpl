@@ -192,12 +192,18 @@ Common Environment Env
         key: {{ $key }}
 {{- end }}
 {{- else if .Values.environment.existingSecret }}
+{{- $secret := lookup "v1" "Secret" .Release.Namespace .Values.environment.existingSecret }}
 {{- range $key, $value := .Values.environment.data }}
+{{- if and $secret (hasKey $secret.data $key) }}
   - name: {{ $key }}
     valueFrom:
       secretKeyRef:
         name: {{ $.Values.environment.existingSecret }}
         key: {{ $key }}
+{{- else }}
+  - name: {{ $key }}
+    value: {{ $value | quote }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -225,10 +231,16 @@ Common Environment Env as Map
     {{- $_ := set $envMap $key $envValue -}}
   {{- end }}
 {{- else if .Values.environment.existingSecret }}
-  {{- range $key, $value := .Values.environment.data }}
+{{- $secret := lookup "v1" "Secret" .Release.Namespace .Values.environment.existingSecret }}
+{{- range $key, $value := .Values.environment.data }}
+{{- if and $secret (hasKey $secret.data $key) }}
     {{- $envValue := dict "valueFrom" (dict "secretKeyRef" (dict "name" $.Values.environment.existingSecret "key" $key)) }}
     {{- $_ := set $envMap $key $envValue }}
-  {{- end }}
+{{- else }}
+    {{- $envValue := dict "value" ($value | toString) }}
+    {{- $_ := set $envMap $key $envValue }}
+{{- end }}
+{{- end }}
 {{- end }}
 {{- $envMap | toYaml -}}
 {{- end }}
