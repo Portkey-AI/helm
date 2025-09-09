@@ -58,8 +58,6 @@ spec:
               value: {{ .Values.dataservice.containerPort | quote }}
             - name: PRIVATE_DEPLOYMENT
               value: "ON"
-            - name: PORTKEY_CLIENT_AUTH
-              value: {{ .Values.config.defaultGatewayClientAuth | quote }}
             - name: ALBUS_BASEPATH
               value: {{ include "portkey.backendURL" . }}
             - name: ALBUS_ENDPOINT

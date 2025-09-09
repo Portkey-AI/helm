@@ -144,10 +144,16 @@ the user or some other secret provisioning mechanism
 {{- include "portkey.fullname" . }}-{{ .Values.gateway.name }}
 {{- end }}
 
+{{- define "portkey.gatewayClientAuth" -}}
+{{- .Values.config.defaultGatewayClientAuth | default "client_auth-PRIVATE_SEVICE" | quote }}
+{{- end }}
+
 {{/*
 Template containing common environment variables that are used by several services.
 */}}
 {{- define "portkey.commonEnv" -}}
+- name: PORTKEY_CLIENT_AUTH
+  value: {{ include "portkey.gatewayClientAuth" . }}
 - name: REDIS_URL
   valueFrom:
     secretKeyRef:
@@ -430,6 +436,8 @@ Template containing common environment variables that are used by several servic
 
 {{- define "gateway.commonEnv" -}}
 {{- include "logStore.commonEnv" . }}
+- name: PORTKEY_CLIENT_AUTH
+  value: {{ include "portkey.gatewayClientAuth" . }}
 {{- if .Values.bedrockAssumed.enabled }}
 - name: AWS_ASSUME_ROLE_ACCESS_KEY_ID
   valueFrom:
