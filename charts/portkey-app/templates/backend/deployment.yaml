@@ -71,8 +71,6 @@ spec:
             {{- else }}
             - name: GATEWAY_BASE_URL
               value: {{ .Values.config.defaultGatewayURL | quote }}
-            - name: PORTKEY_CLIENT_AUTH
-              value: {{ .Values.config.defaultGatewayClientAuth | quote }}
             {{- end }}
             {{- if .Values.config.controlPlaneURL }}
             - name: CONTROL_PLANE_URL
