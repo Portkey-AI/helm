@@ -76,6 +76,7 @@ Can be used alongside either option above to push analytics data to OTEL-compati
 OTEL_PUSH_ENABLED: true
 OTEL_ENDPOINT: "http://localhost:4318"
 OTEL_RESOURCE_ATTRIBUTES: "ApplicationShortName=gateway,AssetId=12323"
+OTEL_EXPORTER_OTLP_HEADERS: "DD-API_KEY=Bearer asd,x-api-key=test"
 ```
 </details>
 
