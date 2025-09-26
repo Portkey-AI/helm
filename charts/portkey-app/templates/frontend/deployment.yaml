@@ -75,11 +75,6 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              echo "Starting copy operations..."
-              ls -l /config
-              cp /config/nginx.conf /etc/nginx/conf.d/default.conf && echo "nginx.conf copied" || echo "Failed to copy nginx.conf"
-              cp /config/config.js /usr/share/nginx/html/config.js && echo "config.js copied" || echo "Failed to copy config.js"
-              echo "Copy operations completed"
               echo "Starting Nginx..."
               exec nginx -g 'daemon off;'
           ports:
@@ -108,8 +103,14 @@ spec:
             {{- end }}
             - name: app-config
               mountPath: /config
-            # - name: config-volume
-            #   mountPath: /config
+            - name: app-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: nginx.conf
+            - name: app-config
+              mountPath: /usr/share/nginx/html/config.js
+              subPath: config.js
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
           {{- with .Values.frontend.deployment.extraContainerConfig }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -135,6 +136,8 @@ spec:
         - name: app-config
           configMap:
             name: {{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}
+        - name: nginx-cache
+          emptyDir: {}
             # items:
             #   - key: nginx.conf
             #     path: nginx.conf
