@@ -8,11 +8,11 @@ images:
   gatewayImage:
     repository: "docker.io/portkeyai/gateway_enterprise"
     pullPolicy: IfNotPresent
-    tag: "1.12.2"
+    tag: "1.15.3"
   dataserviceImage:
     repository: "docker.io/portkeyai/data-service"
     pullPolicy: IfNotPresent
-    tag: "1.2.5"
+    tag: "1.2.7"
   # Add Redis image configuration
   redisImage:
     repository: "docker.io/redis"
