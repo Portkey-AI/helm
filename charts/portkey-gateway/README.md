@@ -77,6 +77,7 @@ OTEL_PUSH_ENABLED: true
 OTEL_ENDPOINT: "http://localhost:4318"
 OTEL_RESOURCE_ATTRIBUTES: "ApplicationShortName=gateway,AssetId=12323"
 OTEL_EXPORTER_OTLP_HEADERS: "DD-API_KEY=Bearer asd,x-api-key=test"
+OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf" # supported values: "http/json"(default if not supplied) and "http/protobuf"
 ```
 </details>
 
