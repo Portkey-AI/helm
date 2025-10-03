@@ -436,8 +436,8 @@ kubectl -n portkey exec -it deploy/<release>-portkey-backend -- ls -l /mnt/secre
 
 ## Rotation
 - AWS Secrets Manager rotations update mounted files automatically.
-- When consuming via env vars (Option A), restart pods to pick up new values if needed.
-- When using file paths (Option B), many apps read on startup; restart pods if your configuration is loaded once at boot.
+- Pods have to be restarted for these values to be updated in the applications
+- Some third party tools like [Reloader](https://github.com/stakater/Reloader) can be used for automatic deployments based on changes in kubernetes secrets. 
 
 ## Troubleshooting
 - Ensure IRSA role is attached to the service accounts and has required permissions.
