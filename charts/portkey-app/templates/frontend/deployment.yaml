@@ -79,7 +79,7 @@ spec:
               exec nginx -g 'daemon off;'
           ports:
             - name: frontend
-              containerPort: {{ .Values.frontend.containerPort }}
+              containerPort: {{ .Values.frontend.containerPort | default 80 }}
               protocol: TCP
           {{- with .Values.frontend.deployment.startupProbe }}
           startupProbe:
@@ -111,6 +111,8 @@ spec:
               subPath: config.js
             - name: nginx-cache
               mountPath: /var/cache/nginx
+            - name: run
+              mountPath: /run
           {{- with .Values.frontend.deployment.extraContainerConfig }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -137,6 +139,8 @@ spec:
           configMap:
             name: {{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}
         - name: nginx-cache
+          emptyDir: {}
+        - name: run
           emptyDir: {}
             # items:
             #   - key: nginx.conf
