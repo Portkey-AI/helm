@@ -11,10 +11,10 @@ Applications accept values either as direct strings or as filesystem paths. For 
 ## Prerequisites
 1. Amazon EKS cluster (v1.23+ recommended)
 2. AWS CLI configured and `kubectl` access
-3. An IRSA role with `secretsmanager:GetSecretValue` and `secretsmanager:DescribeSecret`
+3. An IRSA role with `secretsmanager:GetSecretValue` and `secretsmanager:DescribeSecret`.
 4. Portkey release namespace created (e.g., `portkey`)
 
-Example IAM policy for IRSA:
+[Example IAM policy](https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access_iam-policies.html#auth-and-access_examples-read-and-describe) for IRSA:
 ```json
 {
   "Version": "2012-10-17",
@@ -443,3 +443,11 @@ kubectl -n portkey exec -it deploy/<release>-portkey-backend -- ls -l /mnt/secre
 - Ensure IRSA role is attached to the service accounts and has required permissions.
 - `SecretProviderClass` must be in the same namespace as workloads.
 - For mount-only, confirm keys exist as files under `/mnt/secrets` inside pods.
+
+
+## References
+- [Secrets Store CSI Driver docs](https://secrets-store-csi-driver.sigs.k8s.io/)
+- [AWS Provider for CSI Driver](https://aws.github.io/secrets-store-csi-driver-provider-aws/)
+- [Sync secrets to Kubernetes Secrets](https://secrets-store-csi-driver.sigs.k8s.io/topics/sync-as-kubernetes-secret.html)
+- [Secret rotation with CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io/topics/secret-auto-rotation)
+- [AWS EKS IRSA With Secret Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_ascp_irsa.html)
