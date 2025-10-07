@@ -199,6 +199,7 @@ backend:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -267,6 +268,7 @@ gateway:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -347,6 +349,7 @@ dataservice:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -413,6 +416,7 @@ frontend:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -507,6 +511,7 @@ mysql:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -585,6 +590,7 @@ redis:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -673,6 +679,7 @@ clickhouse:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
