@@ -122,6 +122,10 @@ spec:
         {{- with .Values.mysql.statefulSet.sidecars }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- with .Values.mysql.statefulSet.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.mysql.statefulSet.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

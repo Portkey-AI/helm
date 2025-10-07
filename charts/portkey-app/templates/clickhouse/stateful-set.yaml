@@ -108,6 +108,10 @@ spec:
         {{- with .Values.clickhouse.statefulSet.sidecars }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- with .Values.clickhouse.statefulSet.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.clickhouse.statefulSet.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
