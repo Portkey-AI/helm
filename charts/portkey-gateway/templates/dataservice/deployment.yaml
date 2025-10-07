@@ -96,6 +96,10 @@ spec:
         {{- with .Values.dataservice.deployment.sidecars }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- with .Values.dataservice.deployment.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.dataservice.deployment.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
