@@ -188,6 +188,8 @@ volumeMounts: []
 
 extraContainerConfig: {}
 
+topologySpreadConstraints: []
+
 nodeSelector: {}
 
 tolerations: []
@@ -239,6 +241,7 @@ dataservice:
       timeoutSeconds: 1
     extraEnv: []
     extraContainerConfig: {}
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
