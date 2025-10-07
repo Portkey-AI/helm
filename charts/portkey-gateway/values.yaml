@@ -265,6 +265,17 @@ dataservice:
     minReplicas: 1
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+    behavior:
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        podScaleUpValue: 2
+        percentScaleUpValue: 100
+        periodSeconds: 2
+      scaleDown:
+        stabilizationWindowSeconds: 300
+        podScaleDownValue: 1
+        periodSeconds: 60
 
 # Redis-specific configuration section
 redis:
