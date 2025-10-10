@@ -199,6 +199,10 @@ affinity: {}
 # if you want to restart instance automatically
 autoRestart: false
 
+mcp:
+  enabled: false
+  containerPort: 8788
+
 dataservice:
   name: "dataservice"
   enabled: false
@@ -250,6 +254,7 @@ dataservice:
   service:
     type: ClusterIP
     port: 8081
+    mcpport: 8788
     labels: {}
     annotations: {}
     loadBalancerSourceRanges: []

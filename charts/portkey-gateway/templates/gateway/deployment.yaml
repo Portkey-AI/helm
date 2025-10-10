@@ -56,6 +56,11 @@ spec:
             - name: "gateway"
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+            {{- if .Values.mcp.enabled }}
+            - name: "mcp"
+              containerPort: {{ .Values.service.mcpport }}
+              protocol: TCP
+            {{- end }}
           env:
             {{- if .Values.dataservice.enabled }}
               - name: DATASERVICE_BASEPATH
