@@ -316,3 +316,61 @@ Common Environment Env as Map
 {{- include "portkeyenterprise.renderEnvVar" (list "CLICKHOUSE_PASSWORD" ($commonEnv.ANALYTICS_STORE_PASSWORD)) | nindent 0 }}
 {{- include "portkeyenterprise.renderEnvVar" (list "AWS_S3_FINETUNE_BUCKET" ($commonEnv.FINETUNES_BUCKET)) | nindent 0 }}
 {{- end }}
+
+{{/*
+mcp.serverMode
+→ Returns string
+*/}}
+{{- define "mcp.serverMode" -}}
+{{- $env := (include "portkeyenterprise.commonEnvMap" . | fromYaml) -}}
+{{- $serverMode := "" -}}
+{{- if hasKey $env "SERVER_MODE" -}}
+  {{- $entry := index $env "SERVER_MODE" -}}
+  {{- if hasKey $entry "value" -}}
+    {{- $serverMode = (index $entry "value") | toString -}}
+  {{- else -}}
+    {{- $serverMode = (index .Values.environment.data "SERVER_MODE") | default "" | toString -}}
+  {{- end -}}
+{{- else -}}
+  {{- $serverMode = (index .Values.environment.data "SERVER_MODE") | default "" | toString -}}
+{{- end -}}
+{{- $serverMode | trim | toString -}}
+{{- end -}}
+
+{{/*
+mcp.enabled
+→ Returns boolean
+*/}}
+{{- define "mcp.enabled" -}}
+{{- $serverMode := include "mcp.serverMode" . -}}
+{{- if or (eq $serverMode "all") (eq $serverMode "mcp") -}}
+{{- true -}}
+{{- else -}}
+{{- false -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+mcp.containerPort
+→ Returns integer port
+*/}}
+{{- define "mcp.containerPort" -}}
+{{- $env := (include "portkeyenterprise.commonEnvMap" . | fromYaml) -}}
+{{- $port := "" -}}
+{{- if hasKey $env "MCP_PORT" -}}
+  {{- $entry := index $env "MCP_PORT" -}}
+  {{- if hasKey $entry "value" -}}
+    {{- $port = (index $entry "value") | toString -}}
+  {{- else -}}
+    {{- $port = (index .Values.environment.data "MCP_PORT") | default "" | toString -}}
+  {{- end -}}
+{{- else -}}
+  {{- $port = (index .Values.environment.data "MCP_PORT") | default "" | toString -}}
+{{- end -}}
+{{- /* Return integer safely */ -}}
+{{- if eq $port "" -}}
+8788
+{{- else -}}
+{{- $port | int -}}
+{{- end -}}
+{{- end -}}

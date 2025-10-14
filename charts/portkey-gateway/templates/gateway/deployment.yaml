@@ -56,9 +56,9 @@ spec:
             - name: "gateway"
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-            {{- if .Values.mcp.enabled }}
+            {{- if include "mcp.enabled" . }}
             - name: "mcp"
-              containerPort: {{ .Values.mcp.containerPort }}
+              containerPort: {{ include "mcp.containerPort" . }}
               protocol: TCP
             {{- end }}
           env:
