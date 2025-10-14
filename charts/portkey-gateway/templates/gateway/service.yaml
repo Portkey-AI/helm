@@ -17,7 +17,7 @@ spec:
       protocol: TCP
       name: gateway
     {{- if .Values.mcp.enabled }}
-    - port: {{ .Values.service.mcpport }}
+    - port: {{ .Values.mcp.containerPort }}
       targetPort: mcp
       protocol: TCP
       name: mcp

@@ -58,7 +58,7 @@ spec:
               protocol: TCP
             {{- if .Values.mcp.enabled }}
             - name: "mcp"
-              containerPort: {{ .Values.service.mcpport }}
+              containerPort: {{ .Values.mcp.containerPort }}
               protocol: TCP
             {{- end }}
           env:
