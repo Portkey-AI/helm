@@ -87,6 +87,8 @@ environment:
     FINETUNES_BUCKET: 
     LOG_EXPORTS_BUCKET: 
     FINETUNES_AWS_ROLE_ARN: 
+    SERVER_MODE: 
+    MCP_PORT: 
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -198,6 +200,7 @@ affinity: {}
 
 # if you want to restart instance automatically
 autoRestart: false
+
 
 dataservice:
   name: "dataservice"
