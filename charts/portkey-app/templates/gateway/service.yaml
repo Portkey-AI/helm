@@ -25,6 +25,12 @@ spec:
       port: {{ .Values.gateway.service.port }}
       targetPort: gateway
       protocol: TCP
+    {{- if .Values.mcp.enabled }}
+    - name: mcp
+      port: {{ .Values.mcp.containerPort }}
+      targetPort: mcp
+      protocol: TCP
+    {{- end }}
   selector:
     {{- include "portkey.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}
