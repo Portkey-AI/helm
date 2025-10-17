@@ -63,6 +63,12 @@ spec:
               value: "SELF"
             - name: DATASERVICE_BASEPATH
               value: {{ include "portkey.dataserviceURL" . }}
+            {{- if .Values.mcp.enabled }}
+            - name: MCP_GATEWAY_BASE_URL
+              value: {{ .Values.mcp.externalUrl | quote }}
+            - name: SERVER_MODE
+              value: "all"
+            {{- end }}
             {{- with .Values.gateway.deployment.extraEnv }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -79,6 +85,11 @@ spec:
             - name: gateway
               containerPort: {{ .Values.gateway.containerPort }}
               protocol: TCP
+            {{- if .Values.mcp.enabled }}
+            - name: mcp
+              containerPort: {{ .Values.mcp.containerPort }}
+              protocol: TCP
+            {{- end }}
           {{- with .Values.gateway.deployment.startupProbe }}
           startupProbe:
             {{- toYaml . | nindent 12 }}

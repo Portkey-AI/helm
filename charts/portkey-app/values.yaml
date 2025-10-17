@@ -235,6 +235,11 @@ backend:
         podScaleDownValue: 1
         periodSeconds: 60
 
+mcp:
+  enabled: false
+  containerPort: 8788
+  externalUrl: ""
+
 gateway:
   name: "gateway"
   enabled: true
@@ -297,8 +302,8 @@ gateway:
     labels: {}
     annotations: {}
   autoscaling:
-    enabled: true
-    createHpa: true
+    enabled: false
+    createHpa: false
     minReplicas: 2
     maxReplicas: 20
     targetCPUUtilizationPercentage: 60
