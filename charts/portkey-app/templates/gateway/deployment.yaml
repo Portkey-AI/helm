@@ -66,6 +66,8 @@ spec:
             {{- if .Values.mcp.enabled }}
             - name: MCP_GATEWAY_BASE_URL
               value: {{ .Values.mcp.externalUrl | quote }}
+            - name: MCP_PORT
+              value: {{ .Values.mcp.containerPort | quote }}
             - name: SERVER_MODE
               value: "all"
             {{- end }}

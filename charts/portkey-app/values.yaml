@@ -68,8 +68,12 @@ ingress:
 
 gatewayIngress:
   enabled: true
-  hostname: ""
   ingressClassName: "nginx"
+  hostname: "" # domain for gateway
+  mcpHostname: ""  # Separate subdomain for MCP
+  hostBased: true  # Set to false for path-based routing
+  gatewayPath: "/"   # Path for gateway (when hostBased: false)
+  mcpPath: "/mcp"    # Path for MCP (when hostBased: false)
   annotations: {}
   labels: {}
   tls: []
@@ -302,8 +306,8 @@ gateway:
     labels: {}
     annotations: {}
   autoscaling:
-    enabled: false
-    createHpa: false
+    enabled: true
+    createHpa: true
     minReplicas: 2
     maxReplicas: 20
     targetCPUUtilizationPercentage: 60
