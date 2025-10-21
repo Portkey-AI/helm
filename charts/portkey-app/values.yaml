@@ -68,8 +68,12 @@ ingress:
 
 gatewayIngress:
   enabled: true
-  hostname: ""
   ingressClassName: "nginx"
+  hostname: "" # domain for gateway
+  mcpHostname: ""  # Separate subdomain for MCP
+  hostBased: true  # Set to false for path-based routing
+  gatewayPath: "/"   # Path for gateway (when hostBased: false)
+  mcpPath: "/mcp"    # Path for MCP (when hostBased: false)
   annotations: {}
   labels: {}
   tls: []
@@ -234,6 +238,11 @@ backend:
         stabilizationWindowSeconds: 300
         podScaleDownValue: 1
         periodSeconds: 60
+
+mcp:
+  enabled: false
+  containerPort: 8788
+  externalUrl: ""
 
 gateway:
   name: "gateway"

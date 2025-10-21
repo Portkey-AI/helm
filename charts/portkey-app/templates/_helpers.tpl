@@ -646,3 +646,7 @@ Template containing common environment variables that are used by several servic
 {{- define "portkey.gatewayURL" -}}
 {{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.gateway.containerPort }}
 {{- end -}}
+
+{{- define "portkey.mcpURL" -}}
+{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.mcp.containerPort }}
+{{- end -}}

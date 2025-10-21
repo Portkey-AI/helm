@@ -13,6 +13,7 @@ metadata:
 spec:
   ingressClassName: {{ .Values.gatewayIngress.ingressClassName }}
   rules:
+    {{- if .Values.gatewayIngress.hostBased }}
     - host: {{ .Values.gatewayIngress.hostname }}
       http:
         paths:
@@ -23,6 +24,39 @@ spec:
                 name: {{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}
                 port:
                   number: {{ .Values.gateway.service.port }}
+    {{- if .Values.mcp.enabled }}
+    - host: {{ .Values.gatewayIngress.mcpHostname | default (printf "mcp.%s" .Values.gatewayIngress.hostname) }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}
+                port:
+                  number: {{ .Values.mcp.containerPort }}
+    {{- end }}
+    {{- else }}
+    - host: {{ .Values.gatewayIngress.hostname }}
+      http:
+        paths:
+          {{- if .Values.mcp.enabled }}
+          - path: {{ .Values.gatewayIngress.mcpPath | default "/mcp" }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}
+                port:
+                  number: {{ .Values.mcp.containerPort }}
+          {{- end }}
+          - path: {{ .Values.gatewayIngress.gatewayPath | default "/" }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}
+                port:
+                  number: {{ .Values.gateway.service.port }}
+    {{- end }}
   {{- if .Values.gatewayIngress.tls }}
   tls:
     {{- toYaml .Values.gatewayIngress.tls | nindent 4 }}
