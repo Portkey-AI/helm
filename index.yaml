@@ -7,6 +7,31 @@ entries:
         - name: Chart Source
           url: https://github.com/Portkey-AI/helm
     apiVersion: v2
+    appVersion: 1.3.0
+    created: "2025-10-24T06:51:42.83557927Z"
+    description: Helm chart to deploy the Portkey Full Stack application and all dependent
+      services.
+    digest: c09da9fcb21a4dc5fc010895a1134dfdb29673afd5f42f5bbf0a4b1164200d41
+    home: https://portkey.ai/
+    icon: https://avatars.githubusercontent.com/u/131141116?s=200&v=4
+    maintainers:
+    - email: ayush@portkey.ai
+      name: Ayush
+      url: https://github.com/ayush-portkey
+    - email: sai.t@portkey.ai
+      name: Sai Krishna
+      url: https://github.com/sk-portkey
+    name: app
+    type: application
+    urls:
+    - https://github.com/Portkey-AI/helm/releases/download/app-1.3.0/app-1.3.0.tgz
+    version: 1.3.0
+  - annotations:
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |-
+        - name: Chart Source
+          url: https://github.com/Portkey-AI/helm
+    apiVersion: v2
     appVersion: 1.2.2
     created: "2025-10-07T13:03:06.387368074Z"
     description: Helm chart to deploy the Portkey Full Stack application and all dependent
@@ -608,4 +633,4 @@ entries:
     urls:
     - https://github.com/Portkey-AI/helm/releases/download/gateway-1.0.3/gateway-1.0.3.tgz
     version: 1.0.3
-generated: "2025-10-16T03:20:59.851602078Z"
+generated: "2025-10-24T06:51:42.835707259Z"
