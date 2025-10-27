@@ -128,6 +128,18 @@ ingress:
   annotations: {}
   labels: {}
   tls: []
+  # Set to true for host-based routing (separate hostnames for gateway and MCP)
+  # Set to false for path-based routing (same hostname, different paths)
+  hostBased: false
+  # MCP hostname (only used when hostBased is true)
+  # Defaults to "mcp.{hostname}" if not specified
+  mcpHostname: ""
+  # MCP path (only used when hostBased is false)
+  # Defaults to "/mcp" if not specified
+  mcpPath: "/mcp"
+  # Gateway path (only used when hostBased is false)
+  # Defaults to "/" if not specified
+  gatewayPath: "/"
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
