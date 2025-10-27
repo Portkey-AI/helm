@@ -13,6 +13,7 @@ metadata:
 spec:
   ingressClassName: {{ .Values.ingress.ingressClassName }}
   rules:
+    {{- if .Values.ingress.hostBased }}
     - host: {{ .Values.ingress.hostname }}
       http:
         paths:
@@ -23,6 +24,39 @@ spec:
                 name: {{ include "portkeyenterprise.fullname" . }}
                 port:
                   number: {{ .Values.service.port }}
+    {{- if eq (include "mcp.enabled" .) "true" }}
+    - host: {{ .Values.ingress.mcpHostname | default (printf "mcp.%s" .Values.ingress.hostname) }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "portkeyenterprise.fullname" . }}
+                port:
+                  number: {{ include "mcp.containerPort" . }}
+    {{- end }}
+    {{- else }}
+    - host: {{ .Values.ingress.hostname }}
+      http:
+        paths:
+          {{- if eq (include "mcp.enabled" .) "true" }}
+          - path: {{ .Values.ingress.mcpPath | default "/mcp" }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "portkeyenterprise.fullname" . }}
+                port:
+                  number: {{ include "mcp.containerPort" . }}
+          {{- end }}
+          - path: {{ .Values.ingress.gatewayPath | default "/" }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "portkeyenterprise.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+    {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
     {{- toYaml .Values.ingress.tls | nindent 4 }}
