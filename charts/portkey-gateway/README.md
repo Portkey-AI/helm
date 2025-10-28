@@ -86,9 +86,9 @@ OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf" # supported values: "http/json"(def
 The [Semantic conventions for GenAI Traces](https://opentelemetry.io/docs/specs/semconv/gen-ai/gen-ai-spans/) are still under development hence this feature is experimental
 
 ```yaml
-EXPERIMENTAL_OTEL_PUSH_ENABLED: true
-EXPERIMENTAL_OTEL_OTLP_ENDPOINT: https://api.smith.langchain.com/otel
-EXPERIMENTAL_OTEL_OTLP_HEADERS: x-api-key=langsmith-api-key
+EXPERIMENTAL_GEN_AI_OTEL_PUSH_ENABLED: true
+EXPERIMENTAL_GEN_AI_OTEL_OTLP_ENDPOINT: https://api.smith.langchain.com/otel
+EXPERIMENTAL_GEN_AI_OTEL_OTLP_HEADERS: x-api-key=langsmith-api-key
 ```
 </details>
 
