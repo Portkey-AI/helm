@@ -180,7 +180,7 @@ Common Environment Env
 {{- include "portkeyenterprise.vaultEnv" . | nindent 2}}
 {{- else }}
 {{- if .Values.environment.create }}
-{{- range $key, $value := .Values.environment.data }}
+  {{- range $key, $value := .Values.environment.data }}
   - name: {{ $key }}
     valueFrom:
       {{- if $.Values.environment.secret }}
@@ -190,21 +190,41 @@ Common Environment Env
       {{- end }}
         name: {{ include "portkeyenterprise.fullname" $ }}
         key: {{ $key }}
-{{- end }}
+  {{- end }}
 {{- else if .Values.environment.existingSecret }}
-{{- $secret := lookup "v1" "Secret" .Release.Namespace .Values.environment.existingSecret }}
-{{- range $key, $value := .Values.environment.data }}
-{{- if and $secret (hasKey $secret.data $key) }}
+  {{- /* Auto-detect mode based on presence of secretKeys */}}
+  {{- if .Values.environment.secretKeys }}
+    {{- /* EXPLICIT MODE: secretKeys provided */}}
+    {{- range .Values.environment.secretKeys }}
+  - name: {{ . }}
+    valueFrom:
+      secretKeyRef:
+        name: {{ $.Values.environment.existingSecret }}
+        key: {{ . }}
+    {{- end }}
+    {{- /* Add non-secret data values (skip keys that are in secretKeys) */}}
+    {{- range $key, $value := .Values.environment.data }}
+      {{- if not (has $key $.Values.environment.secretKeys) }}
+  - name: {{ $key }}
+    value: {{ $value | quote }}
+      {{- end }}
+    {{- end }}
+  {{- else }}
+    {{- /* AUTO MODE : No secretKeys provided, use lookup with fallback */}}
+    {{- $secret := lookup "v1" "Secret" .Release.Namespace .Values.environment.existingSecret }}
+    {{- range $key, $value := .Values.environment.data }}
+      {{- if and $secret (hasKey $secret.data $key) }}
   - name: {{ $key }}
     valueFrom:
       secretKeyRef:
         name: {{ $.Values.environment.existingSecret }}
         key: {{ $key }}
-{{- else }}
+      {{- else }}
   - name: {{ $key }}
     value: {{ $value | quote }}
-{{- end }}
-{{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -231,16 +251,33 @@ Common Environment Env as Map
     {{- $_ := set $envMap $key $envValue -}}
   {{- end }}
 {{- else if .Values.environment.existingSecret }}
-{{- $secret := lookup "v1" "Secret" .Release.Namespace .Values.environment.existingSecret }}
-{{- range $key, $value := .Values.environment.data }}
-{{- if and $secret (hasKey $secret.data $key) }}
-    {{- $envValue := dict "valueFrom" (dict "secretKeyRef" (dict "name" $.Values.environment.existingSecret "key" $key)) }}
-    {{- $_ := set $envMap $key $envValue }}
-{{- else }}
-    {{- $envValue := dict "value" ($value | toString) }}
-    {{- $_ := set $envMap $key $envValue }}
-{{- end }}
-{{- end }}
+  {{- /* Auto-detect mode based on presence of secretKeys */}}
+  {{- if .Values.environment.secretKeys }}
+    {{- /* EXPLICIT MODE: secretKeys provided */}}
+    {{- range .Values.environment.secretKeys }}
+      {{- $envValue := dict "valueFrom" (dict "secretKeyRef" (dict "name" $.Values.environment.existingSecret "key" .)) }}
+      {{- $_ := set $envMap . $envValue }}
+    {{- end }}
+    {{- /* Add non-secret data values (skip keys that are in secretKeys) */}}
+    {{- range $key, $value := .Values.environment.data }}
+      {{- if not (has $key $.Values.environment.secretKeys) }}
+        {{- $envValue := dict "value" ($value | toString) }}
+        {{- $_ := set $envMap $key $envValue }}
+      {{- end }}
+    {{- end }}
+  {{- else }}
+    {{- /* AUTO MODE : No secretKeys provided, use lookup with fallback */}}
+    {{- $secret := lookup "v1" "Secret" .Release.Namespace .Values.environment.existingSecret }}
+    {{- range $key, $value := .Values.environment.data }}
+      {{- if and $secret (hasKey $secret.data $key) }}
+        {{- $envValue := dict "valueFrom" (dict "secretKeyRef" (dict "name" $.Values.environment.existingSecret "key" $key)) }}
+        {{- $_ := set $envMap $key $envValue }}
+      {{- else }}
+        {{- $envValue := dict "value" ($value | toString) }}
+        {{- $_ := set $envMap $key $envValue }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{- $envMap | toYaml -}}
 {{- end }}

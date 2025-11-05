@@ -46,9 +46,32 @@ environment:
   create: true
   # Specify whether environment configuration should be deployed as a Secret or a ConfigMap
   secret: true
-  # Specify the name of an existing Secret to use (when create is false)
+  
+  # Use an existing Secret for sensitive values (when create is false)
   existingSecret: ""
-  # Specify the parameters required by Portkey Enterprise
+  
+  # When secretKeys is provided (recommended):
+  #   - Keys listed here are pulled from the external secret
+  #   - Other keys in environment.data are used as direct values
+  #   - Clear separation of sensitive vs non-sensitive configuration
+  # 
+  # When secretKeys is empty :
+  #   - Uses Kubernetes lookup to check if keys exist in secret
+  #   - Falls back to environment.data values if keys not found
+  secretKeys: []
+  #  - REDIS_URL
+  #  - LOG_STORE_ACCESS_KEY
+  #  - LOG_STORE_SECRET_KEY
+  #  - ANALYTICS_STORE_PASSWORD
+  #  - AZURE_STORAGE_KEY
+  #  - AWS_ASSUME_ROLE_ACCESS_KEY_ID
+  #  - AWS_ASSUME_ROLE_SECRET_ACCESS_KEY
+  #  - MONGO_DB_CONNECTION_URL
+  
+  # Application environment variables
+  # When using existingSecret with explicit mode:
+  #   - Keys listed in secretKeys come from the external secret
+  #   - All other keys come from this data section as direct values
   data:
     SERVICE_NAME: portkeyenterprise
     PORT: "8787"
