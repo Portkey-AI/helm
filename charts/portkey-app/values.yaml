@@ -406,7 +406,7 @@ dataservice:
 
 frontend:
   name: "frontend"
-  containerPort: 80
+  containerPort: 8080
   deployment:
     autoRestart: true
     replicas: 1
