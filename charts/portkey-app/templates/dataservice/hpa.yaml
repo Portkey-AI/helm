@@ -29,4 +29,20 @@ spec:
           type: Utilization
           averageUtilization: {{ .Values.dataservice.autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: {{ .Values.dataservice.autoscaling.behavior.scaleUp.stabilizationWindowSeconds | default 0 }}
+      policies:
+      - type: Pods
+        value: {{ .Values.dataservice.autoscaling.behavior.scaleUp.podScaleUpValue | default 4 }}
+        periodSeconds: {{ .Values.dataservice.autoscaling.behavior.scaleUp.periodSeconds | default 15 }}
+      - type: Percent
+        value: {{ .Values.dataservice.autoscaling.behavior.scaleUp.percentScaleUpValue | default 100 }}
+        periodSeconds: {{ .Values.dataservice.autoscaling.behavior.scaleUp.periodSeconds | default 15 }}
+    scaleDown:
+      stabilizationWindowSeconds: {{ .Values.dataservice.autoscaling.behavior.scaleDown.stabilizationWindowSeconds | default 300 }}
+      policies:
+      - type: Pods
+        value: {{ .Values.dataservice.autoscaling.behavior.scaleDown.podScaleDownValue | default 1 }}
+        periodSeconds: {{ .Values.dataservice.autoscaling.behavior.scaleDown.periodSeconds | default 60 }}
 {{- end }}

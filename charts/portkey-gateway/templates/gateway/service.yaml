@@ -16,5 +16,11 @@ spec:
       targetPort: gateway
       protocol: TCP
       name: gateway
+    {{- if include "mcp.enabled" . }}
+    - port: {{ include "mcp.containerPort" . }}
+      targetPort: mcp
+      protocol: TCP
+      name: mcp
+    {{- end }}
   selector:
     {{- include "portkeyenterprise.selectorLabels" . | nindent 4 }}

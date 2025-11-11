@@ -180,7 +180,7 @@ Common Environment Env
 {{- include "portkeyenterprise.vaultEnv" . | nindent 2}}
 {{- else }}
 {{- if .Values.environment.create }}
-{{- range $key, $value := .Values.environment.data }}
+  {{- range $key, $value := .Values.environment.data }}
   - name: {{ $key }}
     valueFrom:
       {{- if $.Values.environment.secret }}
@@ -190,21 +190,41 @@ Common Environment Env
       {{- end }}
         name: {{ include "portkeyenterprise.fullname" $ }}
         key: {{ $key }}
-{{- end }}
+  {{- end }}
 {{- else if .Values.environment.existingSecret }}
-{{- $secret := lookup "v1" "Secret" .Release.Namespace .Values.environment.existingSecret }}
-{{- range $key, $value := .Values.environment.data }}
-{{- if and $secret (hasKey $secret.data $key) }}
+  {{- /* Auto-detect mode based on presence of secretKeys */}}
+  {{- if .Values.environment.secretKeys }}
+    {{- /* EXPLICIT MODE: secretKeys provided */}}
+    {{- range .Values.environment.secretKeys }}
+  - name: {{ . }}
+    valueFrom:
+      secretKeyRef:
+        name: {{ $.Values.environment.existingSecret }}
+        key: {{ . }}
+    {{- end }}
+    {{- /* Add non-secret data values (skip keys that are in secretKeys) */}}
+    {{- range $key, $value := .Values.environment.data }}
+      {{- if not (has $key $.Values.environment.secretKeys) }}
+  - name: {{ $key }}
+    value: {{ $value | quote }}
+      {{- end }}
+    {{- end }}
+  {{- else }}
+    {{- /* AUTO MODE : No secretKeys provided, use lookup with fallback */}}
+    {{- $secret := lookup "v1" "Secret" .Release.Namespace .Values.environment.existingSecret }}
+    {{- range $key, $value := .Values.environment.data }}
+      {{- if and $secret (hasKey $secret.data $key) }}
   - name: {{ $key }}
     valueFrom:
       secretKeyRef:
         name: {{ $.Values.environment.existingSecret }}
         key: {{ $key }}
-{{- else }}
+      {{- else }}
   - name: {{ $key }}
     value: {{ $value | quote }}
-{{- end }}
-{{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -231,16 +251,33 @@ Common Environment Env as Map
     {{- $_ := set $envMap $key $envValue -}}
   {{- end }}
 {{- else if .Values.environment.existingSecret }}
-{{- $secret := lookup "v1" "Secret" .Release.Namespace .Values.environment.existingSecret }}
-{{- range $key, $value := .Values.environment.data }}
-{{- if and $secret (hasKey $secret.data $key) }}
-    {{- $envValue := dict "valueFrom" (dict "secretKeyRef" (dict "name" $.Values.environment.existingSecret "key" $key)) }}
-    {{- $_ := set $envMap $key $envValue }}
-{{- else }}
-    {{- $envValue := dict "value" ($value | toString) }}
-    {{- $_ := set $envMap $key $envValue }}
-{{- end }}
-{{- end }}
+  {{- /* Auto-detect mode based on presence of secretKeys */}}
+  {{- if .Values.environment.secretKeys }}
+    {{- /* EXPLICIT MODE: secretKeys provided */}}
+    {{- range .Values.environment.secretKeys }}
+      {{- $envValue := dict "valueFrom" (dict "secretKeyRef" (dict "name" $.Values.environment.existingSecret "key" .)) }}
+      {{- $_ := set $envMap . $envValue }}
+    {{- end }}
+    {{- /* Add non-secret data values (skip keys that are in secretKeys) */}}
+    {{- range $key, $value := .Values.environment.data }}
+      {{- if not (has $key $.Values.environment.secretKeys) }}
+        {{- $envValue := dict "value" ($value | toString) }}
+        {{- $_ := set $envMap $key $envValue }}
+      {{- end }}
+    {{- end }}
+  {{- else }}
+    {{- /* AUTO MODE : No secretKeys provided, use lookup with fallback */}}
+    {{- $secret := lookup "v1" "Secret" .Release.Namespace .Values.environment.existingSecret }}
+    {{- range $key, $value := .Values.environment.data }}
+      {{- if and $secret (hasKey $secret.data $key) }}
+        {{- $envValue := dict "valueFrom" (dict "secretKeyRef" (dict "name" $.Values.environment.existingSecret "key" $key)) }}
+        {{- $_ := set $envMap $key $envValue }}
+      {{- else }}
+        {{- $envValue := dict "value" ($value | toString) }}
+        {{- $_ := set $envMap $key $envValue }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{- $envMap | toYaml -}}
 {{- end }}
@@ -316,3 +353,61 @@ Common Environment Env as Map
 {{- include "portkeyenterprise.renderEnvVar" (list "CLICKHOUSE_PASSWORD" ($commonEnv.ANALYTICS_STORE_PASSWORD)) | nindent 0 }}
 {{- include "portkeyenterprise.renderEnvVar" (list "AWS_S3_FINETUNE_BUCKET" ($commonEnv.FINETUNES_BUCKET)) | nindent 0 }}
 {{- end }}
+
+{{/*
+mcp.serverMode
+→ Returns string
+*/}}
+{{- define "mcp.serverMode" -}}
+{{- $env := (include "portkeyenterprise.commonEnvMap" . | fromYaml) -}}
+{{- $serverMode := "" -}}
+{{- if hasKey $env "SERVER_MODE" -}}
+  {{- $entry := index $env "SERVER_MODE" -}}
+  {{- if hasKey $entry "value" -}}
+    {{- $serverMode = (index $entry "value") | toString -}}
+  {{- else -}}
+    {{- $serverMode = (index .Values.environment.data "SERVER_MODE") | default "" | toString -}}
+  {{- end -}}
+{{- else -}}
+  {{- $serverMode = (index .Values.environment.data "SERVER_MODE") | default "" | toString -}}
+{{- end -}}
+{{- $serverMode | trim | toString -}}
+{{- end -}}
+
+{{/*
+mcp.enabled
+→ Returns boolean
+*/}}
+{{- define "mcp.enabled" -}}
+{{- $serverMode := include "mcp.serverMode" . -}}
+{{- if or (eq $serverMode "all") (eq $serverMode "mcp") -}}
+{{- true -}}
+{{- else -}}
+{{- false -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+mcp.containerPort
+→ Returns integer port
+*/}}
+{{- define "mcp.containerPort" -}}
+{{- $env := (include "portkeyenterprise.commonEnvMap" . | fromYaml) -}}
+{{- $port := "" -}}
+{{- if hasKey $env "MCP_PORT" -}}
+  {{- $entry := index $env "MCP_PORT" -}}
+  {{- if hasKey $entry "value" -}}
+    {{- $port = (index $entry "value") | toString -}}
+  {{- else -}}
+    {{- $port = (index .Values.environment.data "MCP_PORT") | default "" | toString -}}
+  {{- end -}}
+{{- else -}}
+  {{- $port = (index .Values.environment.data "MCP_PORT") | default "" | toString -}}
+{{- end -}}
+{{- /* Return integer safely */ -}}
+{{- if eq $port "" -}}
+8788
+{{- else -}}
+{{- $port | int -}}
+{{- end -}}
+{{- end -}}

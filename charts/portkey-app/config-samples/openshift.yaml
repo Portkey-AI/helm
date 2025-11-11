@@ -1,0 +1,138 @@
+imageCredentials:
+  - name: portkeyenterpriseregistrycredentials
+    create: true
+    registry: https://index.docker.io/v1/
+    username: <docker-user>
+    password: <docker-pwd>
+imagePullSecrets: [portkeyenterpriseregistrycredentials]
+  
+images:
+  backendImage:
+    repository: "docker.io/portkeyai/backend"
+    pullPolicy: Always
+    tag: "1.3.2" # get latest version from https://portkey.ai/docs/changelog/backend 
+  frontendImage:
+    repository: "docker.io/portkeyai/frontend"
+    pullPolicy: Always
+    tag: "1.4.8" # get latest version from https://portkey.ai/docs/changelog/frontend 
+  dataserviceImage:
+    repository: "docker.io/portkeyai/data-service"
+    pullPolicy: Always
+    tag: "1.3.0" # get latest version from https://portkey.ai/docs/changelog/data-service
+  gatewayImage:
+    repository: "docker.io/portkeyai/gateway_enterprise"
+    pullPolicy: Always
+    tag: "1.16.2" # get latest version from https://portkey.ai/docs/changelog/enterprise 
+
+config:
+  jwtPrivateKey: "<some_random_string>" # Set to a random string for the jwt private key used for signing the frontend jwt tokens
+  disableOrgCreation: false # Set to true to disable organization creation post installation and first time login
+  disableTestimonial: true # Set to true to disable testimonial section in the frontend
+  noAuth:
+    enabled: true # Set to true to disable authentication and allow access to the application without any authentication
+  controlPlaneURL: "<frontend-lb-endpoint>" # Set to the control plane URL of the frontend lb  
+
+logStorage:
+  logStore: "s3_custom"
+  s3Compat:
+    enabled: true
+    LOG_STORE_ACCESS_KEY: "<s3-access-key>"
+    LOG_STORE_SECRET_KEY: "<s3-secret-key>"
+    LOG_STORE_REGION: "<s3-region>"
+    LOG_STORE_BASEPATH: "<s3-basepath>" # Set to the basepath of the s3 bucket including the bucket name
+
+# -- Ingress configuration for frontend (admin dashboard)
+ingress:
+  enabled: true
+  hostname: "<hostname>" # Set to the hostname of the ingress
+  ingressClassName: "nginx" # Set to the ingress class name
+  annotations: {}
+  labels: {}
+  tls: []
+
+# -- Ingress configuration for gateway (llm gateway)
+gatewayIngress:
+  enabled: true
+  hostname: "<gateway-hostname>" # Set to the hostname of the ingress
+  ingressClassName: "nginx" # Set to the ingress class name
+  annotations: {}
+  labels: {}
+  tls: []
+
+gateway:
+  deployment:
+    replicas: 1 # default replicas are 2
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 500Mi
+
+backend:
+  deployment:
+    resources:
+      limits:
+        cpu: 1500m
+        memory: 1500Mi
+      requests:
+        cpu: 750m
+        memory: 750Mi
+    extraEnv:
+      - name: MODEL_CATALOG_ENABLED
+        value: "ON"
+      - name: JWT_ENABLED
+        value: "ON"
+      - name: PM2_HOME
+        value: "/opt/pm2"
+    volumes:
+      - name: pm2-home
+        emptyDir: {}
+    volumeMounts:
+      - name: pm2-home
+        mountPath: /opt/pm2
+
+frontend:
+  containerPort: 8080 # set to non 80
+
+mysql:
+  external:
+    enabled: false
+    user: "portkey"
+    password: "<mysql-password>"
+    database: "<mysql-database>"
+    rootPassword: "<mysql-root-password>" # Set the same password as the password for the user
+  statefulSet:
+    persistence: 
+      enabled: true
+      size: 3Gi
+      storageClassName: "<storage-class-name>" # Set to the storage class name for the mysql instance
+
+redis:
+  external:
+    enabled: false
+    connectionUrl: redis://redis:6379
+    tlsEnabled: "false"
+    mode: "standalone"
+    store: "redis"
+
+clickhouse:
+  external:
+    enabled: false
+    user: "<clickhouse-user>"
+    password: "<clickhouse-password>"
+    database: "default" # has to be default for the clickhouse instance
+    containerNativePort: 9000
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 8Gi
+    requests:
+      cpu: 1000m
+      memory: 4Gi
+  statefulSet:
+    persistence:
+      enabled: true
+      size: 40Gi
+      storageClassName: "<storage-class-name>" # Set to the storage class name for the clickhouse instance

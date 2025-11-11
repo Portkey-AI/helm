@@ -8,11 +8,11 @@ images:
   gatewayImage:
     repository: "docker.io/portkeyai/gateway_enterprise"
     pullPolicy: IfNotPresent
-    tag: "1.15.3"
+    tag: "1.16.2"
   dataserviceImage:
     repository: "docker.io/portkeyai/data-service"
     pullPolicy: IfNotPresent
-    tag: "1.2.7"
+    tag: "1.3.0"
   # Add Redis image configuration
   redisImage:
     repository: "docker.io/redis"
@@ -46,9 +46,32 @@ environment:
   create: true
   # Specify whether environment configuration should be deployed as a Secret or a ConfigMap
   secret: true
-  # Specify the name of an existing Secret to use (when create is false)
+  
+  # Use an existing Secret for sensitive values (when create is false)
   existingSecret: ""
-  # Specify the parameters required by Portkey Enterprise
+  
+  # When secretKeys is provided (recommended):
+  #   - Keys listed here are pulled from the external secret
+  #   - Other keys in environment.data are used as direct values
+  #   - Clear separation of sensitive vs non-sensitive configuration
+  # 
+  # When secretKeys is empty :
+  #   - Uses Kubernetes lookup to check if keys exist in secret
+  #   - Falls back to environment.data values if keys not found
+  secretKeys: []
+  #  - REDIS_URL
+  #  - LOG_STORE_ACCESS_KEY
+  #  - LOG_STORE_SECRET_KEY
+  #  - ANALYTICS_STORE_PASSWORD
+  #  - AZURE_STORAGE_KEY
+  #  - AWS_ASSUME_ROLE_ACCESS_KEY_ID
+  #  - AWS_ASSUME_ROLE_SECRET_ACCESS_KEY
+  #  - MONGO_DB_CONNECTION_URL
+  
+  # Application environment variables
+  # When using existingSecret with explicit mode:
+  #   - Keys listed in secretKeys come from the external secret
+  #   - All other keys come from this data section as direct values
   data:
     SERVICE_NAME: portkeyenterprise
     PORT: "8787"
@@ -87,6 +110,8 @@ environment:
     FINETUNES_BUCKET: 
     LOG_EXPORTS_BUCKET: 
     FINETUNES_AWS_ROLE_ARN: 
+    SERVER_MODE: 
+    MCP_PORT: 
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -126,6 +151,18 @@ ingress:
   annotations: {}
   labels: {}
   tls: []
+  # Set to true for host-based routing (separate hostnames for gateway and MCP)
+  # Set to false for path-based routing (same hostname, different paths)
+  hostBased: false
+  # MCP hostname (only used when hostBased is true)
+  # Defaults to "mcp.{hostname}" if not specified
+  mcpHostname: ""
+  # MCP path (only used when hostBased is false)
+  # Defaults to "/mcp" if not specified
+  mcpPath: "/mcp"
+  # Gateway path (only used when hostBased is false)
+  # Defaults to "/" if not specified
+  gatewayPath: "/"
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -188,6 +225,8 @@ volumeMounts: []
 
 extraContainerConfig: {}
 
+topologySpreadConstraints: []
+
 nodeSelector: {}
 
 tolerations: []
@@ -196,6 +235,7 @@ affinity: {}
 
 # if you want to restart instance automatically
 autoRestart: false
+
 
 dataservice:
   name: "dataservice"
@@ -239,6 +279,7 @@ dataservice:
       timeoutSeconds: 1
     extraEnv: []
     extraContainerConfig: {}
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -262,6 +303,17 @@ dataservice:
     minReplicas: 1
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+    behavior:
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        podScaleUpValue: 2
+        percentScaleUpValue: 100
+        periodSeconds: 2
+      scaleDown:
+        stabilizationWindowSeconds: 300
+        podScaleDownValue: 1
+        periodSeconds: 60
 
 # Redis-specific configuration section
 redis:

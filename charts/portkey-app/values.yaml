@@ -68,8 +68,12 @@ ingress:
 
 gatewayIngress:
   enabled: true
-  hostname: ""
   ingressClassName: "nginx"
+  hostname: "" # domain for gateway
+  mcpHostname: ""  # Separate subdomain for MCP
+  hostBased: true  # Set to false for path-based routing
+  gatewayPath: "/"   # Path for gateway (when hostBased: false)
+  mcpPath: "/mcp"    # Path for MCP (when hostBased: false)
   annotations: {}
   labels: {}
   tls: []
@@ -199,6 +203,7 @@ backend:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -223,6 +228,21 @@ backend:
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
+    behavior:
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        podScaleUpValue: 2
+        percentScaleUpValue: 100
+        periodSeconds: 2
+      scaleDown:
+        stabilizationWindowSeconds: 300
+        podScaleDownValue: 1
+        periodSeconds: 60
+
+mcp:
+  enabled: false
+  containerPort: 8788
+  externalUrl: ""
 
 gateway:
   name: "gateway"
@@ -267,6 +287,7 @@ gateway:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -347,6 +368,7 @@ dataservice:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -371,10 +393,20 @@ dataservice:
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80  
     targetMemoryUtilizationPercentage: 80
+    behavior:
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        podScaleUpValue: 2
+        percentScaleUpValue: 100
+        periodSeconds: 2
+      scaleDown:
+        stabilizationWindowSeconds: 300
+        podScaleDownValue: 1
+        periodSeconds: 60
 
 frontend:
   name: "frontend"
-  containerPort: 80
+  containerPort: 8080
   deployment:
     autoRestart: true
     replicas: 1
@@ -413,6 +445,7 @@ frontend:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -427,6 +460,16 @@ frontend:
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
+    behavior:
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        podScaleUpValue: 2
+        percentScaleUpValue: 100
+        periodSeconds: 2
+      scaleDown:
+        stabilizationWindowSeconds: 300
+        podScaleDownValue: 1
+        periodSeconds: 60
 
   service:
     type: LoadBalancer
@@ -507,6 +550,7 @@ mysql:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -585,6 +629,7 @@ redis:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
@@ -673,6 +718,7 @@ clickhouse:
     extraContainerConfig: {}
     extraEnv: []
     sidecars: []
+    topologySpreadConstraints: []
     nodeSelector: {}
     tolerations: []
     affinity: {}
