@@ -52,42 +52,137 @@
 |----------|------|---------|-------------|
 | `environment.create` | boolean | `true` | Create environment configuration |
 | `environment.secret` | boolean | `true` | Deploy as Secret (true) or ConfigMap (false) |
-| `environment.existingSecret` | string | `""` | Use existing Secret instead of creating new one |
+| `environment.existingSecret` | string | `""` | Use existing Secret for sensitive values |
+| `environment.secretKeys` | array | `[]` | List of keys to pull from existingSecret (recommended) |
+| `environment.data` | object | `{...}` | Environment variables |
+
+#### Secret Management Best Practices
+
+**Option 1: Create New Secret/ConfigMap**
+```yaml
+environment:
+  create: true
+  data:
+    SERVICE_NAME: "my-service"
+    REDIS_URL: "redis://redis:6379"
+```
+- All values from `environment.data` are stored in a new Secret or ConfigMap
+- Best for development or simple deployments
+
+**Option 2: Use Existing Secret (Recommended)**
+```yaml
+environment:
+  create: false
+  existingSecret: "my-secret"
+  secretKeys:  # List sensitive keys here
+    - REDIS_URL
+    - LOG_STORE_SECRET_KEY
+  data:
+    SERVICE_NAME: "my-service"
+    PORT: "8787"
+```
+- **Recommended**
+- Keys listed in `secretKeys` are pulled from the external secret
+- Other keys in `data` are used as direct values
+- Clear separation of sensitive vs non-sensitive configuration
+
+**Option 3: Use Existing Secret (Lookup Pattern)**
+```yaml
+environment:
+  create: false
+  existingSecret: "my-secret"
+  # No secretKeys specified
+  data:
+    SERVICE_NAME: "my-service"
+    REDIS_URL: "redis://redis:6379"  # Fallback if not in secret
+```
+- Uses Kubernetes `lookup` to check if keys exist in secret
+- Falls back to `data` values if keys not found in secret
+- Less explicit about what's sensitive
+
+**Option 4: Vault Injection**
+```yaml
+useVaultInjection: true
+vaultConfig:
+  vaultHost: "vault.example.com"
+  secretPath: "secret/portkey"
+  role: "portkey-gateway"
+```
+- All secrets are injected by HashiCorp Vault
+
+#### Example: Setup with External Secret
+
+**Step 1: Create the external secret**
+```bash
+kubectl create secret generic portkey-credentials \
+  --from-literal=REDIS_URL='redis://user:pass@redis:6379' \
+  --from-literal=LOG_STORE_ACCESS_KEY='AKIA...' \
+  --from-literal=LOG_STORE_SECRET_KEY='secret-key...' \
+  -n portkey
+```
+
+**Step 2: Configure values.yaml**
+```yaml
+environment:
+  create: false
+  existingSecret: "portkey-credentials"
+  
+  # List sensitive keys that come from the secret
+  secretKeys:
+    - REDIS_URL
+    - LOG_STORE_ACCESS_KEY
+    - LOG_STORE_SECRET_KEY
+  
+  # All other configuration
+  data:
+    SERVICE_NAME: "portkeyenterprise"
+    PORT: "8787"
+    LOG_STORE: "s3"
+    LOG_STORE_REGION: "us-east-1"
+    ANALYTICS_STORE: "control_plane"
+```
+
+**Benefits:**
+- Secrets managed separately from configuration
+- Clear separation of sensitive vs non-sensitive values
+- Works with external secret managers (AWS Secrets Manager, Azure Key Vault, etc.)
 
 ### Application Environment Variables
+
+> **Note**: These variables are configured under `environment.data`
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
 | `environment.data.SERVICE_NAME` | string | `"portkeyenterprise"` | Service name identifier |
 | `environment.data.PORT` | string | `"8787"` | Gateway service port |
 | `environment.data.LOG_STORE` | string | `""` | Log storage backend (e.g., s3, azure) |
-| `environment.data.MONGO_DB_CONNECTION_URL` | string | `""` | MongoDB connection URL |
+| `environment.data.MONGO_DB_CONNECTION_URL` | string | `""` | MongoDB connection URL (consider using secretKeys) |
 | `environment.data.MONGO_DATABASE` | string | `""` | MongoDB database name |
 | `environment.data.MONGO_COLLECTION_NAME` | string | `""` | MongoDB collection for logs |
 | `environment.data.MONGO_GENERATIONS_HOOKS_COLLECTION_NAME` | string | `""` | MongoDB collection for generation hooks |
 | `environment.data.LOG_STORE_REGION` | string | `""` | AWS/Azure region for log storage |
-| `environment.data.LOG_STORE_ACCESS_KEY` | string | `""` | Access key for log storage |
-| `environment.data.LOG_STORE_SECRET_KEY` | string | `""` | Secret key for log storage |
+| `environment.data.LOG_STORE_ACCESS_KEY` | string | `""` | Access key for log storage (consider using secretKeys) |
+| `environment.data.LOG_STORE_SECRET_KEY` | string | `""` | Secret key for log storage (consider using secretKeys) |
 | `environment.data.LOG_STORE_GENERATIONS_BUCKET` | string | `""` | S3/Azure bucket for generation logs |
 | `environment.data.LOG_STORE_BASEPATH` | string | `""` | Base path within log storage bucket |
 | `environment.data.LOG_STORE_AWS_ROLE_ARN` | string | `""` | AWS IAM role ARN for log storage |
 | `environment.data.LOG_STORE_AWS_EXTERNAL_ID` | string | `""` | External ID for AWS role assumption |
-| `environment.data.AWS_ASSUME_ROLE_ACCESS_KEY_ID` | string | `""` | Access key for AWS role assumption |
-| `environment.data.AWS_ASSUME_ROLE_SECRET_ACCESS_KEY` | string | `""` | Secret key for AWS role assumption |
+| `environment.data.AWS_ASSUME_ROLE_ACCESS_KEY_ID` | string | `""` | Access key for AWS role assumption (consider using secretKeys) |
+| `environment.data.AWS_ASSUME_ROLE_SECRET_ACCESS_KEY` | string | `""` | Secret key for AWS role assumption (consider using secretKeys) |
 | `environment.data.AWS_ASSUME_ROLE_REGION` | string | `""` | AWS region for role assumption |
 | `environment.data.AZURE_AUTH_MODE` | string | `""` | Azure authentication mode |
 | `environment.data.AZURE_MANAGED_CLIENT_ID` | string | `""` | Azure managed identity client ID |
 | `environment.data.AZURE_STORAGE_ACCOUNT` | string | `""` | Azure storage account name |
-| `environment.data.AZURE_STORAGE_KEY` | string | `""` | Azure storage account key |
+| `environment.data.AZURE_STORAGE_KEY` | string | `""` | Azure storage account key (consider using secretKeys) |
 | `environment.data.AZURE_STORAGE_CONTAINER` | string | `""` | Azure storage container name |
 | `environment.data.ANALYTICS_STORE` | string | `"clickhouse"` | Analytics storage backend |
 | `environment.data.ANALYTICS_STORE_ENDPOINT` | string | `""` | Analytics store endpoint URL |
 | `environment.data.ANALYTICS_STORE_USER` | string | `""` | Analytics store username |
-| `environment.data.ANALYTICS_STORE_PASSWORD` | string | `""` | Analytics store password |
+| `environment.data.ANALYTICS_STORE_PASSWORD` | string | `""` | Analytics store password (consider using secretKeys) |
 | `environment.data.ANALYTICS_LOG_TABLE` | string | `""` | Table name for analytics logs |
 | `environment.data.ANALYTICS_FEEDBACK_TABLE` | string | `""` | Table name for feedback data |
 | `environment.data.CACHE_STORE` | string | `"redis"` | Cache storage backend |
-| `environment.data.REDIS_URL` | string | `"redis://redis:6379"` | Redis connection URL |
+| `environment.data.REDIS_URL` | string | `"redis://redis:6379"` | Redis connection URL (consider using secretKeys if contains auth) |
 | `environment.data.REDIS_TLS_ENABLED` | string | `"false"` | Enable TLS for Redis connection |
 | `environment.data.REDIS_MODE` | string | `""` | Redis deployment mode (standalone/cluster) |
 | `environment.data.PORTKEY_CLIENT_AUTH` | string | `""` | Client authentication configuration |
