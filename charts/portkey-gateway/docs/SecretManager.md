@@ -76,8 +76,169 @@ Include only the keys you want to source from Secrets Manager; others can stay a
 
 ---
 
-## Option A (Preferred): Partial Secret Override
-Sync selected keys from AWS → a Kubernetes Secret, then point the chart to that Secret. Missing keys fall back to literals in `values.yaml`.
+## Option A (Recommended): Partial Secret Override with secretKeys
+Explicitly define which keys come from AWS Secrets Manager, with clear separation of sensitive vs non-sensitive values. This is the recommended approach.
+
+### 1) AWS Secret (example JSON)
+Create an AWS Secrets Manager secret like `arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:portkey/gateway/config`:
+```json
+{
+  "PORTKEY_CLIENT_AUTH": "<shared by portkey>",
+  "ANALYTICS_STORE_PASSWORD": "<password>",
+  "REDIS_URL": "redis://user:pass@redis:6379",
+  "LOG_STORE_ACCESS_KEY": "<key>",
+  "LOG_STORE_SECRET_KEY": "<secret>",
+  "AWS_ASSUME_ROLE_ACCESS_KEY_ID": "",
+  "AWS_ASSUME_ROLE_SECRET_ACCESS_KEY": "",
+  "AZURE_STORAGE_KEY": ""
+}
+```
+
+### 2) SecretProviderClass (sync to a Kubernetes Secret)
+```yaml
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: portkey-gateway-aws-secrets
+  namespace: portkeyai
+spec:
+  provider: aws
+  parameters:
+    objects: |
+      - objectName: "arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:portkey/gateway/config"
+        objectType: "secretsmanager"
+        jmesPath:
+          - path: PORTKEY_CLIENT_AUTH
+            objectAlias: PORTKEY_CLIENT_AUTH
+          - path: ANALYTICS_STORE_PASSWORD
+            objectAlias: ANALYTICS_STORE_PASSWORD
+          - path: REDIS_URL
+            objectAlias: REDIS_URL
+          - path: LOG_STORE_ACCESS_KEY
+            objectAlias: LOG_STORE_ACCESS_KEY
+          - path: LOG_STORE_SECRET_KEY
+            objectAlias: LOG_STORE_SECRET_KEY
+          - path: AWS_ASSUME_ROLE_ACCESS_KEY_ID
+            objectAlias: AWS_ASSUME_ROLE_ACCESS_KEY_ID
+          - path: AWS_ASSUME_ROLE_SECRET_ACCESS_KEY
+            objectAlias: AWS_ASSUME_ROLE_SECRET_ACCESS_KEY
+          - path: AZURE_STORAGE_KEY
+            objectAlias: AZURE_STORAGE_KEY
+  secretObjects:
+    - secretName: portkey-gateway-env
+      type: Opaque
+      data:
+        - objectName: PORTKEY_CLIENT_AUTH
+          key: PORTKEY_CLIENT_AUTH
+        - objectName: ANALYTICS_STORE_PASSWORD
+          key: ANALYTICS_STORE_PASSWORD
+        - objectName: REDIS_URL
+          key: REDIS_URL
+        - objectName: LOG_STORE_ACCESS_KEY
+          key: LOG_STORE_ACCESS_KEY
+        - objectName: LOG_STORE_SECRET_KEY
+          key: LOG_STORE_SECRET_KEY
+        - objectName: AWS_ASSUME_ROLE_ACCESS_KEY_ID
+          key: AWS_ASSUME_ROLE_ACCESS_KEY_ID
+        - objectName: AWS_ASSUME_ROLE_SECRET_ACCESS_KEY
+          key: AWS_ASSUME_ROLE_SECRET_ACCESS_KEY
+        - objectName: AZURE_STORAGE_KEY
+          key: AZURE_STORAGE_KEY
+```
+
+Apply:
+```bash
+kubectl apply -f secretproviderclass-gateway.yaml
+```
+
+### 3) Mount to trigger sync
+```yaml
+# values.yaml
+volumes:
+  - name: portkey-secrets-store
+    csi:
+      driver: secrets-store.csi.k8s.io
+      readOnly: true
+      volumeAttributes:
+        secretProviderClass: "portkey-gateway-aws-secrets"
+volumeMounts:
+  - name: portkey-secrets-store
+    mountPath: "/mnt/secrets"
+    readOnly: true
+
+# For dataservice (if enabled):
+dataservice:
+  deployment:
+    volumes:
+      - name: portkey-secrets-store
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "portkey-gateway-aws-secrets"
+    volumeMounts:
+      - name: portkey-secrets-store
+        mountPath: "/mnt/secrets"
+        readOnly: true
+```
+
+### 4) Point the chart to the synced Secret with explicit secretKeys (RECOMMENDED)
+```yaml
+# values.yaml
+environment:
+  create: false
+  existingSecret: "portkey-gateway-env"
+  
+  # List sensitive keys that come from the secret
+  secretKeys:
+    - PORTKEY_CLIENT_AUTH
+    - ANALYTICS_STORE_PASSWORD
+    - REDIS_URL
+    - LOG_STORE_ACCESS_KEY
+    - LOG_STORE_SECRET_KEY
+    - AWS_ASSUME_ROLE_ACCESS_KEY_ID
+    - AWS_ASSUME_ROLE_SECRET_ACCESS_KEY
+    - AZURE_STORAGE_KEY
+  
+  # All configuration (non-sensitive values listed here)
+  data:
+    SERVICE_NAME: "portkeyenterprise"
+    PORT: "8787"
+    ORGANISATIONS_TO_SYNC: ""
+    ANALYTICS_STORE: "control_plane"
+    ANALYTICS_STORE_ENDPOINT: "<clickhouse host>"
+    ANALYTICS_STORE_USER: "<user>"
+    ANALYTICS_LOG_TABLE: "<table>"
+    ANALYTICS_FEEDBACK_TABLE: "<table>"
+    CACHE_STORE: "redis"
+    REDIS_TLS_ENABLED: "false"
+    REDIS_MODE: ""
+    LOG_STORE: "s3"
+    LOG_STORE_REGION: "us-east-1"
+    LOG_STORE_GENERATIONS_BUCKET: "<bucket>"
+    LOG_STORE_BASEPATH: ""
+    LOG_STORE_AWS_ROLE_ARN: ""
+    LOG_STORE_AWS_EXTERNAL_ID: ""
+    AWS_ASSUME_ROLE_REGION: ""
+    AZURE_AUTH_MODE: ""
+    AZURE_MANAGED_CLIENT_ID: ""
+    AZURE_STORAGE_ACCOUNT: ""
+    AZURE_STORAGE_CONTAINER: ""
+    FINETUNES_BUCKET: ""
+    LOG_EXPORTS_BUCKET: ""
+    FINETUNES_AWS_ROLE_ARN: ""
+```
+
+**Benefits:**
+- Clear separation of sensitive vs non-sensitive configuration
+- Explicit about which values come from secrets
+- Other keys use direct values from `data`
+- Works with external secret managers (AWS Secrets Manager, Azure Key Vault, etc.)
+
+---
+
+## Option A-Alt: Partial Secret Override with Lookup Pattern
+Similar to Option A, but uses Kubernetes `lookup` to check if keys exist in the secret. Less explicit about what's sensitive.
 
 ### 1) AWS Secret (example JSON)
 Create an AWS Secrets Manager secret like `arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:portkey/gateway/config`:
@@ -314,14 +475,13 @@ dataservice:
         readOnly: true
 ```
 
-### 4) Point the chart to the synced Secret (partial override)
+### 4) Configuration (lookup pattern)
 ```yaml
 # values.yaml
 environment:
   create: false
   existingSecret: "portkey-gateway-env"
-  # Keep all the keys you care about listed below; Secret values win if present,
-  # otherwise the literal values here are used.
+  # No secretKeys specified - uses lookup pattern
   data:
     SERVICE_NAME: "portkeyenterprise"
     PORT: "8787"
@@ -360,7 +520,7 @@ environment:
 
 How it works:
 - If a key exists in the Secret, it is injected from the Secret.
-- If a key is absent in the Secret, the literal value from `environment.data` is injected.
+- If a key is absent in the Secret, the literal value from `environment.data` is used.
 - Ensure all variables you need are listed under `environment.data`.
 
 ---
