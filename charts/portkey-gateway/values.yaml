@@ -8,11 +8,11 @@ images:
   gatewayImage:
     repository: "docker.io/portkeyai/gateway_enterprise"
     pullPolicy: IfNotPresent
-    tag: "1.16.2"
+    tag: "1.17.1"
   dataserviceImage:
     repository: "docker.io/portkeyai/data-service"
     pullPolicy: IfNotPresent
-    tag: "1.3.0"
+    tag: "1.4.1"
   # Add Redis image configuration
   redisImage:
     repository: "docker.io/redis"
@@ -110,8 +110,9 @@ environment:
     FINETUNES_BUCKET: 
     LOG_EXPORTS_BUCKET: 
     FINETUNES_AWS_ROLE_ARN: 
-    SERVER_MODE: 
-    MCP_PORT: 
+    SERVER_MODE: ""
+    MCP_PORT: 8788
+    MCP_GATEWAY_BASE_URL: ""
 
 serviceAccount:
   # Specifies whether a service account should be created
