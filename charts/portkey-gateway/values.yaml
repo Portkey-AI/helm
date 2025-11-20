@@ -234,6 +234,15 @@ tolerations: []
 
 affinity: {}
 
+# Pod-level hostAlias configuration
+# Example:
+# hostAlias:
+#   - ip: "192.168.1.100"
+#     hostnames:
+#       - "example.com"
+#       - "www.example.com"
+hostAlias: []
+
 # if you want to restart instance automatically
 autoRestart: false
 
@@ -286,6 +295,14 @@ dataservice:
     affinity: {}
     volumes: []
     volumeMounts: []
+    # Pod-level hostAlias configuration for dataservice
+    # Example:
+    # hostAlias:
+    #   - ip: "192.168.1.100"
+    #     hostnames:
+    #       - "example.com"
+    #       - "www.example.com"
+    hostAlias: []
   service:
     type: ClusterIP
     port: 8081
