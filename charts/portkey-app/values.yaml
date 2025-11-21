@@ -209,6 +209,7 @@ backend:
     affinity: {}
     volumes: []
     volumeMounts: []
+    hostAlias: []
   service:
     type: ClusterIP
     port: 8080
@@ -293,6 +294,7 @@ gateway:
     affinity: {}
     volumes: []
     volumeMounts: []
+    hostAlias: []
   service:
     type: ClusterIP
     port: 8787
@@ -374,6 +376,7 @@ dataservice:
     affinity: {}
     volumes: []
     volumeMounts: []
+    hostAlias: []
   service:
     type: ClusterIP
     port: 8081
@@ -451,6 +454,7 @@ frontend:
     affinity: {}
     volumes: []
     volumeMounts: []
+    hostAlias: []
   autoscaling:
     enabled: false
     # If enabled, use the following values to configure the HPA. You can also use your own HPA configuration by not creating an HPA.
@@ -556,6 +560,7 @@ mysql:
     affinity: {}
     volumes: []
     volumeMounts: []
+    hostAlias: []
     persistence:
       enabled: false
       size: 2Gi
@@ -635,6 +640,7 @@ redis:
     affinity: {}
     volumes: []
     volumeMounts: []
+    hostAlias: []
     persistence:
       enabled: false
       size: 2Gi
@@ -725,6 +731,7 @@ clickhouse:
     volumes:
       - name: data
         emptyDir: {}
+    hostAlias: []
     # We recommend using a persistent volume and increasing the storage size to something like 50Gi when using in a production environment!
     persistence:
       enabled: false

@@ -124,6 +124,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.clickhouse.statefulSet.hostAlias }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         - name: clickhouse-conf
           configMap:
