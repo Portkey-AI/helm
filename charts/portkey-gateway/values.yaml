@@ -111,7 +111,7 @@ environment:
     LOG_EXPORTS_BUCKET: 
     FINETUNES_AWS_ROLE_ARN: 
     SERVER_MODE: ""
-    MCP_PORT: 8788
+    MCP_PORT: "8788"
     MCP_GATEWAY_BASE_URL: ""
 
 serviceAccount:
