@@ -111,8 +111,8 @@ config:
 
 # -- Log storage configuration
 # Used to store raw inputs & outputs of all requests going through portkey
-# We support all S3 and mongo compliant store, AWS s3, Azure blob storage, and GCS, R2, Wasabi, NetApp,etc and MongoDB, AWS DocumentDB
-# You can also use s3 via AWS IAM Assume Role if you s3 buckets are in a different account.
+# We support all S3 compliant stores: AWS S3, Azure Blob Storage, GCS, R2, Wasabi, NetApp, etc.
+# You can also use S3 via AWS IAM Assume Role if your S3 buckets are in a different account.
 # logStorage:
   # -- S3 specific configuration
 logStorage:
@@ -124,6 +124,7 @@ logStorage:
     LOG_STORE_REGION: ""
     LOG_STORE_GENERATIONS_BUCKET: ""
     LOG_STORE_BASEPATH: ""
+  # -- MongoDB configuration (⚠️ MAINTENANCE MODE)
   mongo:
     enabled: false
     MONGO_DB_CONNECTION_URL: ""

@@ -156,10 +156,12 @@ environment:
 | `environment.data.SERVICE_NAME` | string | `"portkeyenterprise"` | Service name identifier |
 | `environment.data.PORT` | string | `"8787"` | Gateway service port |
 | `environment.data.LOG_STORE` | string | `""` | Log storage backend (e.g., s3, azure) |
-| `environment.data.MONGO_DB_CONNECTION_URL` | string | `""` | MongoDB connection URL (consider using secretKeys) |
-| `environment.data.MONGO_DATABASE` | string | `""` | MongoDB database name |
-| `environment.data.MONGO_COLLECTION_NAME` | string | `""` | MongoDB collection for logs |
-| `environment.data.MONGO_GENERATIONS_HOOKS_COLLECTION_NAME` | string | `""` | MongoDB collection for generation hooks |
+| `environment.data.MONGO_DB_CONNECTION_URL` | string | `""` | ⚠️ **Maintenance Mode** - MongoDB connection URL (consider using secretKeys) |
+| `environment.data.MONGO_DATABASE` | string | `""` | ⚠️ **Maintenance Mode** - MongoDB database name |
+| `environment.data.MONGO_COLLECTION_NAME` | string | `""` | ⚠️ **Maintenance Mode** - MongoDB collection for logs |
+| `environment.data.MONGO_GENERATIONS_HOOKS_COLLECTION_NAME` | string | `""` | ⚠️ **Maintenance Mode** - MongoDB collection for generation hooks |
+
+> **Note**: MongoDB as LOG_STORE is in maintenance mode. Known limitations include: 16MB document size limit, no streaming support for writes, and bulk insert performance issues. We recommend using S3-compatible storage for new deployments.
 | `environment.data.LOG_STORE_REGION` | string | `""` | AWS/Azure region for log storage |
 | `environment.data.LOG_STORE_ACCESS_KEY` | string | `""` | Access key for log storage (consider using secretKeys) |
 | `environment.data.LOG_STORE_SECRET_KEY` | string | `""` | Secret key for log storage (consider using secretKeys) |
