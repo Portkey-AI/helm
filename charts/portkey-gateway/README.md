@@ -452,3 +452,281 @@ For additional help:
 - Check the [full configuration reference](values.yaml)
 - Review logs: `kubectl logs -n portkeyai deployment/portkey-gateway`
 - Contact support(suport@portkey.ai) with your configuration details
+
+---
+
+## Configuration Reference
+
+### Global Parameters
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `replicaCount` | Number of gateway pod replicas | `1` | Optional | int |
+| `nameOverride` | Override the chart name | `""` | Optional | string |
+| `fullnameOverride` | Override the full release name | `""` | Optional | string |
+| `autoRestart` | Enable automatic pod restarts | `false` | Optional | bool |
+
+### Image Configuration
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `images.gatewayImage.repository` | Gateway container image repository | `docker.io/portkeyai/gateway_enterprise` | Optional | string |
+| `images.gatewayImage.pullPolicy` | Gateway image pull policy | `IfNotPresent` | Optional | string |
+| `images.gatewayImage.tag` | Gateway image tag | `1.17.1` | Optional | string |
+| `images.dataserviceImage.repository` | Data service container image repository | `docker.io/portkeyai/data-service` | Optional | string |
+| `images.dataserviceImage.pullPolicy` | Data service image pull policy | `IfNotPresent` | Optional | string |
+| `images.dataserviceImage.tag` | Data service image tag | `1.4.1` | Optional | string |
+| `images.redisImage.repository` | Redis container image repository | `docker.io/redis` | Optional | string |
+| `images.redisImage.pullPolicy` | Redis image pull policy | `IfNotPresent` | Optional | string |
+| `images.redisImage.tag` | Redis image tag | `7.2-alpine` | Optional | string |
+
+### Image Pull Secrets
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `imagePullSecrets` | List of image pull secret names | `[portkeyenterpriseregistrycredentials]` | Optional | list |
+| `imageCredentials[].name` | Name of the image pull secret | `portkeyenterpriseregistrycredentials` | Required | string |
+| `imageCredentials[].create` | Create the image pull secret | `true` | Optional | bool |
+| `imageCredentials[].registry` | Docker registry URL | `https://index.docker.io/v1/` | Required | string |
+| `imageCredentials[].username` | Docker registry username | `<docker-user>` | Required | string |
+| `imageCredentials[].password` | Docker registry password | `<docker-pwd>` | Required | string |
+| `imageCredentials[].email` | Docker registry email | `""` | Optional | string |
+| `imageCredentials[].auth` | Base64 encoded auth token (alternative to username/password) | `""` | Optional | string |
+
+### Vault Integration
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `useVaultInjection` | Enable HashiCorp Vault injection for secrets | `false` | Optional | bool |
+| `vaultConfig.vaultHost` | Vault server hostname | `vault.hashicorp.com` | Optional | string |
+| `vaultConfig.secretPath` | Path to secrets in Vault | `path/to/your/secret` | Optional | string |
+| `vaultConfig.role` | Vault role for authentication | `your-vault-role` | Optional | string |
+| `vaultConfig.kubernetesSecret` | Kubernetes secret for Vault auth | `""` | Optional | string |
+
+### Environment Configuration
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `environment.create` | Create environment ConfigMap/Secret | `true` | Optional | bool |
+| `environment.secret` | Deploy environment as Secret (true) or ConfigMap (false) | `true` | Optional | bool |
+| `environment.existingSecret` | Name of existing secret for sensitive values | `""` | Optional | string |
+| `environment.secretKeys` | List of keys to pull from external secret | `[]` | Optional | list |
+
+### Environment Data Variables
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `environment.data.SERVICE_NAME` | Service identifier name | `portkeyenterprise` | Required | string |
+| `environment.data.PORT` | Gateway service port | `8787` | Optional | string |
+| `environment.data.LOG_STORE` | Log storage backend type (s3, gcs, azure, mongo, etc.) | `""` | Optional | string |
+| `environment.data.LOG_STORE_REGION` | Region for log storage | `""` | Optional | string |
+| `environment.data.LOG_STORE_ACCESS_KEY` | Access key for log storage | `""` | Optional | string |
+| `environment.data.LOG_STORE_SECRET_KEY` | Secret key for log storage | `""` | Optional | string |
+| `environment.data.LOG_STORE_GENERATIONS_BUCKET` | Bucket name for generations logs | `""` | Optional | string |
+| `environment.data.LOG_STORE_BASEPATH` | Base path for log storage | `""` | Optional | string |
+| `environment.data.LOG_STORE_AWS_ROLE_ARN` | AWS IAM role ARN for S3 assumed role | `""` | Optional | string |
+| `environment.data.LOG_STORE_AWS_EXTERNAL_ID` | External ID for AWS STS assume role | `""` | Optional | string |
+| `environment.data.AWS_ASSUME_ROLE_ACCESS_KEY_ID` | AWS access key for assume role | `""` | Optional | string |
+| `environment.data.AWS_ASSUME_ROLE_SECRET_ACCESS_KEY` | AWS secret key for assume role | `""` | Optional | string |
+| `environment.data.AWS_ASSUME_ROLE_REGION` | AWS region for assume role | `""` | Optional | string |
+| `environment.data.AZURE_AUTH_MODE` | Azure authentication mode (managed, entra) | `""` | Optional | string |
+| `environment.data.AZURE_MANAGED_CLIENT_ID` | Azure managed identity client ID | `""` | Optional | string |
+| `environment.data.AZURE_STORAGE_ACCOUNT` | Azure storage account name | `""` | Optional | string |
+| `environment.data.AZURE_STORAGE_KEY` | Azure storage account key | `""` | Optional | string |
+| `environment.data.AZURE_STORAGE_CONTAINER` | Azure storage container name | `""` | Optional | string |
+| `environment.data.MONGO_DB_CONNECTION_URL` | MongoDB connection string | `""` | Optional | string |
+| `environment.data.MONGO_DATABASE` | MongoDB database name | `""` | Optional | string |
+| `environment.data.MONGO_COLLECTION_NAME` | MongoDB collection name | `""` | Optional | string |
+| `environment.data.MONGO_GENERATIONS_HOOKS_COLLECTION_NAME` | MongoDB collection for generation hooks | `""` | Optional | string |
+| `environment.data.ANALYTICS_STORE` | Analytics storage backend type | `clickhouse` | Optional | string |
+| `environment.data.ANALYTICS_STORE_ENDPOINT` | Analytics store endpoint URL | `""` | Optional | string |
+| `environment.data.ANALYTICS_STORE_USER` | Analytics store username | `""` | Optional | string |
+| `environment.data.ANALYTICS_STORE_PASSWORD` | Analytics store password | `""` | Optional | string |
+| `environment.data.ANALYTICS_LOG_TABLE` | Analytics log table name | `""` | Optional | string |
+| `environment.data.ANALYTICS_FEEDBACK_TABLE` | Analytics feedback table name | `""` | Optional | string |
+| `environment.data.CACHE_STORE` | Cache storage backend type | `redis` | Optional | string |
+| `environment.data.REDIS_URL` | Redis connection URL | `redis://redis:6379` | Optional | string |
+| `environment.data.REDIS_TLS_ENABLED` | Enable TLS for Redis connections | `false` | Optional | string |
+| `environment.data.REDIS_MODE` | Redis mode (cluster, standalone) | `""` | Optional | string |
+| `environment.data.PORTKEY_CLIENT_AUTH` | Portkey client authentication token | `""` | Required | string |
+| `environment.data.ORGANISATIONS_TO_SYNC` | Organization IDs to sync | `""` | Required | string |
+| `environment.data.FINETUNES_BUCKET` | S3 bucket for fine-tuning data | `""` | Optional | string |
+| `environment.data.LOG_EXPORTS_BUCKET` | S3 bucket for log exports | `""` | Optional | string |
+| `environment.data.FINETUNES_AWS_ROLE_ARN` | AWS role ARN for fine-tuning bucket access | `""` | Optional | string |
+| `environment.data.SERVER_MODE` | Server mode configuration | `""` | Optional | string |
+| `environment.data.MCP_PORT` | MCP (Model Context Protocol) service port | `8788` | Optional | string |
+| `environment.data.MCP_GATEWAY_BASE_URL` | MCP gateway base URL | `""` | Optional | string |
+
+### Service Account
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `serviceAccount.create` | Create a service account | `true` | Optional | bool |
+| `serviceAccount.automount` | Automount service account API credentials | `true` | Optional | bool |
+| `serviceAccount.annotations` | Annotations for the service account | `{}` | Optional | object |
+| `serviceAccount.name` | Service account name (auto-generated if empty) | `""` | Optional | string |
+
+### Pod Configuration
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `podAnnotations` | Annotations for gateway pods | `{}` | Optional | object |
+| `podLabels` | Labels for gateway pods | `{}` | Optional | object |
+| `podSecurityContext` | Security context for pods | `{}` | Optional | object |
+| `securityContext` | Security context for containers | `{}` | Optional | object |
+| `nodeSelector` | Node selector for pod scheduling | `{}` | Optional | object |
+| `tolerations` | Tolerations for pod scheduling | `[]` | Optional | list |
+| `affinity` | Affinity rules for pod scheduling | `{}` | Optional | object |
+| `topologySpreadConstraints` | Topology spread constraints for pods | `[]` | Optional | list |
+| `hostAlias` | Host aliases for pod DNS resolution | `[]` | Optional | list |
+| `extraContainerConfig` | Additional container configuration | `{}` | Optional | object |
+
+### Service Configuration
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `service.type` | Kubernetes service type | `NodePort` | Optional | string |
+| `service.port` | Service port | `8787` | Optional | int |
+| `service.additionalLabels` | Additional labels for the service | `{}` | Optional | object |
+| `service.annotations` | Annotations for the service | `{}` | Optional | object |
+
+### Ingress Configuration
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `ingress.enabled` | Enable ingress resource | `false` | Optional | bool |
+| `ingress.hostname` | Ingress hostname | `""` | Required (if enabled) | string |
+| `ingress.ingressClassName` | Ingress class name | `nginx` | Optional | string |
+| `ingress.annotations` | Ingress annotations | `{}` | Optional | object |
+| `ingress.labels` | Ingress labels | `{}` | Optional | object |
+| `ingress.tls` | TLS configuration for ingress | `[]` | Optional | list |
+| `ingress.hostBased` | Use host-based routing (true) or path-based routing (false) | `false` | Optional | bool |
+| `ingress.mcpHostname` | MCP hostname for host-based routing | `""` | Optional | string |
+| `ingress.mcpPath` | MCP path for path-based routing | `/mcp` | Optional | string |
+| `ingress.gatewayPath` | Gateway path for path-based routing | `/` | Optional | string |
+
+### Resource Management
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `resources` | CPU/Memory resource requests and limits | `{}` | Optional | object |
+| `resources.limits.cpu` | CPU limit | `undefined` | Optional | string |
+| `resources.limits.memory` | Memory limit | `undefined` | Optional | string |
+| `resources.requests.cpu` | CPU request | `undefined` | Optional | string |
+| `resources.requests.memory` | Memory request | `undefined` | Optional | string |
+
+### Health Probes
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `livenessProbe.httpGet.path` | Liveness probe HTTP path | `/v1/health` | Optional | string |
+| `livenessProbe.httpGet.port` | Liveness probe HTTP port | `8787` | Optional | int |
+| `livenessProbe.initialDelaySeconds` | Initial delay before liveness probe | `5` | Optional | int |
+| `livenessProbe.periodSeconds` | Period between liveness probes | `60` | Optional | int |
+| `livenessProbe.timeoutSeconds` | Timeout for liveness probe | `3` | Optional | int |
+| `livenessProbe.failureThreshold` | Failure threshold for liveness probe | `3` | Optional | int |
+| `readinessProbe.httpGet.path` | Readiness probe HTTP path | `/v1/health` | Optional | string |
+| `readinessProbe.httpGet.port` | Readiness probe HTTP port | `8787` | Optional | int |
+| `readinessProbe.initialDelaySeconds` | Initial delay before readiness probe | `5` | Optional | int |
+| `readinessProbe.periodSeconds` | Period between readiness probes | `60` | Optional | int |
+| `readinessProbe.timeoutSeconds` | Timeout for readiness probe | `3` | Optional | int |
+| `readinessProbe.successThreshold` | Success threshold for readiness probe | `1` | Optional | int |
+| `readinessProbe.failureThreshold` | Failure threshold for readiness probe | `3` | Optional | int |
+
+### Autoscaling (HPA)
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `autoscaling.enabled` | Enable Horizontal Pod Autoscaler | `false` | Optional | bool |
+| `autoscaling.minReplicas` | Minimum number of replicas | `2` | Optional | int |
+| `autoscaling.maxReplicas` | Maximum number of replicas | `20` | Optional | int |
+| `autoscaling.targetCPUUtilizationPercentage` | Target CPU utilization for scaling | `60` | Optional | int |
+| `autoscaling.targetMemoryUtilizationPercentage` | Target memory utilization for scaling | `60` | Optional | int |
+| `autoscaling.behavior.scaleUp.stabilizationWindowSeconds` | Stabilization window for scale up | `0` | Optional | int |
+| `autoscaling.behavior.scaleUp.podScaleUpValue` | Pods to add per scale up | `2` | Optional | int |
+| `autoscaling.behavior.scaleUp.percentScaleUpValue` | Percentage to scale up | `100` | Optional | int |
+| `autoscaling.behavior.scaleUp.periodSeconds` | Period for scale up evaluation | `2` | Optional | int |
+| `autoscaling.behavior.scaleDown.stabilizationWindowSeconds` | Stabilization window for scale down | `300` | Optional | int |
+| `autoscaling.behavior.scaleDown.podScaleDownValue` | Pods to remove per scale down | `1` | Optional | int |
+| `autoscaling.behavior.scaleDown.periodSeconds` | Period for scale down evaluation | `60` | Optional | int |
+
+### Volume Configuration
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `volumes` | Additional volumes to mount on the deployment | `[]` | Optional | list |
+| `volumeMounts` | Additional volume mounts for the container | `[]` | Optional | list |
+
+### Data Service Configuration
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `dataservice.name` | Data service name | `dataservice` | Optional | string |
+| `dataservice.enabled` | Enable data service deployment | `false` | Optional | bool |
+| `dataservice.containerPort` | Data service container port | `8081` | Optional | int |
+| `dataservice.finetuneBucket` | S3 bucket for fine-tuning | `""` | Optional | string |
+| `dataservice.logexportsBucket` | S3 bucket for log exports | `""` | Optional | string |
+| `dataservice.env.DEBUG_ENABLED` | Enable debug mode | `false` | Optional | bool |
+| `dataservice.env.SERVICE_NAME` | Data service name | `portkeyenterprise-dataservice` | Optional | string |
+| `dataservice.deployment.autoRestart` | Enable auto restart for data service | `true` | Optional | bool |
+| `dataservice.deployment.replicas` | Number of data service replicas | `1` | Optional | int |
+| `dataservice.deployment.labels` | Labels for data service deployment | `{}` | Optional | object |
+| `dataservice.deployment.selectorLabels` | Selector labels for data service | `{}` | Optional | object |
+| `dataservice.deployment.annotations` | Annotations for data service deployment | `{}` | Optional | object |
+| `dataservice.deployment.podSecurityContext` | Pod security context for data service | `{}` | Optional | object |
+| `dataservice.deployment.securityContext` | Container security context for data service | `{}` | Optional | object |
+| `dataservice.deployment.resources` | Resource requests/limits for data service | `{}` | Optional | object |
+| `dataservice.deployment.extraEnv` | Additional environment variables | `[]` | Optional | list |
+| `dataservice.deployment.extraContainerConfig` | Additional container configuration | `{}` | Optional | object |
+| `dataservice.deployment.topologySpreadConstraints` | Topology spread constraints | `[]` | Optional | list |
+| `dataservice.deployment.nodeSelector` | Node selector for scheduling | `{}` | Optional | object |
+| `dataservice.deployment.tolerations` | Tolerations for scheduling | `[]` | Optional | list |
+| `dataservice.deployment.affinity` | Affinity rules for scheduling | `{}` | Optional | object |
+| `dataservice.deployment.volumes` | Additional volumes | `[]` | Optional | list |
+| `dataservice.deployment.volumeMounts` | Additional volume mounts | `[]` | Optional | list |
+| `dataservice.deployment.hostAlias` | Host aliases for DNS resolution | `[]` | Optional | list |
+| `dataservice.service.type` | Data service Kubernetes service type | `ClusterIP` | Optional | string |
+| `dataservice.service.port` | Data service port | `8081` | Optional | int |
+| `dataservice.service.labels` | Service labels | `{}` | Optional | object |
+| `dataservice.service.annotations` | Service annotations | `{}` | Optional | object |
+| `dataservice.service.loadBalancerSourceRanges` | Load balancer source ranges | `[]` | Optional | list |
+| `dataservice.service.loadBalancerIP` | Static IP for load balancer | `""` | Optional | string |
+| `dataservice.serviceAccount.create` | Create service account for data service | `true` | Optional | bool |
+| `dataservice.serviceAccount.name` | Service account name | `""` | Optional | string |
+| `dataservice.serviceAccount.labels` | Service account labels | `{}` | Optional | object |
+| `dataservice.serviceAccount.annotations` | Service account annotations | `{}` | Optional | object |
+| `dataservice.autoscaling.enabled` | Enable HPA for data service | `false` | Optional | bool |
+| `dataservice.autoscaling.createHpa` | Create HPA resource | `false` | Optional | bool |
+| `dataservice.autoscaling.minReplicas` | Minimum replicas | `1` | Optional | int |
+| `dataservice.autoscaling.maxReplicas` | Maximum replicas | `5` | Optional | int |
+| `dataservice.autoscaling.targetCPUUtilizationPercentage` | Target CPU utilization | `80` | Optional | int |
+| `dataservice.autoscaling.targetMemoryUtilizationPercentage` | Target memory utilization | `80` | Optional | int |
+
+### Data Service Health Probes
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `dataservice.deployment.startupProbe.httpGet.path` | Startup probe path | `/health` | Optional | string |
+| `dataservice.deployment.startupProbe.httpGet.port` | Startup probe port | `8081` | Optional | int |
+| `dataservice.deployment.startupProbe.initialDelaySeconds` | Startup probe initial delay | `60` | Optional | int |
+| `dataservice.deployment.startupProbe.failureThreshold` | Startup probe failure threshold | `3` | Optional | int |
+| `dataservice.deployment.startupProbe.periodSeconds` | Startup probe period | `10` | Optional | int |
+| `dataservice.deployment.startupProbe.timeoutSeconds` | Startup probe timeout | `1` | Optional | int |
+| `dataservice.deployment.livenessProbe.httpGet.path` | Liveness probe path | `/health` | Optional | string |
+| `dataservice.deployment.livenessProbe.httpGet.port` | Liveness probe port | `8081` | Optional | int |
+| `dataservice.deployment.livenessProbe.failureThreshold` | Liveness probe failure threshold | `3` | Optional | int |
+| `dataservice.deployment.livenessProbe.periodSeconds` | Liveness probe period | `10` | Optional | int |
+| `dataservice.deployment.livenessProbe.timeoutSeconds` | Liveness probe timeout | `1` | Optional | int |
+| `dataservice.deployment.readinessProbe.httpGet.path` | Readiness probe path | `/health` | Optional | string |
+| `dataservice.deployment.readinessProbe.httpGet.port` | Readiness probe port | `8081` | Optional | int |
+| `dataservice.deployment.readinessProbe.failureThreshold` | Readiness probe failure threshold | `3` | Optional | int |
+| `dataservice.deployment.readinessProbe.periodSeconds` | Readiness probe period | `10` | Optional | int |
+| `dataservice.deployment.readinessProbe.timeoutSeconds` | Readiness probe timeout | `1` | Optional | int |
+
+### Redis Configuration
+
+| Parameter | Description | Default | Required | Type |
+|-----------|-------------|---------|----------|------|
+| `redis.name` | Redis service name | `redis` | Optional | string |
+| `redis.containerPort` | Redis container port | `6379` | Optional | int |
+| `redis.resources` | Resource requests/limits for Redis | `{}` | Optional | object |
