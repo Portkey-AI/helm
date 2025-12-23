@@ -335,6 +335,7 @@ dataservice:
 
 # Redis-specific configuration section
 redis:
-  name: "redis"
+  name: "redis"  
+  serviceType: NodePort  
   containerPort: 6379
   resources: {}
