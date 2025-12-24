@@ -337,5 +337,6 @@ dataservice:
 redis:
   name: "redis"  
   serviceType: NodePort  
+  servicePort: 6379
   containerPort: 6379
   resources: {}
