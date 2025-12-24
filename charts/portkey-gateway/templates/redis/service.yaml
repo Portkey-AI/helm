@@ -6,10 +6,10 @@ metadata:
   labels:
     {{- include "redis.labels" . | nindent 4 }}
 spec:
-  type: NodePort
+  type: {{ .Values.redis.serviceType | default "NodePort" }}
   ports:
-    - port: 6379
-      targetPort: 6379
+    - port: {{ .Values.redis.servicePort | default ( .Values.redis.containerPort | default 6379 ) }}
+      targetPort: {{ .Values.redis.containerPort | default 6379 }}
       protocol: TCP
       name: "redis"
   selector:
