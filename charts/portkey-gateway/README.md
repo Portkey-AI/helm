@@ -274,7 +274,19 @@ AZURE_ENTRA_TENANT_ID: "<Azure Entra Tenant Id>"
 ```
 </details>
 
-### MongoDB
+### MongoDB (⚠️ Maintenance Mode)
+
+> **⚠️ MAINTENANCE MODE NOTICE**
+> 
+> MongoDB as a LOG_STORE is now in **maintenance mode**. We recommend using S3-compatible storage (AWS S3, Azure Blob, GCS, etc.) for new deployments.
+>
+> **Known Limitations:**
+> - **16MB document size limit**: MongoDB has a maximum document size of 16MB, which can be exceeded by large LLM request/response payloads
+> - **No streaming support**: MongoDB doesn't support streaming writes, requiring the entire document to be buffered before insert
+> - **Bulk insert limitations**: Large batch operations may face performance issues and transaction timeouts
+>
+> Existing MongoDB deployments will continue to be supported, but no new features will be added.
+
 <details>
 <summary>Detailed MongoDB setup</summary>
 
