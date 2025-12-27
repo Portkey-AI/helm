@@ -18,6 +18,11 @@ images:
     repository: "docker.io/redis"
     pullPolicy: IfNotPresent
     tag: "7.2-alpine"
+  # MinIO image configuration
+  minioImage:
+    repository: "docker.io/minio/minio"
+    pullPolicy: IfNotPresent
+    tag: "latest"
 
 imagePullSecrets: [portkeyenterpriseregistrycredentials]
 nameOverride: ""
@@ -340,3 +345,33 @@ redis:
   servicePort: 6379
   containerPort: 6379
   resources: {}
+
+# MinIO object store configuration section
+minio:
+  name: "minio"
+  enabled: false
+  apiPort: 9000                   # Port for the MinIO API
+  consolePort: 9001               # Port for the MinIO WebUI
+  statefulSet:
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    resources: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+  service:
+    type: ClusterIP
+    labels: {}
+    annotations: {}
+  serviceAccount:
+    create: false
+    name: ""
+    labels: {}
+    annotations: {}
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClassName: ""
+    accessMode: ReadWriteOnce
