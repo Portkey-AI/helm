@@ -150,6 +150,37 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+MinIO labels
+*/}}
+{{- define "minio.labels" -}}
+helm.sh/chart: {{ include "portkeyenterprise.chart" . }}
+{{ include "minio.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+MinIO Selector labels
+*/}}
+{{- define "minio.selectorLabels" -}}
+app.kubernetes.io/name: minio
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+MinIO service account name
+*/}}
+{{- define "minio.serviceAccountName" -}}
+{{- if .Values.minio.serviceAccount.create -}}
+{{ default (printf "%s-%s" (include "portkeyenterprise.fullname" .) .Values.minio.name) .Values.minio.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+{{ default "default" .Values.minio.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Vault Annotations
 */}}
 {{- define "portkeyenterprise.vaultAnnotations" -}}

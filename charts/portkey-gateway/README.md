@@ -274,6 +274,41 @@ AZURE_ENTRA_TENANT_ID: "<Azure Entra Tenant Id>"
 ```
 </details>
 
+### MinIO (In-Cluster)
+Simple deployments, development
+
+```yaml
+environment:
+  data: 
+    LOG_STORE: s3_custom
+    LOG_STORE_BASEPATH: http://minio:9000/<MinIO Bucket Name>   
+    LOG_STORE_REGION: us-east-1
+    LOG_STORE_ACCESS_KEY: <Minio IO Access Key>                 
+    LOG_STORE_SECRET_KEY: <Minio IO Secret Key>                 
+  
+# MinIO object store configuration section
+minio:
+  name: "minio"
+  enabled: true
+  apiPort: 9000                   # Port for the MinIO API
+  consolePort: 9001               # Port for the MinIO WebUI
+  service:
+    type: ClusterIP
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClassName: ""          # Provide class name used to provision volumes for MinIO
+    accessMode: ReadWriteOnce
+```
+**Notes**
+
+* Value specified for `LOG_STORE_ACCESS_KEY` and `LOG_STORE_SECRET_KEY` will become MinIO `ROOT USERNAME` and `ROOT PASSWORD`.
+* The MinIO WebUI console can be accessed at `http://localhost:9001` after port-forwarding the service to your local machine:
+  ```sh
+  kubectl port-forward svc/minio 9001:9001
+  ```
+* Once the helm chart installation is complete, log in to the MinIO Console (`http://localhost:9001`) using the root username and password, and create a bucket to be used as the log store. 
+
 ### MongoDB
 <details>
 <summary>Detailed MongoDB setup</summary>

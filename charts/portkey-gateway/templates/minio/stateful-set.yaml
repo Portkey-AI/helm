@@ -1,0 +1,138 @@
+{{- if .Values.minio.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+  labels:
+    {{- include "minio.labels" . | nindent 4 }}
+    {{- with .Values.minio.statefulSet.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.minio.statefulSet.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  serviceName: minio
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "minio.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "minio.labels" . | nindent 8 }}
+        {{- with .Values.minio.statefulSet.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.minio.statefulSet.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.minio.statefulSet.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "minio.serviceAccountName" . }}
+      containers:
+        - name: {{ .Values.minio.name }}
+          image: "{{ .Values.images.minioImage.repository }}:{{ .Values.images.minioImage.tag }}"
+          imagePullPolicy: {{ .Values.images.minioImage.pullPolicy }}
+          command:
+            - minio
+            - server
+            - /data
+            - --console-address
+            - ":{{ .Values.minio.consolePort }}"
+            - --address
+            - ":{{ .Values.minio.apiPort }}"
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  {{- if .Values.environment.existingSecret }}
+                  name: {{ .Values.environment.existingSecret }}
+                  {{- else }}
+                  name: {{ include "portkeyenterprise.fullname" $ }}
+                  {{- end }}
+                  key: LOG_STORE_ACCESS_KEY
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{- if .Values.environment.existingSecret }}
+                  name: {{ .Values.environment.existingSecret }}
+                  {{- else }}
+                  name: {{ include "portkeyenterprise.fullname" $ }}
+                  {{- end }}
+                  key: LOG_STORE_SECRET_KEY
+          ports:
+            - name: api
+              containerPort: {{ .Values.minio.apiPort | default 9000 }}
+              protocol: TCP
+            - name: console
+              containerPort: {{ .Values.minio.consolePort | default 9001 }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: api
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: api
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.minio.statefulSet.resources | nindent 12 }}
+          {{- with .Values.minio.statefulSet.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{- with .Values.minio.statefulSet.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.minio.statefulSet.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.minio.statefulSet.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if not .Values.minio.persistence.enabled }}
+      volumes:
+        - name: data
+          emptyDir: {}
+      {{- end }}
+  {{- if .Values.minio.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "minio.selectorLabels" . | nindent 10 }}
+        {{- with .Values.minio.persistence.annotations }}
+        annotations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+          - {{ .Values.minio.persistence.accessMode }}
+        resources:
+          requests:
+            storage: {{ .Values.minio.persistence.size }}
+        {{- if .Values.minio.persistence.storageClassName }}
+        storageClassName: {{ .Values.minio.persistence.storageClassName }}
+        {{- end }}
+  {{- end }}
+{{- end }}
