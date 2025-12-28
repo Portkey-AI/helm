@@ -1,2 +1,2 @@
 portkey_config*.yaml
-*.DS_Store
+**/.DS_Store
