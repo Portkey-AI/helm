@@ -9,4 +9,3 @@ data:
       security:
         authorizationEnabled: true
 {{- end }}
-        

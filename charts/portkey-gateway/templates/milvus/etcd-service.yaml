@@ -15,6 +15,3 @@ spec:
   selector:
     {{- include "milvus-etcd.selectorLabels" . | nindent 4 }}
 {{- end }}
-
-
-

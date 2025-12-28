@@ -26,6 +26,3 @@ spec:
   selector:
     {{- include "milvus.selectorLabels" . | nindent 4 }}
 {{- end }}
-
-
-
