@@ -11,15 +11,6 @@ Milvus requires MinIO for object storage. Ensure MinIO is enabled in your deploy
 Add the following to your `values.yaml`:
 
 ```yaml
-minio:
-  enabled: true
-  secret:
-    create: true
-    accessKey: "minioadmin"
-    secretKey: "minioadmin123"
-  persistence:
-    enabled: true
-    size: 10Gi
 
 milvus:
   enabled: true
