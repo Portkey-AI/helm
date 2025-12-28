@@ -1,0 +1,124 @@
+{{- if .Values.milvus.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: milvus
+  labels:
+    {{- include "milvus.labels" . | nindent 4 }}
+    {{- with .Values.milvus.milvus.statefulSet.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- with .Values.milvus.milvus.statefulSet.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  serviceName: milvus
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "milvus.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "milvus.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.milvus.milvus.statefulSet.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- else }}
+      securityContext:
+        seccompProfile:
+          type: Unconfined
+      {{- end }}
+      {{- with .Values.milvus.milvus.statefulSet.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.milvus.milvus.statefulSet.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.milvus.milvus.statefulSet.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: milvus
+          image: "{{ .Values.images.milvusImage.repository }}:{{ .Values.images.milvusImage.tag }}"
+          imagePullPolicy: {{ .Values.images.milvusImage.pullPolicy | default "IfNotPresent" }}
+          command: ["milvus", "run", "standalone"]
+          env:
+            - name: ETCD_ENDPOINTS
+              value: "milvus-etcd:{{ .Values.milvus.etcd.port | default 2379 }}"
+            - name: MINIO_ADDRESS
+              value: "minio:{{ .Values.minio.apiPort | default 9000 }}"
+            - name: MINIO_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "minio.secretName" . }}
+                  key: accessKey
+            - name: MINIO_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "minio.secretName" . }}
+                  key: secretKey
+          ports:
+            - name: grpc
+              containerPort: {{ .Values.milvus.milvus.grpcPort | default 19530 }}
+              protocol: TCP
+            - name: http
+              containerPort: {{ .Values.milvus.milvus.httpPort | default 9091 }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.milvus.milvus.httpPort | default 9091 }}
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 20
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.milvus.milvus.httpPort | default 9091 }}
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 20
+            failureThreshold: 3
+          {{- with .Values.milvus.milvus.statefulSet.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.milvus.milvus.resources | nindent 12 }}
+          volumeMounts:
+            - name: milvus-config
+              mountPath: /milvus/configs/user.yaml
+              subPath: user.yaml
+            {{- if .Values.milvus.milvus.persistence.enabled }}
+            - name: data
+              mountPath: /var/lib/milvus
+            {{- end }}
+      volumes:
+        - name: milvus-config
+          configMap:
+            name: milvus-config
+  {{- if .Values.milvus.milvus.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "milvus.selectorLabels" . | nindent 10 }}
+      spec:
+        accessModes:
+          - {{ .Values.milvus.milvus.persistence.accessMode | default "ReadWriteOnce" }}
+        resources:
+          requests:
+            storage: {{ .Values.milvus.milvus.persistence.size | default "10Gi" }}
+        {{- if .Values.milvus.milvus.persistence.storageClassName }}
+        storageClassName: {{ .Values.milvus.milvus.persistence.storageClassName }}
+        {{- end }}
+  {{- end }}
+{{- end }}
+

@@ -38,7 +38,7 @@ helm.sh/chart: {{ include "portkeyenterprise.chart" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: Helm
 {{- end }}
 
 {{/*
@@ -138,7 +138,7 @@ helm.sh/chart: {{ include "portkeyenterprise.chart" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/managed-by: Helm
 {{- end }}
 
 {{/*
@@ -411,3 +411,78 @@ mcp.containerPort
 {{- $port | int -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Milvus etcd labels
+*/}}
+{{- define "milvus-etcd.labels" -}}
+helm.sh/chart: {{ include "portkeyenterprise.chart" . }}
+{{ include "milvus-etcd.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: Helm
+{{- end }}
+
+{{/*
+Milvus etcd selector labels
+*/}}
+{{- define "milvus-etcd.selectorLabels" -}}
+app.kubernetes.io/name: milvus-etcd
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: milvus-etcd
+{{- end }}
+
+{{/*
+MinIO labels
+*/}}
+{{- define "minio.labels" -}}
+helm.sh/chart: {{ include "portkeyenterprise.chart" . }}
+{{ include "minio.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: Helm
+{{- end }}
+
+{{/*
+MinIO selector labels
+*/}}
+{{- define "minio.selectorLabels" -}}
+app.kubernetes.io/name: minio
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: minio
+{{- end }}
+
+{{/*
+MinIO secret name
+*/}}
+{{- define "minio.secretName" -}}
+{{- if .Values.minio.secret.existingSecret -}}
+{{- .Values.minio.secret.existingSecret -}}
+{{- else -}}
+minio-secret
+{{- end -}}
+{{- end }}
+
+{{/*
+Milvus labels
+*/}}
+{{- define "milvus.labels" -}}
+helm.sh/chart: {{ include "portkeyenterprise.chart" . }}
+{{ include "milvus.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: Helm
+{{- end }}
+
+{{/*
+Milvus selector labels
+*/}}
+{{- define "milvus.selectorLabels" -}}
+app.kubernetes.io/name: milvus
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: milvus
+{{- end }}
+

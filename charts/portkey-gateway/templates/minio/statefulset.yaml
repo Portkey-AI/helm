@@ -1,0 +1,114 @@
+{{- if .Values.minio.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+  labels:
+    {{- include "minio.labels" . | nindent 4 }}
+    {{- with .Values.minio.statefulSet.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- with .Values.minio.statefulSet.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  serviceName: minio
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "minio.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "minio.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.minio.statefulSet.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.minio.statefulSet.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.minio.statefulSet.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.minio.statefulSet.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: minio
+          image: "{{ .Values.images.minioImage.repository }}:{{ .Values.images.minioImage.tag }}"
+          imagePullPolicy: {{ .Values.images.minioImage.pullPolicy | default "IfNotPresent" }}
+          command:
+            - minio
+            - server
+            - /data
+            - --console-address
+            - ":{{ .Values.minio.consolePort }}"
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "minio.secretName" . }}
+                  key: accessKey
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "minio.secretName" . }}
+                  key: secretKey
+          ports:
+            - name: api
+              containerPort: {{ .Values.minio.apiPort | default 9000 }}
+              protocol: TCP
+            - name: console
+              containerPort: {{ .Values.minio.consolePort | default 9001 }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: {{ .Values.minio.apiPort | default 9000 }}
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 20
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: {{ .Values.minio.apiPort | default 9000 }}
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 20
+            failureThreshold: 3
+          {{- if .Values.minio.persistence.enabled }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          {{- end }}
+          {{- with .Values.minio.statefulSet.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.minio.statefulSet.resources | nindent 12 }}
+  {{- if .Values.minio.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "minio.selectorLabels" . | nindent 10 }}
+      spec:
+        accessModes:
+          - {{ .Values.minio.persistence.accessMode | default "ReadWriteOnce" }}
+        resources:
+          requests:
+            storage: {{ .Values.minio.persistence.size | default "10Gi" }}
+        {{- if .Values.minio.persistence.storageClassName }}
+        storageClassName: {{ .Values.minio.persistence.storageClassName }}
+        {{- end }}
+  {{- end }}
+{{- end }}
+

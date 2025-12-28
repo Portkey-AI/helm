@@ -42,6 +42,9 @@ Choose your storage backends from the options below. You'll need to configure:
 **Cache Store**
 - Cache configuration
 
+**Vector Store** *(Optional)*
+- For semantic caching with Milvus. See [Semantic Cache Setup](./docs/SemanticCache.md)
+
 ---
 
 ## Analytics Store
@@ -240,6 +243,55 @@ LOG_STORE_SECRET_KEY: "<Custom S3 Secret Key>"
 LOG_STORE_BASEPATH: "<Custom S3 Base Path Including Bucket Name>"
 ```
 </details>
+
+### MinIO (In-Cluster)
+Simple deployments, development
+
+```yaml
+
+# MinIO object store configuration section
+minio:
+  name: "minio"
+  enabled: true
+  apiPort: 9000                   # Port for the MinIO API
+  consolePort: 9001               # Port for the MinIO WebUI
+  secret:
+    create: true
+    existingSecret: ""            # Use existing secret if available
+    accessKey: "<MinIO Access Key>"
+    secretKey: "<MinIO Secret Key>"
+  service:
+    type: ClusterIP
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClassName: ""          # Provide class name to be used to provision volumes for MinIO
+    accessMode: ReadWriteOnce
+```
+
+**Notes**
+
+* The values specified for `minio.secret.accessKey` and `minio.secret.secretKey` will be used as the MinIO `ROOT USERNAME` and `ROOT PASSWORD`.
+* To access the MinIO WebUI console, port-forward the service to your local machine:
+  ```sh
+  kubectl port-forward svc/minio 9001:9001
+  ```
+  Then open `http://localhost:9001` in your browser.
+
+**When using MinIO as Gateway's Log Store** *(skip if MinIO is **only** used for Milvus vector store)*
+```yaml
+environment:
+  data: 
+    LOG_STORE: s3_custom
+    LOG_STORE_BASEPATH: http://minio:9000/<MinIO Bucket Name>   
+    LOG_STORE_REGION: us-east-1
+    LOG_STORE_ACCESS_KEY: <MinIO Access Key>                 
+    LOG_STORE_SECRET_KEY: <MinIO Secret Key>                 
+```
+
+* Ensure `LOG_STORE_ACCESS_KEY` and `LOG_STORE_SECRET_KEY` match the `minio.secret.accessKey` and `minio.secret.secretKey` values respectively.
+* After Helm installation, log in to the MinIO Console using the root credentials and create a bucket with the same name specified in `LOG_STORE_BASEPATH`.
+
 
 ### Azure Blob Storage
 <details>

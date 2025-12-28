@@ -1,0 +1,31 @@
+{{- if .Values.milvus.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: milvus
+  labels:
+    {{- include "milvus.labels" . | nindent 4 }}
+    {{- with .Values.milvus.milvus.service.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- with .Values.milvus.milvus.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.milvus.milvus.service.serviceType | default "ClusterIP" }}
+  ports:
+    - port: {{ .Values.milvus.milvus.grpcPort | default 19530 }}
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+    - port: {{ .Values.milvus.milvus.httpPort | default 9091 }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "milvus.selectorLabels" . | nindent 4 }}
+{{- end }}
+
+
+
