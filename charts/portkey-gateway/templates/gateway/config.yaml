@@ -1,4 +1,5 @@
-{{- if and .Values.environment.create -}}
+{{- if .Values.environment.create -}}
+{{- $envData := include "portkeyenterprise.processedEnvData" . | fromYaml -}}
 {{- if .Values.environment.secret -}}
 apiVersion: v1
 kind: Secret
@@ -6,11 +7,11 @@ metadata:
   name: {{ include "portkeyenterprise.fullname" . }}
   labels:
     {{- include "gateway.labels" . }}
-data:    
-{{- range $key, $val := .Values.environment.data }}
+data:
+{{- range $key, $val := $envData }}
   {{ $key }}: {{- if $val }} {{ $val | b64enc }} {{- else }} "" {{- end }}
 {{- end -}}
-{{- else -}}  
+{{- else -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -18,8 +19,8 @@ metadata:
   labels:
     {{- include "gateway.labels" . }}
 data:
-{{- range $key, $val := .Values.environment.data }}
-  {{ $key }}: {{ $val }}
+{{- range $key, $val := $envData }}
+  {{ $key }}: {{ $val | quote }}
 {{- end -}}
 {{- end -}}
 {{- end -}}
