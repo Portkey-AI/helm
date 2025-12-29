@@ -22,12 +22,16 @@ images:
     repository: "minio/minio"
     pullPolicy: IfNotPresent
     tag: "RELEASE.2025-09-07T16-13-09Z"
+  minioClientImage:
+    repository: "quay.io/minio/mc"
+    pullPolicy: IfNotPresent
+    tag: "RELEASE.2025-08-13T08-35-41Z"
   etcdImage:
     repository: "quay.io/coreos/etcd"
     pullPolicy: IfNotPresent
     tag: "v3.5.5"
   milvusImage:
-    repository: "milvusdb/milvus"
+    repository: "docker.io/milvusdb/milvus"
     pullPolicy: IfNotPresent
     tag: "v2.3.21"
 
@@ -87,16 +91,16 @@ environment:
   data:
     SERVICE_NAME: portkeyenterprise
     PORT: "8787"
-    LOG_STORE: 
+    LOG_STORE:
     MONGO_DB_CONNECTION_URL: 
     MONGO_DATABASE: 
     MONGO_COLLECTION_NAME:
     MONGO_GENERATIONS_HOOKS_COLLECTION_NAME:
-    LOG_STORE_REGION: 
-    LOG_STORE_ACCESS_KEY: 
-    LOG_STORE_SECRET_KEY: 
-    LOG_STORE_GENERATIONS_BUCKET: 
-    LOG_STORE_BASEPATH: 
+    LOG_STORE_REGION:
+    LOG_STORE_ACCESS_KEY:
+    LOG_STORE_SECRET_KEY:
+    LOG_STORE_GENERATIONS_BUCKET:
+    LOG_STORE_BASEPATH:  
     LOG_STORE_AWS_ROLE_ARN:
     LOG_STORE_AWS_EXTERNAL_ID:
     AWS_ASSUME_ROLE_ACCESS_KEY_ID:
@@ -125,6 +129,10 @@ environment:
     SERVER_MODE: ""
     MCP_PORT: "8788"
     MCP_GATEWAY_BASE_URL: ""
+    VECTOR_STORE: ""
+    VECTOR_STORE_ADDRESS: ""
+    VECTOR_STORE_COLLECTION_NAME: ""
+    VECTOR_STORE_API_KEY: ""
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -356,14 +364,13 @@ redis:
 # MinIO configuration section
 minio:
   name: "minio"
-  enabled: false
   apiPort: 9000
   consolePort: 9001
-  secret:
+  authKey:
     create: true
     existingSecret: ""
-    accessKey: "minioadmin"
-    secretKey: "minioadmin123"
+    accessKey: "portkey"
+    secretKey: "portkey123"
   statefulSet:
     labels: {}
     annotations: {}
@@ -385,7 +392,26 @@ minio:
 
 # Milvus configuration section
 milvus:
-  enabled: false
+  grpcPort: 19530
+  httpPort: 9091
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClassName: ""
+    accessMode: ReadWriteOnce
+  service:
+    serviceType: ClusterIP
+    labels: {}
+    annotations: {}
+  resources: {}
+  statefulSet:
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
   etcd:
     port: 2379
     env:
@@ -397,27 +423,6 @@ milvus:
       enabled: true
       size: 10Gi
       storageClassName: ""
-    service:
-      serviceType: ClusterIP
-      labels: {}
-      annotations: {}
-    resources: {}
-    statefulSet:
-      labels: {}
-      annotations: {}
-      podSecurityContext: {}
-      securityContext: {}
-      nodeSelector: {}
-      tolerations: []
-      affinity: {}
-  milvus:
-    grpcPort: 19530
-    httpPort: 9091
-    persistence:
-      enabled: true
-      size: 10Gi
-      storageClassName: ""
-      accessMode: ReadWriteOnce
     service:
       serviceType: ClusterIP
       labels: {}

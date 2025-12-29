@@ -43,7 +43,7 @@ Choose your storage backends from the options below. You'll need to configure:
 - Cache configuration
 
 **Vector Store** *(Optional)*
-- For semantic caching with Milvus. See [Semantic Cache Setup](./docs/SemanticCache.md)
+- For semantic caching with Milvus. See [Vector Store Setup](./docs/VectorStore.md)
 
 ---
 
@@ -244,53 +244,38 @@ LOG_STORE_BASEPATH: "<Custom S3 Base Path Including Bucket Name>"
 ```
 </details>
 
-### MinIO (In-Cluster)
+### MinIO (Local/In-Cluster)
 Simple deployments, development
 
 ```yaml
 
-# MinIO object store configuration section
+# Local (MinIO) object store configuration section
+environment:
+  data: 
+    LOG_STORE: local
+    LOG_STORE_GENERATIONS_BUCKET: "<Bucket Name>"                 # Bucket will automatically be create in MinIO by this Helm chart. Default portkey-log-store
+
 minio:
   name: "minio"
-  enabled: true
-  apiPort: 9000                   # Port for the MinIO API
-  consolePort: 9001               # Port for the MinIO WebUI
-  secret:
+  authKey:
     create: true
-    existingSecret: ""            # Use existing secret if available
-    accessKey: "<MinIO Access Key>"
-    secretKey: "<MinIO Secret Key>"
-  service:
-    type: ClusterIP
+    accessKey: "portkey"
+    secretKey: "portkey123"
   persistence:
     enabled: true
     size: 10Gi
-    storageClassName: ""          # Provide class name to be used to provision volumes for MinIO
-    accessMode: ReadWriteOnce
+    storageClassName: "<Storage Class Name>"                      # Provide k8s storage class name to provision volumes for data persistence.
+    accessMode: ReadWriteOnce   
 ```
 
 **Notes**
 
-* The values specified for `minio.secret.accessKey` and `minio.secret.secretKey` will be used as the MinIO `ROOT USERNAME` and `ROOT PASSWORD`.
+* The values specified for `minio.authKey.accessKey` and `minio.authKey.secretKey` will be used as the MinIO `ROOT USERNAME` and `ROOT PASSWORD`.
 * To access the MinIO WebUI console, port-forward the service to your local machine:
   ```sh
   kubectl port-forward svc/minio 9001:9001
   ```
   Then open `http://localhost:9001` in your browser.
-
-**When using MinIO as Gateway's Log Store** *(skip if MinIO is **only** used for Milvus vector store)*
-```yaml
-environment:
-  data: 
-    LOG_STORE: s3_custom
-    LOG_STORE_BASEPATH: http://minio:9000/<MinIO Bucket Name>   
-    LOG_STORE_REGION: us-east-1
-    LOG_STORE_ACCESS_KEY: <MinIO Access Key>                 
-    LOG_STORE_SECRET_KEY: <MinIO Secret Key>                 
-```
-
-* Ensure `LOG_STORE_ACCESS_KEY` and `LOG_STORE_SECRET_KEY` match the `minio.secret.accessKey` and `minio.secret.secretKey` values respectively.
-* After Helm installation, log in to the MinIO Console using the root credentials and create a bucket with the same name specified in `LOG_STORE_BASEPATH`.
 
 
 ### Azure Blob Storage
@@ -503,4 +488,4 @@ helm uninstall portkey-gateway --namespace portkeyai
 For additional help:
 - Check the [full configuration reference](values.yaml)
 - Review logs: `kubectl logs -n portkeyai deployment/portkey-gateway`
-- Contact support(suport@portkey.ai) with your configuration details
+- Contact support(support@portkey.ai) with your configuration details

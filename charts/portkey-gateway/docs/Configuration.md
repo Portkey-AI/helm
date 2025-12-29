@@ -398,18 +398,17 @@ environment:
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
 | `minio.name` | string | `"minio"` | MinIO component name |
-| `minio.enabled` | boolean | `false` | Enable MinIO deployment |
 | `minio.apiPort` | integer | `9000` | MinIO API port |
 | `minio.consolePort` | integer | `9001` | MinIO WebUI console port |
 
-#### MinIO Secret
+#### MinIO Auth Key Secret
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `minio.secret.create` | boolean | `true` | Create MinIO credentials secret |
-| `minio.secret.existingSecret` | string | `""` | Use existing secret for MinIO credentials |
-| `minio.secret.accessKey` | string | `"minioadmin"` | MinIO root username / access key |
-| `minio.secret.secretKey` | string | `"minioadmin123"` | MinIO root password / secret key |
+| `minio.authKey.create` | boolean | `true` | Create MinIO credentials secret |
+| `minio.authKey.existingSecret` | string | `""` | Use existing secret for MinIO credentials |
+| `minio.authKey.accessKey` | string | `"portkey"` | MinIO root username / access key |
+| `minio.authKey.secretKey` | string | `"portkey123"` | MinIO root password / secret key |
 
 #### MinIO StatefulSet
 
@@ -443,11 +442,11 @@ environment:
 
 ### Milvus Configuration
 
-> **Note**: Milvus requires MinIO for object storage. Enable MinIO (`minio.enabled: true`) when using Milvus.
+> **Note**: Milvus requires MinIO for object storage. MinIO is deployed automatically when `environment.data.LOG_STORE: local` or `environment.data.VECTOR_STORE: local` is set.
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `milvus.enabled` | boolean | `false` | Enable Milvus vector database deployment |
+| `environment.data.VECTOR_STORE` | string | `""` | Set to `local` to deploy in-cluster Milvus and auto-configure Gateway env vars |
 
 #### Milvus etcd Configuration
 
@@ -477,20 +476,20 @@ environment:
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `milvus.milvus.grpcPort` | integer | `19530` | Milvus gRPC port |
-| `milvus.milvus.httpPort` | integer | `9091` | Milvus HTTP port |
-| `milvus.milvus.persistence.enabled` | boolean | `true` | Enable persistent storage for Milvus |
-| `milvus.milvus.persistence.size` | string | `"10Gi"` | Storage size for Milvus data |
-| `milvus.milvus.persistence.storageClassName` | string | `""` | Storage class for Milvus PVC |
-| `milvus.milvus.persistence.accessMode` | string | `"ReadWriteOnce"` | PVC access mode |
-| `milvus.milvus.service.serviceType` | string | `"ClusterIP"` | Milvus service type |
-| `milvus.milvus.service.labels` | object | `{}` | Milvus service labels |
-| `milvus.milvus.service.annotations` | object | `{}` | Milvus service annotations |
-| `milvus.milvus.resources` | object | `{}` | Resource requests and limits for Milvus |
-| `milvus.milvus.statefulSet.labels` | object | `{}` | Labels for Milvus StatefulSet |
-| `milvus.milvus.statefulSet.annotations` | object | `{}` | Annotations for Milvus StatefulSet |
-| `milvus.milvus.statefulSet.podSecurityContext` | object | `{}` | Pod security context |
-| `milvus.milvus.statefulSet.securityContext` | object | `{}` | Container security context |
-| `milvus.milvus.statefulSet.nodeSelector` | object | `{}` | Node selector for scheduling |
-| `milvus.milvus.statefulSet.tolerations` | array | `[]` | Tolerations for scheduling |
-| `milvus.milvus.statefulSet.affinity` | object | `{}` | Affinity rules for scheduling |
+| `milvus.grpcPort` | integer | `19530` | Milvus gRPC port |
+| `milvus.httpPort` | integer | `9091` | Milvus HTTP port |
+| `milvus.persistence.enabled` | boolean | `true` | Enable persistent storage for Milvus |
+| `milvus.persistence.size` | string | `"10Gi"` | Storage size for Milvus data |
+| `milvus.persistence.storageClassName` | string | `""` | Storage class for Milvus PVC |
+| `milvus.persistence.accessMode` | string | `"ReadWriteOnce"` | PVC access mode |
+| `milvus.service.serviceType` | string | `"ClusterIP"` | Milvus service type |
+| `milvus.service.labels` | object | `{}` | Milvus service labels |
+| `milvus.service.annotations` | object | `{}` | Milvus service annotations |
+| `milvus.resources` | object | `{}` | Resource requests and limits for Milvus |
+| `milvus.statefulSet.labels` | object | `{}` | Labels for Milvus StatefulSet |
+| `milvus.statefulSet.annotations` | object | `{}` | Annotations for Milvus StatefulSet |
+| `milvus.statefulSet.podSecurityContext` | object | `{}` | Pod security context |
+| `milvus.statefulSet.securityContext` | object | `{}` | Container security context |
+| `milvus.statefulSet.nodeSelector` | object | `{}` | Node selector for scheduling |
+| `milvus.statefulSet.tolerations` | array | `[]` | Tolerations for scheduling |
+| `milvus.statefulSet.affinity` | object | `{}` | Affinity rules for scheduling |

@@ -295,11 +295,55 @@ Common Environment Env as Map
 
 {{- define "logStore.commonEnv" -}}
 {{- $commonEnv := include "portkeyenterprise.commonEnvMap" . | fromYaml -}}
+{{- /* Get LOG_STORE value to check if it's "local" */ -}}
+{{- $logStore := "" -}}
+{{- if hasKey $commonEnv "LOG_STORE" -}}
+  {{- $entry := index $commonEnv "LOG_STORE" -}}
+  {{- if hasKey $entry "value" -}}
+    {{- $logStore = $entry.value -}}
+  {{- else -}}
+    {{- $logStore = (index .Values.environment.data "LOG_STORE") | default "" -}}
+  {{- end -}}
+{{- else -}}
+  {{- $logStore = (index .Values.environment.data "LOG_STORE") | default "" -}}
+{{- end -}}
+
+{{- /* Check if local mode - override with in-cluster MinIO */ -}}
+{{- if eq $logStore "local" -}}
+- name: LOG_STORE
+  value: "s3_custom"
+- name: LOG_STORE_GENERATIONS_BUCKET
+  value: {{ .Values.environment.data.LOG_STORE_GENERATIONS_BUCKET | default "portkey-log-store" }}
+- name: LOG_STORE_BASEPATH
+  value: "http://minio:{{ .Values.minio.apiPort | default 9000 }}/{{ .Values.environment.data.LOG_STORE_GENERATIONS_BUCKET | default "portkey-log-store" }}"
+- name: LOG_STORE_ACCESS_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "minio.secretName" . }}
+      key: accessKey
+- name: LOG_STORE_SECRET_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "minio.secretName" . }}
+      key: secretKey
+- name: LOG_STORE_REGION
+  value: "us-east-1"
+- name: LOG_STORE_GENERATIONS_BUCKET
+  value: {{ .Values.environment.data.LOG_STORE_GENERATIONS_BUCKET | default "portkey-log-store" | quote }}
+{{- /* Include MONGO keys if present */ -}}
+{{- range $key, $value := $commonEnv }}
+{{- if has $key (list "MONGO_DB_CONNECTION_URL" "MONGO_DATABASE" "MONGO_COLLECTION_NAME" "MONGO_GENERATION_HOOKS_COLLECTION_NAME") }}
+{{- include "portkeyenterprise.renderEnvVar" (list $key $value) | nindent 0 }}
+{{- end }}
+{{- end }}
+{{- else -}}
+{{- /* Normal mode - use values from environment.data */ -}}
 {{- range $key, $value := $commonEnv }}
 {{- if has $key (list "LOG_STORE" "MONGO_DB_CONNECTION_URL" "MONGO_DATABASE" "MONGO_COLLECTION_NAME" "MONGO_GENERATION_HOOKS_COLLECTION_NAME" "LOG_STORE_ACCESS_KEY" "LOG_STORE_SECRET_KEY" "LOG_STORE_REGION" "LOG_STORE_GENERATIONS_BUCKET" "LOG_STORE_BASEPATH" "LOG_STORE_AWS_ROLE_ARN" "LOG_STORE_AWS_EXTERNAL_ID" "AZURE_AUTH_MODE" "AZURE_STORAGE_ACCOUNT" "AZURE_STORAGE_KEY" "AZURE_STORAGE_CONTAINER") }}
 {{- include "portkeyenterprise.renderEnvVar" (list $key $value) | nindent 0 }}
 {{- end }}
 {{- end }}
+{{- end -}}
 {{- end }}
 
 {{- define "analyticStore.commonEnv" -}}
@@ -318,6 +362,41 @@ Common Environment Env as Map
 {{- include "portkeyenterprise.renderEnvVar" (list $key $value) | nindent 0 }}
 {{- end }}
 {{- end }}
+{{- end }}
+
+{{- define "vectorStore.commonEnv" -}}
+{{- $commonEnv := include "portkeyenterprise.commonEnvMap" . | fromYaml -}}
+{{- /* Get VECTOR_STORE value to check if it's "local" */ -}}
+{{- $vectorStore := "" -}}
+{{- if hasKey $commonEnv "VECTOR_STORE" -}}
+  {{- $entry := index $commonEnv "VECTOR_STORE" -}}
+  {{- if hasKey $entry "value" -}}
+    {{- $vectorStore = $entry.value -}}
+  {{- else -}}
+    {{- $vectorStore = (index .Values.environment.data "VECTOR_STORE") | default "" -}}
+  {{- end -}}
+{{- else -}}
+  {{- $vectorStore = (index .Values.environment.data "VECTOR_STORE") | default "" -}}
+{{- end -}}
+
+{{- /* Check if local mode - override with in-cluster Milvus */ -}}
+{{- if eq $vectorStore "local" -}}
+- name: VECTOR_STORE
+  value: "milvus"
+- name: VECTOR_STORE_ADDRESS
+  value: "http://milvus:{{ .Values.milvus.grpcPort | default 19530 }}"
+- name: VECTOR_STORE_COLLECTION_NAME
+  value: {{ .Values.environment.data.VECTOR_STORE_COLLECTION_NAME | default "textEmbedding3Small" | quote }}
+- name: VECTOR_STORE_API_KEY
+  value: "root:Milvus"
+{{- else -}}
+{{- /* Normal mode - use values from environment.data */ -}}
+{{- range $key, $value := $commonEnv }}
+{{- if has $key (list "VECTOR_STORE" "VECTOR_STORE_ADDRESS" "VECTOR_STORE_COLLECTION_NAME" "VECTOR_STORE_API_KEY") }}
+{{- include "portkeyenterprise.renderEnvVar" (list $key $value) | nindent 0 }}
+{{- end }}
+{{- end }}
+{{- end -}}
 {{- end }}
 
 {{- define "controlPlane.commonEnv" -}}
@@ -413,27 +492,6 @@ mcp.containerPort
 {{- end -}}
 
 {{/*
-Milvus etcd labels
-*/}}
-{{- define "milvus-etcd.labels" -}}
-helm.sh/chart: {{ include "portkeyenterprise.chart" . }}
-{{ include "milvus-etcd.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end }}
-
-{{/*
-Milvus etcd selector labels
-*/}}
-{{- define "milvus-etcd.selectorLabels" -}}
-app.kubernetes.io/name: milvus-etcd
-app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/component: milvus-etcd
-{{- end }}
-
-{{/*
 MinIO labels
 */}}
 {{- define "minio.labels" -}}
@@ -455,11 +513,11 @@ app.kubernetes.io/component: minio
 {{- end }}
 
 {{/*
-MinIO secret name
+MinIO auth key secret name
 */}}
 {{- define "minio.secretName" -}}
-{{- if .Values.minio.secret.existingSecret -}}
-{{- .Values.minio.secret.existingSecret -}}
+{{- if .Values.minio.authKey.existingSecret -}}
+{{- .Values.minio.authKey.existingSecret -}}
 {{- else -}}
 minio-secret
 {{- end -}}
@@ -485,3 +543,65 @@ app.kubernetes.io/name: milvus
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: milvus
 {{- end }}
+
+{{/*
+Milvus etcd labels
+*/}}
+{{- define "milvus-etcd.labels" -}}
+helm.sh/chart: {{ include "portkeyenterprise.chart" . }}
+{{ include "milvus-etcd.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Milvus etcd selector labels
+*/}}
+{{- define "milvus-etcd.selectorLabels" -}}
+app.kubernetes.io/name: milvus-etcd
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: milvus-etcd
+{{- end }}
+
+{{/*
+Environment data with local overrides applied
+Returns a map of key-value pairs for Secret/ConfigMap
+*/}}
+{{- define "portkeyenterprise.processedEnvData" -}}
+{{- $result := dict -}}
+{{- $logStoreLocal := eq (.Values.environment.data.LOG_STORE | default "") "local" -}}
+{{- $vectorStoreLocal := eq (.Values.environment.data.VECTOR_STORE | default "") "local" -}}
+{{- $logStoreKeys := list "LOG_STORE" "LOG_STORE_BASEPATH" "LOG_STORE_ACCESS_KEY" "LOG_STORE_SECRET_KEY" "LOG_STORE_REGION" "LOG_STORE_GENERATIONS_BUCKET" -}}
+{{- $vectorStoreKeys := list "VECTOR_STORE" "VECTOR_STORE_ADDRESS" "VECTOR_STORE_COLLECTION_NAME" "VECTOR_STORE_API_KEY" -}}
+
+{{- /* Add LOG_STORE overrides if local mode */ -}}
+{{- if $logStoreLocal -}}
+  {{- $_ := set $result "LOG_STORE" "s3_custom" -}}
+  {{- $_ := set $result "LOG_STORE_BASEPATH" (printf "http://minio:%v/%s" (.Values.minio.apiPort | default 9000) (.Values.environment.data.LOG_STORE_GENERATIONS_BUCKET | default "portkey-log-store")) -}}
+  {{- $_ := set $result "LOG_STORE_ACCESS_KEY" (.Values.minio.authKey.accessKey | default "portkey") -}}
+  {{- $_ := set $result "LOG_STORE_SECRET_KEY" (.Values.minio.authKey.secretKey | default "portkey123") -}}
+  {{- $_ := set $result "LOG_STORE_REGION" "us-east-1" -}}
+  {{- $_ := set $result "LOG_STORE_GENERATIONS_BUCKET" (.Values.environment.data.LOG_STORE_GENERATIONS_BUCKET | default "portkey-log-store") -}}
+{{- end -}}
+
+{{- /* Add VECTOR_STORE overrides if local mode */ -}}
+{{- if $vectorStoreLocal -}}
+  {{- $_ := set $result "VECTOR_STORE" "milvus" -}}
+  {{- $_ := set $result "VECTOR_STORE_ADDRESS" (printf "http://milvus:%v" (.Values.milvus.grpcPort | default 19530)) -}}
+  {{- $_ := set $result "VECTOR_STORE_COLLECTION_NAME" (.Values.environment.data.VECTOR_STORE_COLLECTION_NAME | default "textEmbedding3Small") -}}
+  {{- $_ := set $result "VECTOR_STORE_API_KEY" "root:Milvus" -}}
+{{- end -}}
+
+{{- /* Add remaining keys from environment.data, skip overridden ones */ -}}
+{{- range $key, $val := .Values.environment.data -}}
+  {{- if and $logStoreLocal (has $key $logStoreKeys) -}}
+  {{- else if and $vectorStoreLocal (has $key $vectorStoreKeys) -}}
+  {{- else -}}
+    {{- $_ := set $result $key $val -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $result | toYaml -}}
+{{- end -}}

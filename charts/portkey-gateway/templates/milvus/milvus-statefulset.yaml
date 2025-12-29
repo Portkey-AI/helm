@@ -1,15 +1,15 @@
-{{- if .Values.milvus.enabled }}
+{{- if eq .Values.environment.data.VECTOR_STORE "local" }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: milvus
   labels:
     {{- include "milvus.labels" . | nindent 4 }}
-    {{- with .Values.milvus.milvus.statefulSet.labels }}
+    {{- with .Values.milvus.statefulSet.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
-    {{- with .Values.milvus.milvus.statefulSet.annotations }}
+    {{- with .Values.milvus.statefulSet.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
@@ -23,7 +23,7 @@ spec:
       labels:
         {{- include "milvus.labels" . | nindent 8 }}
     spec:
-      {{- with .Values.milvus.milvus.statefulSet.podSecurityContext }}
+      {{- with .Values.milvus.statefulSet.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- else }}
@@ -31,15 +31,15 @@ spec:
         seccompProfile:
           type: Unconfined
       {{- end }}
-      {{- with .Values.milvus.milvus.statefulSet.nodeSelector }}
+      {{- with .Values.milvus.statefulSet.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.milvus.milvus.statefulSet.tolerations }}
+      {{- with .Values.milvus.statefulSet.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.milvus.milvus.statefulSet.affinity }}
+      {{- with .Values.milvus.statefulSet.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -65,15 +65,15 @@ spec:
                   key: secretKey
           ports:
             - name: grpc
-              containerPort: {{ .Values.milvus.milvus.grpcPort | default 19530 }}
+              containerPort: {{ .Values.milvus.grpcPort | default 19530 }}
               protocol: TCP
             - name: http
-              containerPort: {{ .Values.milvus.milvus.httpPort | default 9091 }}
+              containerPort: {{ .Values.milvus.httpPort | default 9091 }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /healthz
-              port: {{ .Values.milvus.milvus.httpPort | default 9091 }}
+              port: {{ .Values.milvus.httpPort | default 9091 }}
             initialDelaySeconds: 60
             periodSeconds: 30
             timeoutSeconds: 20
@@ -81,22 +81,22 @@ spec:
           readinessProbe:
             httpGet:
               path: /healthz
-              port: {{ .Values.milvus.milvus.httpPort | default 9091 }}
+              port: {{ .Values.milvus.httpPort | default 9091 }}
             initialDelaySeconds: 60
             periodSeconds: 30
             timeoutSeconds: 20
             failureThreshold: 3
-          {{- with .Values.milvus.milvus.statefulSet.securityContext }}
+          {{- with .Values.milvus.statefulSet.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           resources:
-            {{- toYaml .Values.milvus.milvus.resources | nindent 12 }}
+            {{- toYaml .Values.milvus.resources | nindent 12 }}
           volumeMounts:
             - name: milvus-config
               mountPath: /milvus/configs/user.yaml
               subPath: user.yaml
-            {{- if .Values.milvus.milvus.persistence.enabled }}
+            {{- if .Values.milvus.persistence.enabled }}
             - name: data
               mountPath: /var/lib/milvus
             {{- end }}
@@ -104,7 +104,7 @@ spec:
         - name: milvus-config
           configMap:
             name: milvus-config
-  {{- if .Values.milvus.milvus.persistence.enabled }}
+  {{- if .Values.milvus.persistence.enabled }}
   volumeClaimTemplates:
     - metadata:
         name: data
@@ -112,12 +112,12 @@ spec:
           {{- include "milvus.selectorLabels" . | nindent 10 }}
       spec:
         accessModes:
-          - {{ .Values.milvus.milvus.persistence.accessMode | default "ReadWriteOnce" }}
+          - {{ .Values.milvus.persistence.accessMode | default "ReadWriteOnce" }}
         resources:
           requests:
-            storage: {{ .Values.milvus.milvus.persistence.size | default "10Gi" }}
-        {{- if .Values.milvus.milvus.persistence.storageClassName }}
-        storageClassName: {{ .Values.milvus.milvus.persistence.storageClassName }}
+            storage: {{ .Values.milvus.persistence.size | default "10Gi" }}
+        {{- if .Values.milvus.persistence.storageClassName }}
+        storageClassName: {{ .Values.milvus.persistence.storageClassName }}
         {{- end }}
   {{- end }}
 {{- end }}

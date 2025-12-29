@@ -1,8 +1,10 @@
-{{- if .Values.milvus.enabled }}
+{{- if eq .Values.environment.data.VECTOR_STORE "local" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: milvus-config
+  labels:
+    {{- include "milvus.labels" . | nindent 4 }}
 data:
   user.yaml: |
     common:
