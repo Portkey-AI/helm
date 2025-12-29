@@ -328,8 +328,6 @@ Common Environment Env as Map
       key: secretKey
 - name: LOG_STORE_REGION
   value: "us-east-1"
-- name: LOG_STORE_GENERATIONS_BUCKET
-  value: {{ .Values.environment.data.LOG_STORE_GENERATIONS_BUCKET | default "portkey-log-store" | quote }}
 {{- /* Include MONGO keys if present */ -}}
 {{- range $key, $value := $commonEnv }}
 {{- if has $key (list "MONGO_DB_CONNECTION_URL" "MONGO_DATABASE" "MONGO_COLLECTION_NAME" "MONGO_GENERATION_HOOKS_COLLECTION_NAME") }}
