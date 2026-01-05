@@ -83,5 +83,6 @@ data:
       VITE_PRIVATE_DEPLOYMENT: "ON", 
       VITE_AUTH_MODE: "{{- if .Values.config.oauth.enabled }}SSO{{- end }}{{- if .Values.config.noAuth.enabled }}NO_AUTH{{- end }}", 
       VITE_DISABLE_TESTIMONIAL: "{{- if .Values.config.disableTestimonial }}ON{{- else }}OFF{{- end }}",
-      VITE_LOGIN_DISCLAIMER: {{- .Values.config.loginDisclaimer | quote }}
+      VITE_LOGIN_DISCLAIMER: {{- .Values.config.loginDisclaimer | quote }},
+      VITE_CONFIGS_URL: "/albus/v2/utils/model-configs"
     };
