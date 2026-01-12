@@ -47,6 +47,9 @@ Selector labels
 {{- define "portkeyenterprise.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "portkeyenterprise.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- with .Values.selectorLabels }}
+{{ toYaml . }}
+{{- end }}
 {{- end }}
 
 {{/*
