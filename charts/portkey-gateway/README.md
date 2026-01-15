@@ -42,6 +42,9 @@ Choose your storage backends from the options below. You'll need to configure:
 **Cache Store**
 - Cache configuration
 
+**Vector Store** *(Optional)*
+- For semantic caching with Milvus. See [Vector Store Setup](./docs/VectorStore.md)
+
 ---
 
 ## Analytics Store
@@ -240,6 +243,27 @@ LOG_STORE_SECRET_KEY: "<Custom S3 Secret Key>"
 LOG_STORE_BASEPATH: "<Custom S3 Base Path Including Bucket Name>"
 ```
 </details>
+
+### MinIO (In-Cluster)
+
+Simple deployments, development
+
+Configure chart for in-cluster Minio Deployment. See [MinIO setup in README](./docs/MinioConfiguration.md) for configuration details.
+
+```yaml
+environment:
+  data: 
+    LOG_STORE: s3_custom
+    LOG_STORE_BASEPATH: http://minio:9000/<MinIO Bucket Name>   
+    LOG_STORE_REGION: us-east-1
+    LOG_STORE_GENERATIONS_BUCKET: <Minio Bucket Name>                             
+    LOG_STORE_ACCESS_KEY: <MinIO Access Key>                 
+    LOG_STORE_SECRET_KEY: <MinIO Secret Key>                 
+```
+
+* Ensure `LOG_STORE_ACCESS_KEY` and `LOG_STORE_SECRET_KEY` match the `minio.authKey.accessKey` and `minio.authKey.secretKey` values respectively.
+* The Helm chart will automatically create a MinIO bucket using the name specified in the `LOG_STORE_GENERATIONS_BUCKET` field for storing logs.
+
 
 ### Azure Blob Storage
 <details>

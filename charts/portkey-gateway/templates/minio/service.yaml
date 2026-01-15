@@ -1,0 +1,28 @@
+{{- if .Values.minio.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  labels:
+    {{- include "minio.labels" . | nindent 4 }}
+    {{- with .Values.minio.service.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- with .Values.minio.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.minio.service.type | default "ClusterIP" }}
+  ports:
+    - port: {{ .Values.minio.apiPort | default 9000 }}
+      targetPort: api
+      protocol: TCP
+      name: api
+    - port: {{ .Values.minio.consolePort | default 9001 }}
+      targetPort: console
+      protocol: TCP
+      name: console
+  selector:
+    {{- include "minio.selectorLabels" . | nindent 4 }}
+{{- end }}
