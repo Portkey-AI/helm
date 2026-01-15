@@ -1,26 +1,18 @@
-# Semantic Cache Configuration
+# Cector Cache Configuration
 
 This guide explains how to configure Milvus as a vector store for semantic caching in Portkey Gateway.
 
 ## Enable MinIO in Helm Chart
 
-Milvus requires MinIO for object storage. Ensure MinIO is enabled in your deployment before proceeding. See [MinIO setup in README](../README.md#minio-in-cluster) for configuration details.
+Milvus requires MinIO for object storage. Ensure MinIO is enabled in your deployment before proceeding. See [MinIO setup in README](./MinioConfiguration.md) for configuration details.
+
+**Note:** If local MinIO is already enabled for log storage, skip this section and proceed to the next step.
 
 ## Enable Milvus in Helm Chart
 
 Add the following to your `values.yaml`:
 
 ```yaml
-minio:
-  enabled: true
-  secret:
-    create: true
-    accessKey: "minioadmin"
-    secretKey: "minioadmin123"
-  persistence:
-    enabled: true
-    size: 10Gi
-
 milvus:
   enabled: true
   etcd:
@@ -32,6 +24,31 @@ milvus:
       enabled: true
       size: 10Gi
 ```
+
+## Configure Gateway for Semantic Cache
+
+Update your `values.yaml` with the semantic cache configuration:
+
+```yaml
+environment:
+  data:
+    VECTOR_STORE: "milvus"
+    VECTOR_STORE_ADDRESS: "http://milvus:19530"
+    VECTOR_STORE_COLLECTION_NAME: "textEmbedding3Small"
+    VECTOR_STORE_API_KEY: "<root>:Milvus"
+    SEMANTIC_CACHE_EMBEDDINGS_URL: "<embeddings endpoint>"
+    SEMANTIC_CACHE_EMBEDDING_MODEL: "<embeddings model>"
+    SEMANTIC_CACHE_EMBEDDING_API_KEY: "<embeddings api key>"
+```
+
+## Upgrade Gateway
+
+Apply the configuration by upgrading the Helm installation:
+
+```sh
+helm upgrade --install portkey-ai portkey-ai/gateway -f ./values.yaml -n portkeyai --create-namespace
+```
+
 
 ## Access Milvus Instance
 
@@ -114,39 +131,9 @@ curl --location --request POST 'http://localhost:19530/v2/vectordb/collections/d
 }'
 ```
 
-## Configure Gateway for Semantic Cache
 
-Update your `values.yaml` with the semantic cache configuration:
 
-```yaml
-environment:
-  data:
-    VECTOR_STORE: "milvus"
-    VECTOR_STORE_ADDRESS: "http://milvus:19530"
-    VECTOR_STORE_COLLECTION_NAME: "textEmbedding3Small"
-    VECTOR_STORE_API_KEY: "<root>:Milvus"
-    SEMANTIC_CACHE_EMBEDDINGS_URL: "<embeddings endpoint>"
-    SEMANTIC_CACHE_EMBEDDING_MODEL: "<embeddings model>"
-    SEMANTIC_CACHE_EMBEDDING_API_KEY: "<embeddings api key>"
-```
 
-| Variable | Description |
-|----------|-------------|
-| `VECTOR_STORE` | Vector store type (use `milvus`) |
-| `VECTOR_STORE_ADDRESS` | Milvus service address |
-| `VECTOR_STORE_COLLECTION_NAME` | Name of the collection created above |
-| `VECTOR_STORE_API_KEY` | Milvus credentials in `username:password` format |
-| `SEMANTIC_CACHE_EMBEDDINGS_URL` | Endpoint for generating embeddings |
-| `SEMANTIC_CACHE_EMBEDDING_MODEL` | Embedding model name |
-| `SEMANTIC_CACHE_EMBEDDING_API_KEY` | API key for the embeddings service |
-
-## Upgrade Gateway
-
-Apply the configuration by upgrading the Helm installation:
-
-```sh
-helm upgrade --install portkey-ai portkey-ai/gateway -f ./values.yaml -n portkeyai --create-namespace
-```
 
 ## Notes
 
@@ -155,4 +142,3 @@ helm upgrade --install portkey-ai portkey-ai/gateway -f ./values.yaml -n portkey
   ```sh
   kubectl get pods -n portkeyai | grep milvus
   ```
-

@@ -1,4 +1,4 @@
-{{- if .Values.milvus.enabled }}
+{{- if and .Values.milvus.enabled .Values.minio.enabled }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:

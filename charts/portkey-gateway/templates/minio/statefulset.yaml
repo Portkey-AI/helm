@@ -94,6 +94,51 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.minio.statefulSet.resources | nindent 12 }}
+        - name: minio-client
+          image: "{{ .Values.images.minioClientImage.repository }}:{{ .Values.images.minioClientImage.tag }}"
+          imagePullPolicy: {{ .Values.images.minioClientImage.pullPolicy | default "IfNotPresent" }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for MinIO to be ready..."
+              until /usr/bin/mc alias set minio http://localhost:{{ .Values.minio.apiPort | default 9000 }} $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD 2>/dev/null; do
+                echo "MinIO not ready yet, waiting..."
+                sleep 2
+              done
+              echo "MinIO is ready, configuring buckets..."
+              /usr/bin/mc mb --ignore-existing minio/{{ .Values.environment.data.LOG_STORE_GENERATIONS_BUCKET }}
+              echo "Bucket '{{ .Values.environment.data.LOG_STORE_GENERATIONS_BUCKET }}' created!"
+              touch /tmp/ready
+              echo "Bucket setup complete. Container will now idle."
+              sleep infinity
+          readinessProbe:
+            exec:
+              command:
+                - cat
+                - /tmp/ready
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 12
+          livenessProbe:
+            exec:
+              command:
+                - cat
+                - /tmp/ready
+            initialDelaySeconds: 90
+            periodSeconds: 30
+            failureThreshold: 5
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "minio.secretName" . }}
+                  key: accessKey
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "minio.secretName" . }}
+                  key: secretKey
   {{- if .Values.minio.persistence.enabled }}
   volumeClaimTemplates:
     - metadata:

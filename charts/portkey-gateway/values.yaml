@@ -359,7 +359,7 @@ minio:
   enabled: false
   apiPort: 9000
   consolePort: 9001
-  secret:
+  authKey:
     create: true
     existingSecret: ""
     accessKey: "minioadmin"
