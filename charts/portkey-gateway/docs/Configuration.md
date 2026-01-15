@@ -28,7 +28,7 @@
 | `images.etcdImage.repository` | string | `"quay.io/coreos/etcd"` | etcd container image repository |
 | `images.etcdImage.pullPolicy` | string | `"IfNotPresent"` | Image pull policy for etcd |
 | `images.etcdImage.tag` | string | `"v3.5.5"` | etcd image tag |
-| `images.milvusImage.repository` | string | `"milvusdb/milvus"` | Milvus container image repository |
+| `images.milvusImage.repository` | string | `"docker.io/milvusdb/milvus"` | Milvus container image repository |
 | `images.milvusImage.pullPolicy` | string | `"IfNotPresent"` | Image pull policy for Milvus |
 | `images.milvusImage.tag` | string | `"v2.3.21"` | Milvus image tag |
 | `imagePullSecrets` | array | `[portkeyenterpriseregistrycredentials]` | Kubernetes secrets for pulling private images |
