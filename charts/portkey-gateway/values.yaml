@@ -39,6 +39,8 @@ imagePullSecrets: [portkeyenterpriseregistrycredentials]
 nameOverride: ""
 fullnameOverride: ""
 
+selectorLabels: {}
+
 imageCredentials:
 - name: portkeyenterpriseregistrycredentials
   create: true
