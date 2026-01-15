@@ -19,7 +19,7 @@ images:
     pullPolicy: IfNotPresent
     tag: "7.2-alpine"
   minioImage:
-    repository: "minio/minio"
+    repository: "docker.io/minio/minio"
     pullPolicy: IfNotPresent
     tag: "RELEASE.2025-09-07T16-13-09Z"
   minioClientImage:

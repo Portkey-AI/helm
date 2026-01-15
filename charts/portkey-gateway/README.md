@@ -43,7 +43,7 @@ Choose your storage backends from the options below. You'll need to configure:
 - Cache configuration
 
 **Vector Store** *(Optional)*
-- For semantic caching with Milvus. See [Semantic Cache Setup](./docs/SemanticCache.md)
+- For semantic caching with Milvus. See [Vector Store Setup](./docs/VectorStore.md)
 
 ---
 
@@ -261,7 +261,7 @@ environment:
     LOG_STORE_SECRET_KEY: <MinIO Secret Key>                 
 ```
 
-* Ensure `LOG_STORE_ACCESS_KEY` and `LOG_STORE_SECRET_KEY` match the `minio.secret.accessKey` and `minio.secret.secretKey` values respectively.
+* Ensure `LOG_STORE_ACCESS_KEY` and `LOG_STORE_SECRET_KEY` match the `minio.authKey.accessKey` and `minio.authKey.secretKey` values respectively.
 * The Helm chart will automatically create a MinIO bucket using the name specified in the `LOG_STORE_GENERATIONS_BUCKET` field for storing logs.
 
 
