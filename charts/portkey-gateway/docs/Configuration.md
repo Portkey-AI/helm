@@ -406,10 +406,10 @@ environment:
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `minio.secret.create` | boolean | `true` | Create MinIO credentials secret |
-| `minio.secret.existingSecret` | string | `""` | Use existing secret for MinIO credentials |
-| `minio.secret.accessKey` | string | `"minioadmin"` | MinIO root username / access key |
-| `minio.secret.secretKey` | string | `"minioadmin123"` | MinIO root password / secret key |
+| `minio.authKey.create` | boolean | `true` | Create MinIO credentials secret |
+| `minio.authKey.existingSecret` | string | `""` | Use existing secret for MinIO credentials |
+| `minio.authKey.accessKey` | string | `"minioadmin"` | MinIO root username / access key |
+| `minio.authKey.secretKey` | string | `"minioadmin123"` | MinIO root password / secret key |
 
 #### MinIO StatefulSet
 

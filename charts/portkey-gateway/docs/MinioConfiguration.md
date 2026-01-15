@@ -21,7 +21,7 @@ minio:
 
 **Notes**
 
-* The values specified for `minio.secret.accessKey` and `minio.secret.secretKey` will be used as the MinIO `ROOT USERNAME` and `ROOT PASSWORD`.
+* The values specified for `minio.authKey.accessKey` and `minio.authKey.secretKey` will be used as the MinIO `ROOT USERNAME` and `ROOT PASSWORD`.
 * To access the MinIO WebUI console, port-forward the service to your local machine:
   ```sh
   kubectl port-forward svc/minio 9001:9001

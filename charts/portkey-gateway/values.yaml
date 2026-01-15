@@ -22,12 +22,16 @@ images:
     repository: "minio/minio"
     pullPolicy: IfNotPresent
     tag: "RELEASE.2025-09-07T16-13-09Z"
+  minioClientImage:
+    repository: "quay.io/minio/mc"
+    pullPolicy: IfNotPresent
+    tag: "RELEASE.2025-08-13T08-35-41Z"
   etcdImage:
     repository: "quay.io/coreos/etcd"
     pullPolicy: IfNotPresent
     tag: "v3.5.5"
   milvusImage:
-    repository: "milvusdb/milvus"
+    repository: "docker.io/milvusdb/milvus"
     pullPolicy: IfNotPresent
     tag: "v2.3.21"
 
