@@ -15,19 +15,25 @@ data:
       <user_files_path>/var/lib/clickhouse/user_files/</user_files_path>
       <format_schema_path>/var/lib/clickhouse/format_schemas/</format_schema_path>
       <access_control_path>/var/lib/clickhouse/access/</access_control_path>
-      {{ if .Values.clickhouse.https.enabled }}
+      {{- if .Values.clickhouse.https.enabled }}
       <https_port>{{ .Values.clickhouse.https.port }}</https_port>
       <openSSL>
         <server>
           <certificateFile>{{ .Values.clickhouse.https.certs.crt }}</certificateFile>
           <privateKeyFile>{{ .Values.clickhouse.https.certs.key }}</privateKeyFile>
-          {{ if .Values.clickhouse.https.certs.ca }}
+          {{- if .Values.clickhouse.https.certs.ca }}
           <caConfig>{{ .Values.clickhouse.https.certs.ca }}</caConfig>
-          {{ end }}
+          {{- end }}
           <verificationMode>{{ .Values.clickhouse.https.certs.verificationMode }}</verificationMode>
         </server>
       </openSSL>
-      {{ end }}
+      {{- end }}
+      {{- if .Values.clickhouse.retention.enabled }}
+      <merge_tree>
+        <merge_with_ttl_timeout>{{ .Values.clickhouse.retention.mergeWithTtlTimeout }}</merge_with_ttl_timeout>
+        <ttl_only_drop_parts>{{ .Values.clickhouse.retention.ttlOnlyDropParts }}</ttl_only_drop_parts>
+      </merge_tree>
+      {{- end }}
     </clickhouse>
   users.xml: |
     <clickhouse>
