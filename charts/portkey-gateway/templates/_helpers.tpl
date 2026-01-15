@@ -455,11 +455,11 @@ app.kubernetes.io/component: minio
 {{- end }}
 
 {{/*
-MinIO secret name
+MinIO auth key secret name
 */}}
 {{- define "minio.secretName" -}}
-{{- if .Values.minio.secret.existingSecret -}}
-{{- .Values.minio.secret.existingSecret -}}
+{{- if .Values.minio.authKey.existingSecret -}}
+{{- .Values.minio.authKey.existingSecret -}}
 {{- else -}}
 minio-secret
 {{- end -}}

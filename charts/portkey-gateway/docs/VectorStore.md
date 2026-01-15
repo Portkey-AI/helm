@@ -1,4 +1,4 @@
-# Cector Cache Configuration
+# Vector Cache Configuration
 
 This guide explains how to configure Milvus as a vector store for semantic caching in Portkey Gateway.
 
