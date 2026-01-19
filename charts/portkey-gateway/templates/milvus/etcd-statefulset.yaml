@@ -1,0 +1,111 @@
+{{- if and .Values.milvus.enabled .Values.minio.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: milvus-etcd
+  labels:
+    {{- include "milvus-etcd.labels" . | nindent 4 }}
+    {{- with .Values.milvus.etcd.statefulSet.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- with .Values.milvus.etcd.statefulSet.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  serviceName: milvus-etcd
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "milvus-etcd.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "milvus-etcd.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.milvus.etcd.statefulSet.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.milvus.etcd.statefulSet.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.milvus.etcd.statefulSet.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.milvus.etcd.statefulSet.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: etcd
+          image: "{{ .Values.images.etcdImage.repository }}:{{ .Values.images.etcdImage.tag }}"
+          imagePullPolicy: {{ .Values.images.etcdImage.pullPolicy | default "IfNotPresent" }}
+          command:
+            - etcd
+            - -advertise-client-urls=http://127.0.0.1:{{ .Values.milvus.etcd.port | default 2379 }}
+            - -listen-client-urls=http://0.0.0.0:{{ .Values.milvus.etcd.port | default 2379 }}
+            - --data-dir=/etcd
+          env:
+            - name: ETCD_AUTO_COMPACTION_MODE
+              value: {{ .Values.milvus.etcd.env.autoCompactionMode | default "revision" | quote }}
+            - name: ETCD_AUTO_COMPACTION_RETENTION
+              value: {{ .Values.milvus.etcd.env.autoCompactionRetention | default "1000" | quote }}
+            - name: ETCD_QUOTA_BACKEND_BYTES
+              value: {{ .Values.milvus.etcd.env.quotaBackendBytes | default "4294967296" | quote }}
+            - name: ETCD_SNAPSHOT_COUNT
+              value: {{ .Values.milvus.etcd.env.snapshotCount | default "50000" | quote }}
+          ports:
+            - name: client
+              containerPort: {{ .Values.milvus.etcd.port | default 2379 }}
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - etcdctl
+                - endpoint
+                - health
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 20
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - etcdctl
+                - endpoint
+                - health
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 20
+            failureThreshold: 3
+          {{- if .Values.milvus.etcd.persistence.enabled }}
+          volumeMounts:
+            - name: data
+              mountPath: /etcd
+          {{- end }}
+          {{- with .Values.milvus.etcd.statefulSet.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.milvus.etcd.resources | nindent 12 }}
+  {{- if .Values.milvus.etcd.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "milvus-etcd.selectorLabels" . | nindent 10 }}
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.milvus.etcd.persistence.size | default "10Gi" }}
+        {{- if .Values.milvus.etcd.persistence.storageClassName }}
+        storageClassName: {{ .Values.milvus.etcd.persistence.storageClassName }}
+        {{- end }}
+  {{- end }}
+{{- end }}
