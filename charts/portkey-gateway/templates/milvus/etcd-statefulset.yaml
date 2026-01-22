@@ -39,6 +39,10 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      imagePullSecrets: 
+      {{- range .Values.imageCredentials }}
+      - name: {{ .name }}
+      {{- end }}
       containers:
         - name: etcd
           image: "{{ .Values.images.etcdImage.repository }}:{{ .Values.images.etcdImage.tag }}"
