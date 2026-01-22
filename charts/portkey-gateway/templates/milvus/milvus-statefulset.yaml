@@ -43,6 +43,10 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      imagePullSecrets: 
+      {{- range .Values.imageCredentials }}
+      - name: {{ .name }}
+      {{- end }}
       containers:
         - name: milvus
           image: "{{ .Values.images.milvusImage.repository }}:{{ .Values.images.milvusImage.tag }}"
