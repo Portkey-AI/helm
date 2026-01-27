@@ -160,6 +160,7 @@ securityContext: {}
 service:
   type: NodePort
   port: 8787
+  containerPort: 8787
   additionalLabels: {}
   annotations: {}
 

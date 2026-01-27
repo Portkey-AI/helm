@@ -7,8 +7,11 @@ metadata:
   labels:
     {{- include "gateway.labels" . }}
 data:    
+  PORT: {{ include "gateway.containerPort" . | b64enc }}
 {{- range $key, $val := .Values.environment.data }}
+{{- if ne $key "PORT" }}
   {{ $key }}: {{- if $val }} {{ $val | b64enc }} {{- else }} "" {{- end }}
+{{- end }}
 {{- end -}}
 {{- else -}}  
 apiVersion: v1
@@ -18,8 +21,11 @@ metadata:
   labels:
     {{- include "gateway.labels" . }}
 data:
+  PORT: "{{ include "gateway.containerPort" . }}"
 {{- range $key, $val := .Values.environment.data }}
+{{- if ne $key "PORT" }}
   {{ $key }}: {{ $val }}
+{{- end }}
 {{- end -}}
 {{- end -}}
 {{- end -}}
