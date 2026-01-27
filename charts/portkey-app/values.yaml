@@ -668,6 +668,12 @@ clickhouse:
     database: "default"
     tls: false
     existingSecretName: ""
+  customConfig:
+    enabled: false
+  retention:
+    enabled: false
+    mergeWithTtlTimeout: 14400
+    ttlOnlyDropParts: 0
   https:
     enabled: false
     port: 8443

@@ -22,6 +22,15 @@
 | `images.redisImage.repository` | string | `"docker.io/redis"` | Redis container image repository |
 | `images.redisImage.pullPolicy` | string | `"IfNotPresent"` | Image pull policy for Redis |
 | `images.redisImage.tag` | string | `"7.2-alpine"` | Redis image tag |
+| `images.minioImage.repository` | string | `"minio/minio"` | MinIO container image repository |
+| `images.minioImage.pullPolicy` | string | `"IfNotPresent"` | Image pull policy for MinIO |
+| `images.minioImage.tag` | string | `"RELEASE.2025-09-07T16-13-09Z"` | MinIO image tag |
+| `images.etcdImage.repository` | string | `"quay.io/coreos/etcd"` | etcd container image repository |
+| `images.etcdImage.pullPolicy` | string | `"IfNotPresent"` | Image pull policy for etcd |
+| `images.etcdImage.tag` | string | `"v3.5.5"` | etcd image tag |
+| `images.milvusImage.repository` | string | `"docker.io/milvusdb/milvus"` | Milvus container image repository |
+| `images.milvusImage.pullPolicy` | string | `"IfNotPresent"` | Image pull policy for Milvus |
+| `images.milvusImage.tag` | string | `"v2.3.21"` | Milvus image tag |
 | `imagePullSecrets` | array | `[portkeyenterpriseregistrycredentials]` | Kubernetes secrets for pulling private images |
 
 ### Image Credentials
@@ -383,3 +392,105 @@ environment:
 | `redis.name` | string | `"redis"` | Redis component name |
 | `redis.containerPort` | integer | `6379` | Redis container port |
 | `redis.resources` | object | `{}` | Resource requests and limits for Redis |
+
+### MinIO Configuration
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `minio.name` | string | `"minio"` | MinIO component name |
+| `minio.enabled` | boolean | `false` | Enable MinIO deployment |
+| `minio.apiPort` | integer | `9000` | MinIO API port |
+| `minio.consolePort` | integer | `9001` | MinIO WebUI console port |
+
+#### MinIO Secret
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `minio.authKey.create` | boolean | `true` | Create MinIO credentials secret |
+| `minio.authKey.existingSecret` | string | `""` | Use existing secret for MinIO credentials |
+| `minio.authKey.accessKey` | string | `"minioadmin"` | MinIO root username / access key |
+| `minio.authKey.secretKey` | string | `"minioadmin123"` | MinIO root password / secret key |
+
+#### MinIO StatefulSet
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `minio.statefulSet.labels` | object | `{}` | Labels for MinIO StatefulSet |
+| `minio.statefulSet.annotations` | object | `{}` | Annotations for MinIO StatefulSet |
+| `minio.statefulSet.podSecurityContext` | object | `{}` | Pod security context |
+| `minio.statefulSet.securityContext` | object | `{}` | Container security context |
+| `minio.statefulSet.resources` | object | `{}` | Resource requests and limits |
+| `minio.statefulSet.nodeSelector` | object | `{}` | Node selector for scheduling |
+| `minio.statefulSet.tolerations` | array | `[]` | Tolerations for scheduling |
+| `minio.statefulSet.affinity` | object | `{}` | Affinity rules for scheduling |
+
+#### MinIO Service
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `minio.service.type` | string | `"ClusterIP"` | MinIO service type |
+| `minio.service.labels` | object | `{}` | Service labels |
+| `minio.service.annotations` | object | `{}` | Service annotations |
+
+#### MinIO Persistence
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `minio.persistence.enabled` | boolean | `true` | Enable persistent storage for MinIO |
+| `minio.persistence.size` | string | `"10Gi"` | Storage size for MinIO data |
+| `minio.persistence.storageClassName` | string | `""` | Storage class for MinIO PVC |
+| `minio.persistence.accessMode` | string | `"ReadWriteOnce"` | PVC access mode |
+
+### Milvus Configuration
+
+> **Note**: Milvus requires MinIO for object storage. Enable MinIO (`minio.enabled: true`) when using Milvus.
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `milvus.enabled` | boolean | `false` | Enable Milvus vector database deployment |
+
+#### Milvus etcd Configuration
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `milvus.etcd.port` | integer | `2379` | etcd client port |
+| `milvus.etcd.env.autoCompactionMode` | string | `"revision"` | etcd auto compaction mode |
+| `milvus.etcd.env.autoCompactionRetention` | string | `"1000"` | etcd auto compaction retention |
+| `milvus.etcd.env.quotaBackendBytes` | string | `"4294967296"` | etcd backend quota in bytes |
+| `milvus.etcd.env.snapshotCount` | string | `"50000"` | etcd snapshot count |
+| `milvus.etcd.persistence.enabled` | boolean | `true` | Enable persistent storage for etcd |
+| `milvus.etcd.persistence.size` | string | `"10Gi"` | Storage size for etcd data |
+| `milvus.etcd.persistence.storageClassName` | string | `""` | Storage class for etcd PVC |
+| `milvus.etcd.service.serviceType` | string | `"ClusterIP"` | etcd service type |
+| `milvus.etcd.service.labels` | object | `{}` | etcd service labels |
+| `milvus.etcd.service.annotations` | object | `{}` | etcd service annotations |
+| `milvus.etcd.resources` | object | `{}` | Resource requests and limits for etcd |
+| `milvus.etcd.statefulSet.labels` | object | `{}` | Labels for etcd StatefulSet |
+| `milvus.etcd.statefulSet.annotations` | object | `{}` | Annotations for etcd StatefulSet |
+| `milvus.etcd.statefulSet.podSecurityContext` | object | `{}` | Pod security context |
+| `milvus.etcd.statefulSet.securityContext` | object | `{}` | Container security context |
+| `milvus.etcd.statefulSet.nodeSelector` | object | `{}` | Node selector for scheduling |
+| `milvus.etcd.statefulSet.tolerations` | array | `[]` | Tolerations for scheduling |
+| `milvus.etcd.statefulSet.affinity` | object | `{}` | Affinity rules for scheduling |
+
+#### Milvus Server Configuration
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `milvus.milvus.grpcPort` | integer | `19530` | Milvus gRPC port |
+| `milvus.milvus.httpPort` | integer | `9091` | Milvus HTTP port |
+| `milvus.milvus.persistence.enabled` | boolean | `true` | Enable persistent storage for Milvus |
+| `milvus.milvus.persistence.size` | string | `"10Gi"` | Storage size for Milvus data |
+| `milvus.milvus.persistence.storageClassName` | string | `""` | Storage class for Milvus PVC |
+| `milvus.milvus.persistence.accessMode` | string | `"ReadWriteOnce"` | PVC access mode |
+| `milvus.milvus.service.serviceType` | string | `"ClusterIP"` | Milvus service type |
+| `milvus.milvus.service.labels` | object | `{}` | Milvus service labels |
+| `milvus.milvus.service.annotations` | object | `{}` | Milvus service annotations |
+| `milvus.milvus.resources` | object | `{}` | Resource requests and limits for Milvus |
+| `milvus.milvus.statefulSet.labels` | object | `{}` | Labels for Milvus StatefulSet |
+| `milvus.milvus.statefulSet.annotations` | object | `{}` | Annotations for Milvus StatefulSet |
+| `milvus.milvus.statefulSet.podSecurityContext` | object | `{}` | Pod security context |
+| `milvus.milvus.statefulSet.securityContext` | object | `{}` | Container security context |
+| `milvus.milvus.statefulSet.nodeSelector` | object | `{}` | Node selector for scheduling |
+| `milvus.milvus.statefulSet.tolerations` | array | `[]` | Tolerations for scheduling |
+| `milvus.milvus.statefulSet.affinity` | object | `{}` | Affinity rules for scheduling |

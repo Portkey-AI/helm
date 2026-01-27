@@ -1,0 +1,17 @@
+{{- if and .Values.milvus.enabled .Values.minio.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: milvus-etcd
+  labels:
+    {{- include "milvus-etcd.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.milvus.etcd.service.serviceType | default "ClusterIP" }}
+  ports:
+    - port: {{ .Values.milvus.etcd.port | default 2379 }}
+      targetPort: client
+      protocol: TCP
+      name: client
+  selector:
+    {{- include "milvus-etcd.selectorLabels" . | nindent 4 }}
+{{- end }}
