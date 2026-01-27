@@ -4,7 +4,7 @@ description: Helm chart to deploy the Portkey AI Gateway application in a hybrid
 home: https://portkey.ai/
 icon: https://avatars.githubusercontent.com/u/131141116?s=200&v=4
 type: application
-version: "1.5.1"
+version: "1.6.0"
 appVersion: "1.17.15"
 maintainers:
   - name: Ayush
