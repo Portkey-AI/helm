@@ -54,7 +54,7 @@ spec:
           imagePullPolicy: {{ .Values.images.gatewayImage.pullPolicy }}
           ports:
             - name: "gateway"
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ include "gateway.containerPort" . }}
               protocol: TCP
             {{- if include "mcp.enabled" . }}
             - name: "mcp"
