@@ -418,7 +418,6 @@ mcp.containerPort
 {{/*
 gateway.containerPort
 → Returns integer port for gateway
-Priority: containerPort > environment.data.PORT > service.port > 8787
 */}}
 {{- define "gateway.containerPort" -}}
 {{- if .Values.service.containerPort -}}
@@ -436,7 +435,6 @@ Priority: containerPort > environment.data.PORT > service.port > 8787
 {{- else -}}
   {{- $port = (index .Values.environment.data "PORT") | default "" | toString -}}
 {{- end -}}
-{{- /* Return integer safely */ -}}
 {{- if eq $port "" -}}
 {{- .Values.service.port | default 8787 | int -}}
 {{- else -}}
