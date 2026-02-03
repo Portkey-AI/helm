@@ -4,8 +4,8 @@ description: Helm chart to deploy the Portkey Full Stack application and all dep
 home: https://portkey.ai/
 icon: https://avatars.githubusercontent.com/u/131141116?s=200&v=4
 type: application
-appVersion: "1.7.2"
-version: 1.4.3
+appVersion: "1.7.3"
+version: 1.5.0
 maintainers:
   - name: Ayush
     email: ayush@portkey.ai
