@@ -164,6 +164,14 @@ service:
   additionalLabels: {}
   annotations: {}
 
+mcpService:
+  enabled: false
+  type: ClusterIP
+  port: 8788
+  containerPort: 8788
+  additionalLabels: {}
+  annotations: {}
+
 ingress:
   enabled: false
   hostname: ""
