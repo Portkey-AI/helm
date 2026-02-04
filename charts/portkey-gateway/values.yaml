@@ -167,8 +167,7 @@ service:
 mcpService:
   enabled: false
   type: ClusterIP
-  port: 8788
-  containerPort: 8788
+  port: 80
   additionalLabels: {}
   annotations: {}
 
