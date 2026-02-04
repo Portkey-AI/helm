@@ -24,3 +24,28 @@ spec:
     {{- end }}
   selector:
     {{- include "portkeyenterprise.selectorLabels" . | nindent 4 }}
+---
+{{- if and .Values.mcpService.enabled (eq (include "mcp.enabled" .) "true") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "portkeyenterprise.fullname" . }}-mcp
+  labels:
+    {{- include "gateway.labels" . }}
+    {{- with .Values.mcpService.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.mcpService.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.mcpService.type }}
+  ports:
+    - port: {{ .Values.mcpService.port }}
+      targetPort: mcp
+      protocol: TCP
+      name: mcp
+  selector:
+    {{- include "portkeyenterprise.selectorLabels" . | nindent 4 }}
+{{- end }}
