@@ -684,6 +684,15 @@ clickhouse:
       verificationMode: "strict"
   containerHttpPort: 8123
   containerNativePort: 9000
+  initContainer:
+    resources: {}
+    # resources:
+    #   requests:
+    #     cpu: "50m"
+    #     memory: "64Mi"
+    #   limits:
+    #     cpu: "100m"
+    #     memory: "128Mi"
   statefulSet:
     labels: {}
     annotations: {}
