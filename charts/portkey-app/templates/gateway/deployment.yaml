@@ -134,6 +134,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.gateway.deployment.hostAlias }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.gateway.deployment.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

@@ -128,6 +128,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.dataservice.deployment.hostAlias }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.dataservice.deployment.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

@@ -156,6 +156,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.backend.deployment.hostAlias }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.backend.deployment.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

@@ -179,6 +179,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.clickhouse.statefulSet.hostAlias }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         {{- if .Values.clickhouse.external.existingSecretName }}
         - name: clickhouse-users-config
