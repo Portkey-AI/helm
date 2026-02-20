@@ -173,6 +173,13 @@ service:
   additionalLabels: {}
   annotations: {}
 
+mcpService:
+  enabled: false
+  type: ClusterIP
+  port: 80
+  additionalLabels: {}
+  annotations: {}
+
 ingress:
   enabled: false
   hostname: ""
