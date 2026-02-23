@@ -317,7 +317,7 @@ Common Environment Env as Map
 {{- define "cacheStore.commonEnv" -}}
 {{- $commonEnv := include "portkeyenterprise.commonEnvMap" . | fromYaml -}}
 {{- range $key, $value := $commonEnv }}
-{{- if has $key (list "CACHE_STORE" "REDIS_URL" "REDIS_TLS_ENABLED" "REDIS_MODE") }}
+{{- if has $key (list "CACHE_STORE" "REDIS_URL" "REDIS_PORT" "REDIS_HOST" "REDIS_TLS_ENABLED" "REDIS_MODE" "REDIS_TLS_CERTS" "REDIS_USERNAME" "REDIS_PASSWORD" "REDIS_SCALE_READS" "REDIS_CLUSTER_ENDPOINTS" "REDIS_CLUSTER_DISCOVERY_URL" "REDIS_CLUSTER_DISCOVERY_AUTH" "AZURE_REDIS_AUTH_MODE" "AZURE_REDIS_ENTRA_CLIENT_ID" "AZURE_REDIS_ENTRA_CLIENT_SECRET" "AZURE_REDIS_ENTRA_TENANT_ID" "AZURE_REDIS_MANAGED_CLIENT_ID" "AWS_REDIS_AUTH_MODE" "AWS_REDIS_CLUSTER_NAME" "AWS_REDIS_REGION" "AWS_REDIS_ASSUME_ROLE_ARN" "AWS_REDIS_ROLE_EXTERNAL_ID") }}
 {{- include "portkeyenterprise.renderEnvVar" (list $key $value) | nindent 0 }}
 {{- end }}
 {{- end }}

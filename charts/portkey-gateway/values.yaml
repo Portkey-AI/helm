@@ -4,15 +4,24 @@
 
 replicaCount: 1
 
+# Deployment strategy configuration
+# Example:
+# strategy:
+#   type: RollingUpdate
+#   rollingUpdate:
+#     maxSurge: 1
+#     maxUnavailable: 0
+strategy: {}
+
 images:
   gatewayImage:
     repository: "docker.io/portkeyai/gateway_enterprise"
     pullPolicy: IfNotPresent
-    tag: "1.17.1"
+    tag: "2.1.0"
   dataserviceImage:
     repository: "docker.io/portkeyai/data-service"
     pullPolicy: IfNotPresent
-    tag: "1.4.1"
+    tag: "1.5.0"
   # Add Redis image configuration
   redisImage:
     repository: "docker.io/redis"
@@ -271,6 +280,10 @@ hostAlias: []
 
 # if you want to restart instance automatically
 autoRestart: false
+
+# Optional: Grace period for pod termination (in seconds)
+# terminationGracePeriodSeconds: 30
+terminationGracePeriodSeconds:
 
 
 dataservice:
