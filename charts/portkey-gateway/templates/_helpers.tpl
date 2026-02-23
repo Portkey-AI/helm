@@ -393,8 +393,12 @@ mcp.enabled
 {{/*
 mcp.containerPort
 → Returns integer port
+Priority: mcpService.containerPort > MCP_PORT env > 8788 default
 */}}
 {{- define "mcp.containerPort" -}}
+{{- if and .Values.mcpService .Values.mcpService.enabled .Values.mcpService.containerPort -}}
+{{- .Values.mcpService.containerPort | int -}}
+{{- else -}}
 {{- $env := (include "portkeyenterprise.commonEnvMap" . | fromYaml) -}}
 {{- $port := "" -}}
 {{- if hasKey $env "MCP_PORT" -}}
@@ -407,11 +411,11 @@ mcp.containerPort
 {{- else -}}
   {{- $port = (index .Values.environment.data "MCP_PORT") | default "" | toString -}}
 {{- end -}}
-{{- /* Return integer safely */ -}}
 {{- if eq $port "" -}}
 8788
 {{- else -}}
 {{- $port | int -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 
