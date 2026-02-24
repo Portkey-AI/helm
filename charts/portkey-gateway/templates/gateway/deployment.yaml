@@ -31,6 +31,7 @@ spec:
       {{- if .Values.autoRestart }}
         rollme: {{ randAlphaNum 5 | quote }}
       {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/gateway/config.yaml") . | sha256sum }}
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
