@@ -414,6 +414,12 @@ When creating Virtual Keys in Portkey, provide:
 
 </details>
 
+## Additional Configurations
+
+```yaml
+REQUEST_TIMEOUT: 300000 # custom request timeout in milli seconds (useful for long running requests)
+```
+
 ---
 
 ## Installation
