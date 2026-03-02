@@ -34,6 +34,49 @@ data:
         <ttl_only_drop_parts>{{ .Values.clickhouse.retention.ttlOnlyDropParts }}</ttl_only_drop_parts>
       </merge_tree>
       {{- end }}
+      {{- if include "clickhouse.replicationEnabled" . }}
+      <interserver_http_port>{{ .Values.clickhouse.containerInterserverPort }}</interserver_http_port>
+      <remote_servers>
+        <{{ .Values.clickhouse.clusterName }}>
+          <shard>
+            <internal_replication>true</internal_replication>
+            {{- $replicas := int .Values.clickhouse.statefulSet.replicas }}
+            {{- $headlessSvc := include "clickhouse.headlessServiceName" . }}
+            {{- $nativePort := .Values.clickhouse.containerNativePort }}
+            {{- $fullname := include "portkey.fullname" . }}
+            {{- $chName := .Values.clickhouse.name }}
+            {{- range $i := until $replicas }}
+            <replica>
+              <host>{{ $fullname }}-{{ $chName }}-{{ $i }}.{{ $headlessSvc }}</host>
+              <port>{{ $nativePort }}</port>
+            </replica>
+            {{- end }}
+          </shard>
+        </{{ .Values.clickhouse.clusterName }}>
+      </remote_servers>
+      <zookeeper>
+        {{- if .Values.clickhouseKeeper.external.enabled }}
+        {{- range .Values.clickhouseKeeper.external.hosts }}
+        <node>
+          <host>{{ .host }}</host>
+          <port>{{ .port }}</port>
+        </node>
+        {{- end }}
+        {{- else }}
+        {{- $keeperReplicas := int .Values.clickhouseKeeper.replicas }}
+        {{- $keeperHeadlessSvc := include "clickhouseKeeper.headlessServiceName" . }}
+        {{- $keeperFullname := include "portkey.fullname" . }}
+        {{- $keeperName := .Values.clickhouseKeeper.name }}
+        {{- $keeperPort := .Values.clickhouseKeeper.containerPort }}
+        {{- range $i := until $keeperReplicas }}
+        <node>
+          <host>{{ $keeperFullname }}-{{ $keeperName }}-{{ $i }}.{{ $keeperHeadlessSvc }}</host>
+          <port>{{ $keeperPort }}</port>
+        </node>
+        {{- end }}
+        {{- end }}
+      </zookeeper>
+      {{- end }}
     </clickhouse>
   {{- if not .Values.clickhouse.external.existingSecretName }}
   users.xml: |

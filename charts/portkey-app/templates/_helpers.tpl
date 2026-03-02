@@ -552,6 +552,34 @@ Template containing common environment variables that are used by several servic
 {{- end -}}
 {{- end -}}
 
+{{- define "clickhouse.replicationEnabled" -}}
+{{- if and (not .Values.clickhouse.external.enabled) (gt (int .Values.clickhouse.statefulSet.replicas) 1) -}}
+true
+{{- end -}}
+{{- end -}}
+
+{{- define "clickhouse.headlessServiceName" -}}
+{{- printf "%s-%s-headless" (include "portkey.fullname" .) .Values.clickhouse.name -}}
+{{- end -}}
+
+{{- define "clickhouseKeeper.deployEnabled" -}}
+{{- if and (include "clickhouse.replicationEnabled" .) (not .Values.clickhouseKeeper.external.enabled) -}}
+true
+{{- end -}}
+{{- end -}}
+
+{{- define "clickhouseKeeper.headlessServiceName" -}}
+{{- printf "%s-%s-headless" (include "portkey.fullname" .) .Values.clickhouseKeeper.name -}}
+{{- end -}}
+
+{{- define "clickhouseKeeper.serviceAccountName" -}}
+{{- if .Values.clickhouseKeeper.serviceAccount.create -}}
+    {{ default (printf "%s-%s" (include "portkey.fullname" .) .Values.clickhouseKeeper.name) .Values.clickhouseKeeper.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.clickhouseKeeper.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
 {{- define "mysql.serviceAccountName" -}}
 {{- if .Values.mysql.serviceAccount.create -}}
     {{ default (printf "%s-%s" (include "portkey.fullname" .) .Values.mysql.name) .Values.mysql.serviceAccount.name | trunc 63 | trimSuffix "-" }}

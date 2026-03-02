@@ -1,0 +1,43 @@
+{{- if include "clickhouseKeeper.deployEnabled" . }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "portkey.fullname" . }}-{{ .Values.clickhouseKeeper.name }}
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+  annotations:
+    {{- include "portkey.annotations" . | nindent 4 }}
+data:
+  keeper_config.xml: |
+    <clickhouse>
+      <logger>
+        <level>information</level>
+        <console>1</console>
+      </logger>
+      <keeper_server>
+        <tcp_port>{{ .Values.clickhouseKeeper.containerPort }}</tcp_port>
+        <server_id>${SERVER_ID}</server_id>
+        <log_storage_path>/var/lib/clickhouse-keeper/log</log_storage_path>
+        <snapshot_storage_path>/var/lib/clickhouse-keeper/snapshots</snapshot_storage_path>
+        <coordination_settings>
+          <operation_timeout_ms>10000</operation_timeout_ms>
+          <session_timeout_ms>30000</session_timeout_ms>
+          <raft_logs_level>warning</raft_logs_level>
+        </coordination_settings>
+        <raft_configuration>
+          {{- $keeperReplicas := int .Values.clickhouseKeeper.replicas }}
+          {{- $fullname := include "portkey.fullname" . }}
+          {{- $keeperName := .Values.clickhouseKeeper.name }}
+          {{- $headlessSvc := include "clickhouseKeeper.headlessServiceName" . }}
+          {{- $raftPort := .Values.clickhouseKeeper.containerRaftPort }}
+          {{- range $i := until $keeperReplicas }}
+          <server>
+            <id>{{ add $i 1 }}</id>
+            <hostname>{{ $fullname }}-{{ $keeperName }}-{{ $i }}.{{ $headlessSvc }}</hostname>
+            <port>{{ $raftPort }}</port>
+          </server>
+          {{- end }}
+        </raft_configuration>
+      </keeper_server>
+    </clickhouse>
+{{- end }}
