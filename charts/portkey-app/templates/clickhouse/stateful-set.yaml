@@ -26,11 +26,15 @@ spec:
       app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
   template:
     metadata:
+      {{- if or .Values.clickhouse.statefulSet.annotations (include "clickhouse.replicationEnabled" .) }}
       annotations:
+        {{- if include "clickhouse.replicationEnabled" . }}
         checksum/config: {{ include (print $.Template.BasePath "/clickhouse/config-map.yaml") . | sha256sum }}
+        {{- end }}
         {{- with .Values.clickhouse.statefulSet.annotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- end }}
       labels:
         {{- with .Values.clickhouse.statefulSet.labels }}
             {{- toYaml . | nindent 8 }}
