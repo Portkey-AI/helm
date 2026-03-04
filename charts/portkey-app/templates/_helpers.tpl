@@ -553,7 +553,13 @@ Template containing common environment variables that are used by several servic
 {{- end -}}
 
 {{- define "clickhouse.replicationEnabled" -}}
-{{- if and (not .Values.clickhouse.external.enabled) (gt (int .Values.clickhouse.statefulSet.replicas) 1) -}}
+{{- if and (not .Values.clickhouse.external.enabled) (or .Values.clickhouseKeeper.enabled .Values.clickhouseKeeper.external.enabled) -}}
+true
+{{- end -}}
+{{- end -}}
+
+{{- define "clickhouse.shardingEnabled" -}}
+{{- if and (include "clickhouse.replicationEnabled" .) .Values.clickhouse.sharding.enabled -}}
 true
 {{- end -}}
 {{- end -}}
@@ -563,7 +569,7 @@ true
 {{- end -}}
 
 {{- define "clickhouseKeeper.deployEnabled" -}}
-{{- if and (include "clickhouse.replicationEnabled" .) (not .Values.clickhouseKeeper.external.enabled) -}}
+{{- if and .Values.clickhouseKeeper.enabled (not .Values.clickhouseKeeper.external.enabled) -}}
 true
 {{- end -}}
 {{- end -}}

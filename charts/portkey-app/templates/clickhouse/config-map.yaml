@@ -38,20 +38,33 @@ data:
       <interserver_http_port>{{ .Values.clickhouse.containerInterserverPort }}</interserver_http_port>
       <remote_servers>
         <{{ .Values.clickhouse.clusterName }}>
+          {{- if include "clickhouse.shardingEnabled" . }}
+          {{- $shardsCount := int .Values.clickhouse.sharding.shardsCount }}
+          {{- $replicasPerShard := int .Values.clickhouse.sharding.replicasPerShard }}
+          {{- $fullname := include "portkey.fullname" . }}
+          {{- $chName := .Values.clickhouse.name }}
+          {{- $headlessSvc := include "clickhouse.headlessServiceName" . }}
+          {{- $nativePort := .Values.clickhouse.containerNativePort }}
+          {{- range $s := until $shardsCount }}
           <shard>
             <internal_replication>true</internal_replication>
-            {{- $replicas := int .Values.clickhouse.statefulSet.replicas }}
-            {{- $headlessSvc := include "clickhouse.headlessServiceName" . }}
-            {{- $nativePort := .Values.clickhouse.containerNativePort }}
-            {{- $fullname := include "portkey.fullname" . }}
-            {{- $chName := .Values.clickhouse.name }}
-            {{- range $i := until $replicas }}
+            {{- range $r := until $replicasPerShard }}
+            {{- $ordinal := add (mul $s $replicasPerShard) $r }}
             <replica>
-              <host>{{ $fullname }}-{{ $chName }}-{{ $i }}.{{ $headlessSvc }}</host>
+              <host>{{ $fullname }}-{{ $chName }}-{{ $ordinal }}.{{ $headlessSvc }}</host>
               <port>{{ $nativePort }}</port>
             </replica>
             {{- end }}
           </shard>
+          {{- end }}
+          {{- else }}
+          <shard>
+            <internal_replication>true</internal_replication>
+            <discovery>
+              <path>/clickhouse/discovery/{{ .Values.clickhouse.clusterName }}</path>
+            </discovery>
+          </shard>
+          {{- end }}
         </{{ .Values.clickhouse.clusterName }}>
       </remote_servers>
       <zookeeper>

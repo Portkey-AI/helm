@@ -686,6 +686,10 @@ clickhouse:
   containerNativePort: 9000
   containerInterserverPort: 9009
   clusterName: "portkey_cluster"
+  sharding:
+    enabled: false
+    shardsCount: 1
+    replicasPerShard: 1
   initContainer:
     resources: {}
     # resources:
@@ -763,6 +767,7 @@ clickhouse:
     annotations: {}
 
 clickhouseKeeper:
+  enabled: false
   name: "clickhouse-keeper"
   replicas: 3
   containerPort: 2181

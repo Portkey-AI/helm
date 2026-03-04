@@ -15,17 +15,22 @@ metadata:
     {{- end }}
 spec:
   serviceName: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}{{- if include "clickhouse.replicationEnabled" . }}-headless{{- end }}
+  {{- if include "clickhouse.shardingEnabled" . }}
+  replicas: {{ mul (int .Values.clickhouse.sharding.shardsCount) (int .Values.clickhouse.sharding.replicasPerShard) }}
+  {{- else }}
   replicas: {{ .Values.clickhouse.statefulSet.replicas | default 1 }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "portkey.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
   template:
     metadata:
-      {{- with .Values.clickhouse.statefulSet.annotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/clickhouse/config-map.yaml") . | sha256sum }}
+        {{- with .Values.clickhouse.statefulSet.annotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- with .Values.clickhouse.statefulSet.labels }}
             {{- toYaml . | nindent 8 }}
@@ -94,11 +99,17 @@ spec:
             - -c
             - |
               REPLICA=$(hostname)
+              ORDINAL=${REPLICA##*-}
+              {{- if include "clickhouse.shardingEnabled" . }}
+              SHARD=$(printf "%02d" $(( (ORDINAL / REPLICAS_PER_SHARD) + 1 )))
+              {{- else }}
+              SHARD="01"
+              {{- end }}
               cat > /tmp/macros/macros.xml << EOF
               <clickhouse>
                 <macros>
                   <cluster>${CLUSTER_NAME}</cluster>
-                  <shard>01</shard>
+                  <shard>${SHARD}</shard>
                   <replica>${REPLICA}</replica>
                 </macros>
               </clickhouse>
@@ -106,6 +117,10 @@ spec:
           env:
             - name: CLUSTER_NAME
               value: {{ .Values.clickhouse.clusterName | quote }}
+            {{- if include "clickhouse.shardingEnabled" . }}
+            - name: REPLICAS_PER_SHARD
+              value: {{ .Values.clickhouse.sharding.replicasPerShard | quote }}
+            {{- end }}
           volumeMounts:
             - name: clickhouse-macros
               mountPath: /tmp/macros
