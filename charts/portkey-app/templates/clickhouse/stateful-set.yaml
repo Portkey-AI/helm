@@ -14,17 +14,26 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  serviceName: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
+  serviceName: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}{{- if include "clickhouse.replicationEnabled" . }}-headless{{- end }}
+  {{- if include "clickhouse.shardingEnabled" . }}
+  replicas: {{ mul (int .Values.clickhouse.sharding.shardsCount) (int .Values.clickhouse.sharding.replicasPerShard) }}
+  {{- else }}
   replicas: {{ .Values.clickhouse.statefulSet.replicas | default 1 }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "portkey.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
   template:
     metadata:
-      {{- with .Values.clickhouse.statefulSet.annotations }}
+      {{- if or .Values.clickhouse.statefulSet.annotations (include "clickhouse.replicationEnabled" .) }}
       annotations:
+        {{- if include "clickhouse.replicationEnabled" . }}
+        checksum/config: {{ include (print $.Template.BasePath "/clickhouse/config-map.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.clickhouse.statefulSet.annotations }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- end }}
       labels:
         {{- with .Values.clickhouse.statefulSet.labels }}
@@ -40,8 +49,9 @@ spec:
       securityContext:
         {{- toYaml .Values.clickhouse.statefulSet.podSecurityContext | nindent 8 }}
       serviceAccountName: {{ include "clickhouse.serviceAccountName" . }}
-      {{- if .Values.clickhouse.external.existingSecretName }}
+      {{- if or .Values.clickhouse.external.existingSecretName (include "clickhouse.replicationEnabled" .) }}
       initContainers:
+        {{- if .Values.clickhouse.external.existingSecretName }}
         - name: generate-users-config
           image: busybox:1.36
           command:
@@ -84,6 +94,45 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+        {{- end }}
+        {{- if include "clickhouse.replicationEnabled" . }}
+        - name: generate-macros
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              REPLICA=$(hostname)
+              ORDINAL=${REPLICA##*-}
+              {{- if include "clickhouse.shardingEnabled" . }}
+              SHARD=$(printf "%02d" $(( (ORDINAL / REPLICAS_PER_SHARD) + 1 )))
+              {{- else }}
+              SHARD="01"
+              {{- end }}
+              cat > /tmp/macros/macros.xml << EOF
+              <clickhouse>
+                <macros>
+                  <cluster>${CLUSTER_NAME}</cluster>
+                  <shard>${SHARD}</shard>
+                  <replica>${REPLICA}</replica>
+                </macros>
+              </clickhouse>
+              EOF
+          env:
+            - name: CLUSTER_NAME
+              value: {{ .Values.clickhouse.clusterName | quote }}
+            {{- if include "clickhouse.shardingEnabled" . }}
+            - name: REPLICAS_PER_SHARD
+              value: {{ .Values.clickhouse.sharding.replicasPerShard | quote }}
+            {{- end }}
+          volumeMounts:
+            - name: clickhouse-macros
+              mountPath: /tmp/macros
+          {{- with .Values.clickhouse.initContainer.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- end }}
       {{- end }}
       containers:
         - name: {{ .Values.clickhouse.name }}
@@ -122,6 +171,11 @@ spec:
             - name: ch-native
               containerPort: {{ .Values.clickhouse.containerNativePort }}
               protocol: TCP
+            {{- if include "clickhouse.replicationEnabled" . }}
+            - name: ch-interserver
+              containerPort: {{ .Values.clickhouse.containerInterserverPort }}
+              protocol: TCP
+            {{- end }}
           {{- with .Values.clickhouse.statefulSet.startupProbe }}
           startupProbe:
             {{- toYaml . | nindent 12 }}
@@ -152,10 +206,15 @@ spec:
               name: clickhouse-conf
               subPath: users.xml
             {{- end }}
-            {{- if .Values.clickhouse.customConfig.enabled }}
+            {{- if or .Values.clickhouse.customConfig.enabled (include "clickhouse.replicationEnabled" .) }}
             - mountPath: /etc/clickhouse-server/config.d/config.xml
               name: clickhouse-conf
               subPath: config.xml
+            {{- end }}
+            {{- if include "clickhouse.replicationEnabled" . }}
+            - mountPath: /etc/clickhouse-server/config.d/macros.xml
+              name: clickhouse-macros
+              subPath: macros.xml
             {{- end }}
           {{- with .Values.clickhouse.statefulSet.extraContainerConfig }}
             {{- toYaml . | nindent 10 }}
@@ -183,7 +242,7 @@ spec:
         {{- if .Values.clickhouse.external.existingSecretName }}
         - name: clickhouse-users-config
           emptyDir: {}
-        {{- if .Values.clickhouse.customConfig.enabled }}
+        {{- if or .Values.clickhouse.customConfig.enabled (include "clickhouse.replicationEnabled" .) }}
         - name: clickhouse-conf
           configMap:
             name: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
@@ -198,10 +257,14 @@ spec:
             items:
               - key: users.xml
                 path: users.xml
-              {{- if .Values.clickhouse.customConfig.enabled }}
+              {{- if or .Values.clickhouse.customConfig.enabled (include "clickhouse.replicationEnabled" .) }}
               - key: config.xml
                 path: config.xml
               {{- end }}
+        {{- end }}
+        {{- if include "clickhouse.replicationEnabled" . }}
+        - name: clickhouse-macros
+          emptyDir: {}
         {{- end }}
       {{- with .Values.clickhouse.statefulSet.volumes }}
           {{- toYaml . | nindent 8 }}
