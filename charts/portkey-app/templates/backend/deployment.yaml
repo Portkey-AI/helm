@@ -106,8 +106,8 @@ spec:
           args:
             - |
               /app/docker-entrypoint.sh &&
-              npx knex migrate:latest --env local &&
-              npx knex seed:run --env local &&
+              ./node_modules/.bin/knex migrate:latest --env local &&
+              ./node_modules/.bin/knex seed:run --env local &&
               node ch_init.js &&
               pm2-runtime src/server.js
           ports:
