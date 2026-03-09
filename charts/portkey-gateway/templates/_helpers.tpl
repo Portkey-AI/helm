@@ -360,21 +360,28 @@ Common Environment Env as Map
 {{/*
 mcp.serverMode
 → Returns string
+Reads SERVER_MODE from the K8s Secret via lookup when vault injection
+or existingSecret is used. Falls back to environment.data if the secret
+is not yet available.
 */}}
 {{- define "mcp.serverMode" -}}
-{{- $env := (include "portkeyenterprise.commonEnvMap" . | fromYaml) -}}
 {{- $serverMode := "" -}}
-{{- if hasKey $env "SERVER_MODE" -}}
-  {{- $entry := index $env "SERVER_MODE" -}}
-  {{- if hasKey $entry "value" -}}
-    {{- $serverMode = (index $entry "value") | toString -}}
-  {{- else -}}
-    {{- $serverMode = (index .Values.environment.data "SERVER_MODE") | default "" | toString -}}
+{{- if .Values.useVaultInjection -}}
+  {{- $secretName := .Values.vaultConfig.kubernetesSecret | default .Chart.Name -}}
+  {{- $secret := lookup "v1" "Secret" .Release.Namespace $secretName -}}
+  {{- if and $secret $secret.data (hasKey $secret.data "SERVER_MODE") -}}
+    {{- $serverMode = index $secret.data "SERVER_MODE" | b64dec | toString | trim -}}
   {{- end -}}
-{{- else -}}
-  {{- $serverMode = (index .Values.environment.data "SERVER_MODE") | default "" | toString -}}
+{{- else if and (not .Values.environment.create) .Values.environment.existingSecret -}}
+  {{- $secret := lookup "v1" "Secret" .Release.Namespace .Values.environment.existingSecret -}}
+  {{- if and $secret $secret.data (hasKey $secret.data "SERVER_MODE") -}}
+    {{- $serverMode = index $secret.data "SERVER_MODE" | b64dec | toString | trim -}}
+  {{- end -}}
 {{- end -}}
-{{- $serverMode | trim | toString -}}
+{{- if eq $serverMode "" -}}
+  {{- $serverMode = (index .Values.environment.data "SERVER_MODE") | default "" | toString | trim -}}
+{{- end -}}
+{{- $serverMode -}}
 {{- end -}}
 
 {{/*
