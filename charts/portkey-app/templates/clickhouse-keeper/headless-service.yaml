@@ -1,0 +1,32 @@
+{{- if include "clickhouseKeeper.deployEnabled" . }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "clickhouseKeeper.headlessServiceName" . }}
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+    {{- with .Values.clickhouseKeeper.service.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- include "portkey.annotations" . | nindent 4 }}
+    {{- with .Values.clickhouseKeeper.service.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - name: keeper-client
+      port: {{ .Values.clickhouseKeeper.containerPort }}
+      targetPort: keeper-client
+      protocol: TCP
+    - name: keeper-raft
+      port: {{ .Values.clickhouseKeeper.containerRaftPort }}
+      targetPort: keeper-raft
+      protocol: TCP
+  selector:
+    {{- include "portkey.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.clickhouseKeeper.name }}
+{{- end }}

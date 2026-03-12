@@ -1,8 +1,8 @@
-{{- if not .Values.clickhouse.external.enabled }}
+{{- if include "clickhouse.replicationEnabled" . }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
+  name: {{ include "clickhouse.headlessServiceName" . }}
   labels:
     {{- include "portkey.labels" . | nindent 4 }}
     {{- with .Values.clickhouse.service.labels }}
@@ -14,12 +14,9 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  type: {{ .Values.clickhouse.service.type }}
-  {{- with .Values.clickhouse.service.loadBalancerSourceRanges }}
-  loadBalancerSourceRanges:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  loadBalancerIP: {{ .Values.clickhouse.service.loadBalancerIP }}
+  type: ClusterIP
+  clusterIP: None
+  publishNotReadyAddresses: true
   ports:
     - name: ch
       port: {{ .Values.clickhouse.service.httpPort }}
@@ -29,12 +26,10 @@ spec:
       port: {{ .Values.clickhouse.service.nativePort }}
       targetPort: ch-native
       protocol: TCP
-    {{- if include "clickhouse.replicationEnabled" . }}
     - name: ch-interserver
       port: {{ .Values.clickhouse.containerInterserverPort }}
       targetPort: ch-interserver
       protocol: TCP
-    {{- end }}
   selector:
     {{- include "portkey.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}

@@ -684,6 +684,12 @@ clickhouse:
       verificationMode: "strict"
   containerHttpPort: 8123
   containerNativePort: 9000
+  containerInterserverPort: 9009
+  clusterName: "portkey_cluster"
+  sharding:
+    enabled: false
+    shardsCount: 1
+    replicasPerShard: 1
   initContainer:
     resources: {}
     # resources:
@@ -754,6 +760,39 @@ clickhouse:
     annotations: {}
     loadBalancerSourceRanges: []
     loadBalancerIP: ""
+  serviceAccount:
+    create: true
+    name: ""
+    labels: {}
+    annotations: {}
+
+clickhouseKeeper:
+  enabled: false
+  name: "clickhouse-keeper"
+  replicas: 3
+  containerPort: 2181
+  containerRaftPort: 9234
+  external:
+    enabled: false
+    hosts: []
+    # - host: keeper-1.example.com
+    #   port: 2181
+  statefulSet:
+    labels: {}
+    annotations: {}
+    podSecurityContext: {}
+    securityContext: {}
+    resources: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    persistence:
+      enabled: false
+      size: 5Gi
+      storageClassName: ""
+  service:
+    labels: {}
+    annotations: {}
   serviceAccount:
     create: true
     name: ""

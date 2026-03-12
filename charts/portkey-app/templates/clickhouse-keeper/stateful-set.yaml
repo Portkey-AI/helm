@@ -1,0 +1,140 @@
+{{- if include "clickhouseKeeper.deployEnabled" . }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "portkey.fullname" . }}-{{ .Values.clickhouseKeeper.name }}
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+    {{- with .Values.clickhouseKeeper.statefulSet.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- include "portkey.annotations" . | nindent 4 }}
+    {{- with .Values.clickhouseKeeper.statefulSet.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  serviceName: {{ include "clickhouseKeeper.headlessServiceName" . }}
+  replicas: {{ .Values.clickhouseKeeper.replicas }}
+  selector:
+    matchLabels:
+      {{- include "portkey.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.clickhouseKeeper.name }}
+  template:
+    metadata:
+      {{- with .Values.clickhouseKeeper.statefulSet.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- with .Values.clickhouseKeeper.statefulSet.labels }}
+            {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- include "portkey.labels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.clickhouseKeeper.name }}
+    spec:
+      imagePullSecrets:
+      {{- range .Values.imageCredentials }}
+      - name: {{ .name }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.clickhouseKeeper.statefulSet.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ include "clickhouseKeeper.serviceAccountName" . }}
+      initContainers:
+        - name: generate-keeper-config
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              HOSTNAME=$(hostname)
+              SERVER_ID=$((${HOSTNAME##*-} + 1))
+              sed "s/\${SERVER_ID}/${SERVER_ID}/g" /etc/clickhouse-keeper-template/keeper_config.xml > /etc/clickhouse-keeper/keeper_config.xml
+          volumeMounts:
+            - name: keeper-config-template
+              mountPath: /etc/clickhouse-keeper-template
+            - name: keeper-config
+              mountPath: /etc/clickhouse-keeper
+      containers:
+        - name: {{ .Values.clickhouseKeeper.name }}
+          image: "{{ .Values.images.clickhouseImage.repository }}:{{ .Values.images.clickhouseImage.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.clickhouseImage.pullPolicy }}
+          command:
+            - clickhouse-keeper
+            - --config-file=/etc/clickhouse-keeper/keeper_config.xml
+          ports:
+            - name: keeper-client
+              containerPort: {{ .Values.clickhouseKeeper.containerPort }}
+              protocol: TCP
+            - name: keeper-raft
+              containerPort: {{ .Values.clickhouseKeeper.containerRaftPort }}
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - bash
+                - -c
+                - echo ruok | nc localhost {{ .Values.clickhouseKeeper.containerPort }} | grep -q imok
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - bash
+                - -c
+                - echo ruok | nc localhost {{ .Values.clickhouseKeeper.containerPort }} | grep -q imok
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.clickhouseKeeper.statefulSet.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.clickhouseKeeper.statefulSet.securityContext | nindent 12 }}
+          volumeMounts:
+            - name: keeper-config
+              mountPath: /etc/clickhouse-keeper
+            - name: keeper-data
+              mountPath: /var/lib/clickhouse-keeper
+      {{- with .Values.clickhouseKeeper.statefulSet.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.clickhouseKeeper.statefulSet.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.clickhouseKeeper.statefulSet.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: keeper-config-template
+          configMap:
+            name: {{ include "portkey.fullname" . }}-{{ .Values.clickhouseKeeper.name }}
+        - name: keeper-config
+          emptyDir: {}
+        {{- if not .Values.clickhouseKeeper.statefulSet.persistence.enabled }}
+        - name: keeper-data
+          emptyDir: {}
+        {{- end }}
+  {{- if .Values.clickhouseKeeper.statefulSet.persistence.enabled }}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: keeper-data
+        labels:
+          {{- include "portkey.selectorLabels" . | nindent 10 }}
+          app.kubernetes.io/component: {{ include "portkey.fullname" . }}-{{ .Values.clickhouseKeeper.name }}
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.clickhouseKeeper.statefulSet.persistence.size }}
+        {{- if .Values.clickhouseKeeper.statefulSet.persistence.storageClassName }}
+        storageClassName: {{ .Values.clickhouseKeeper.statefulSet.persistence.storageClassName }}
+        {{- end }}
+  {{- end }}
+{{- end }}
