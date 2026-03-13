@@ -87,6 +87,9 @@ spec:
           {{- with .Values.extraContainerConfig }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
+        {{- with .Values.sidecars }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

@@ -262,6 +262,30 @@ volumeMounts: []
 
 extraContainerConfig: {}
 
+# Additional sidecar containers injected into the gateway pod.
+# Each entry is a full Kubernetes container spec.
+# Example: nginx TLS-termination sidecar
+# sidecars:
+#   - name: nginx-tls
+#     image: nginx:1.27-alpine
+#     ports:
+#       - containerPort: 443
+#     volumeMounts:
+#       - name: tls-certs
+#         mountPath: /etc/tls
+#         readOnly: true
+#       - name: nginx-config
+#         mountPath: /etc/nginx/conf.d
+#         readOnly: true
+#     resources:
+#       requests:
+#         cpu: 50m
+#         memory: 64Mi
+#       limits:
+#         cpu: 200m
+#         memory: 128Mi
+sidecars: []
+
 topologySpreadConstraints: []
 
 nodeSelector: {}
