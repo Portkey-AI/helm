@@ -175,10 +175,10 @@ backend:
     # resources:
     #   limits:
     #     cpu: 1000m
-    #     memory: 1Gi
+    #     memory: 4Gi
     #   requests:
-    #     cpu: 200m
-    #     memory: 500Mi
+    #     cpu: 500m
+    #     memory: 2Gi
     startupProbe:
       httpGet:
         path: /health
@@ -259,10 +259,10 @@ gateway:
     resources:
       limits:
         cpu: 1000m
-        memory: 1Gi
+        memory: 2Gi
       requests:
-        cpu: 200m
-        memory: 500Mi
+        cpu: 500m
+        memory: 1Gi
     startupProbe:
       httpGet:
         path: /v1/health
@@ -340,10 +340,10 @@ dataservice:
     # resources:
     #   limits:
     #     cpu: 1000m
-    #     memory: 1Gi
+    #     memory: 4Gi
     #   requests:
-    #     cpu: 200m
-    #     memory: 500Mi
+    #     cpu: 500m
+    #     memory: 1Gi
     startupProbe:
       httpGet:
         path: /health
@@ -594,7 +594,7 @@ redis:
     replicas: 1
     # resources:
     #   limits:
-    #     cpu: 4000m
+    #     cpu: 2000m
     #     memory: 16Gi
     #   requests:
     #     cpu: 1000m
@@ -701,10 +701,10 @@ clickhouse:
     replicas: 1
     # resources:
     #   limits:
-    #     cpu: 1000m
+    #     cpu: 4000m
     #     memory: 16Gi
     #   requests:
-    #     cpu: 500m
+    #     cpu: 2000m
     #     memory: 8Gi
     command:
       - "/bin/bash"
