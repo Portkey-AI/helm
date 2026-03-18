@@ -138,6 +138,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.mysql.statefulSet.hostAlias }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.mysql.statefulSet.volumes }}
       volumes:
           {{- toYaml . | nindent 8 }}
