@@ -667,6 +667,9 @@ clickhouse:
     password: ""
     database: "default"
     tls: false
+    replicationEnabled: false
+    shardingEnabled: false
+    clusterName: "portkey_cluster"
     existingSecretName: ""
   customConfig:
     enabled: false
