@@ -506,6 +506,28 @@ entries:
         - name: Chart Source
           url: https://github.com/Portkey-AI/helm
     apiVersion: v2
+    appVersion: 2.4.0
+    created: "2026-03-18T14:13:23.497732483Z"
+    description: Helm chart to deploy the Portkey AI Gateway application in a hybrid
+      cloud environment.
+    digest: 6706ae07cdc4558d72dc0e9701dec2bdf46193d5da1b865f6dd458dad367e08f
+    home: https://portkey.ai/
+    icon: https://avatars.githubusercontent.com/u/131141116?s=200&v=4
+    maintainers:
+    - email: ayush@portkey.ai
+      name: Ayush
+      url: https://github.com/ayush-portkey
+    name: gateway
+    type: application
+    urls:
+    - https://github.com/Portkey-AI/helm/releases/download/gateway-1.6.4/gateway-1.6.4.tgz
+    version: 1.6.4
+  - annotations:
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |-
+        - name: Chart Source
+          url: https://github.com/Portkey-AI/helm
+    apiVersion: v2
     appVersion: 2.2.3
     created: "2026-02-23T20:17:23.012948172Z"
     description: Helm chart to deploy the Portkey AI Gateway application in a hybrid
@@ -1072,4 +1094,4 @@ entries:
     urls:
     - https://github.com/Portkey-AI/helm/releases/download/gateway-1.0.3/gateway-1.0.3.tgz
     version: 1.0.3
-generated: "2026-03-07T05:36:44.368363199Z"
+generated: "2026-03-18T14:13:23.498005314Z"
