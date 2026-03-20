@@ -209,6 +209,21 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.clickhouseSecretsName" . }}
       key: clickhouse_tls
+- name: CLICKHOUSE_REPLICATION_ENABLED
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_replication_enabled
+- name: CLICKHOUSE_SHARDING_ENABLED
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_sharding_enabled
+- name: CLICKHOUSE_CLUSTER_NAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_cluster_name
 - name: DB_NAME
   valueFrom:
     secretKeyRef:
@@ -497,6 +512,21 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.clickhouseSecretsName" . }}
       key: clickhouse_tls
+- name: ANALYTICS_STORE_REPLICATION_ENABLED
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_replication_enabled
+- name: ANALYTICS_STORE_SHARDING_ENABLED
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_sharding_enabled
+- name: ANALYTICS_STORE_CLUSTER_NAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.clickhouseSecretsName" . }}
+      key: clickhouse_cluster_name
 - name: ANALYTICS_DB
   valueFrom:
     secretKeyRef:
