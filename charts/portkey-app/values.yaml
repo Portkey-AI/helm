@@ -669,7 +669,7 @@ clickhouse:
     tls: false
     replicationEnabled: false
     shardingEnabled: false
-    clusterName: "portkey_cluster"
+    clusterName: "portkey"
     existingSecretName: ""
   customConfig:
     enabled: false

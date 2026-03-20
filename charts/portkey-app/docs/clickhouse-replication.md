@@ -62,7 +62,7 @@ Adjust `replicasCount`, `shardsCount`, keeper `replicaCount`, and storage sizes 
 ### Step 3: Install the Chart
 
 ```bash
-helm install portkey-clickhouse altinity/clickhouse \
+helm install portkey altinity/clickhouse \
   -f clickhouse-replicated-values.yaml \
   -n portkey \
   --create-namespace
@@ -95,14 +95,16 @@ clickhouse:
     tls: false
     replicationEnabled: true
     shardingEnabled: false
-    clusterName: "portkey_cluster"
+    clusterName: "portkey"
 ```
 
 When `replicationEnabled: true`, the backend runs migrations using `ReplicatedMergeTree` instead of `MergeTree` and creates the database with `ENGINE = Replicated(...)`.
 
 When `shardingEnabled: true`, the backend additionally creates `_local` tables and `Distributed` tables on top, and all DDL is executed with `ON CLUSTER`.
 
-`clusterName` must match the cluster name in your ClickHouse deployment (defaults to `portkey_cluster`).
+`clusterName` must match the cluster name in your ClickHouse deployment. When using the Altinity Helm chart, the cluster name is the same as the Helm release name (truncated to 15 characters). For example, `helm install portkey altinity/clickhouse ...` creates a cluster named `portkey`.
+
+> **Note:** The release name should only contain alphanumeric characters and underscores (`_`). Other special characters (e.g. `-`, `.`, `+`) are not supported in ClickHouse cluster names.
 
 Then deploy or upgrade Portkey:
 
