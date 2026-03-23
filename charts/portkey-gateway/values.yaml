@@ -263,6 +263,15 @@ volumeMounts: []
 
 extraContainerConfig: {}
 
+# envFrom allows loading all keys from secrets/configmaps as environment variables.
+# Useful for loading credentials from external secret managers (e.g., ESO, Vault CSI).
+# Note: Variables in env section (from environment.data) take precedence over envFrom.
+envFrom: []
+
+# Additional environment variables for the gateway container.
+# Applied after commonEnv, so these can override environment.data values.
+extraEnv: []
+
 # Additional sidecar containers injected into the gateway pod.
 # Each entry is a full Kubernetes container spec.
 # Example: nginx TLS-termination sidecar
@@ -318,6 +327,8 @@ dataservice:
   containerPort: 8081
   finetuneBucket: ""
   logexportsBucket: ""
+  # envFrom for dataservice - loads secrets/configmaps as env vars.
+  envFrom: []
   env:
     DEBUG_ENABLED: false
     SERVICE_NAME: "portkeyenterprise-dataservice"
@@ -400,10 +411,12 @@ dataservice:
 
 # Redis-specific configuration section
 redis:
-  name: "redis"  
-  serviceType: NodePort  
+  name: "redis"
+  serviceType: NodePort
   servicePort: 6379
   containerPort: 6379
+  # Set to false to skip deploying in-cluster Redis (when using external Redis/ElastiCache)
+  deployLocal: true
   resources: {}
 
 # MinIO configuration section
