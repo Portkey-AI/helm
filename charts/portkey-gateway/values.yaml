@@ -263,6 +263,14 @@ volumeMounts: []
 
 extraContainerConfig: {}
 
+# envFrom allows loading all keys from secrets/configmaps as environment variables.
+# Useful for external secret managers (ESO, Vault CSI, AWS Secrets Manager).
+# Variables in env (from environment.data) take precedence over envFrom.
+envFrom: []
+
+# Additional environment variables appended after commonEnv.
+extraEnv: []
+
 # Additional sidecar containers injected into the gateway pod.
 # Each entry is a full Kubernetes container spec.
 # Example: nginx TLS-termination sidecar
@@ -318,12 +326,14 @@ dataservice:
   containerPort: 8081
   finetuneBucket: ""
   logexportsBucket: ""
+  envFrom: []
   env:
     DEBUG_ENABLED: false
     SERVICE_NAME: "portkeyenterprise-dataservice"
   deployment:
     autoRestart: true
     replicas: 1
+    # terminationGracePeriodSeconds: 30
     labels: {}
     selectorLabels: {}
     annotations: {}
