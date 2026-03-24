@@ -37,18 +37,18 @@ Follow the [ClickHouse Replication](clickhouse-replication.md) guide to deploy a
 Old (built-in) instance:
 
 ```bash
-# Port-forward the built-in ClickHouse
-kubectl port-forward svc/<release>-app-clickhouse 8123:8123 -n <namespace>
+# Port-forward the built-in ClickHouse native port
+kubectl port-forward svc/<release>-app-clickhouse 9000:9000 -n <namespace>
 ```
 
 New (replicated) cluster:
 
 ```bash
-# Port-forward the new ClickHouse (adjust service name to your deployment)
-kubectl port-forward svc/<new-clickhouse-svc> 8124:8123 -n <namespace>
+# Port-forward the new ClickHouse native port (adjust service name to your deployment)
+kubectl port-forward svc/<new-clickhouse-svc> 9001:9000 -n <namespace>
 ```
 
-You now have the old instance on `localhost:8123` and the new cluster on `localhost:8124`.
+You now have the old instance on `localhost:9000` and the new cluster on `localhost:9001`.
 
 ## Step 3: Export Schema from the Old Instance
 
@@ -125,12 +125,12 @@ kubectl rollout status deployment/<release>-app-backend -n <namespace>
 
 ## Step 6: Import Data into the New Cluster
 
-With port-forward to the new cluster still active on `localhost:8124`:
+With port-forward to the new cluster still active on `localhost:9001`:
 
 ```bash
 for table in generations feedbacks generation_hooks audit_logs; do
   echo "Importing ${table}..."
-  clickhouse-client --host localhost --port 8124 \
+  clickhouse-client --host localhost --port 9001 \
     --query "INSERT INTO default.${table} FORMAT Native" \
     < "${table}.native"
   echo "Done."
@@ -147,7 +147,7 @@ Compare row counts between old and new:
 for table in generations feedbacks generation_hooks audit_logs; do
   old=$(clickhouse-client --host localhost --port 9000 \
     --query "SELECT count() FROM default.${table}")
-  new=$(clickhouse-client --host localhost --port 8124 \
+  new=$(clickhouse-client --host localhost --port 9001 \
     --query "SELECT count() FROM default.${table}")
   echo "${table}: old=${old} new=${new} $([ "$old" = "$new" ] && echo '✓' || echo 'MISMATCH')"
 done
@@ -188,7 +188,7 @@ SELECT
 FROM system.replication_queue;
 ```
 
-## Step 9: Decommission the Old Instance
+### Step 9: Decommission the Old Instance
 
 Once everything is verified and Portkey is running against the new cluster:
 
@@ -212,7 +212,7 @@ kubectl delete pvc -l app.kubernetes.io/component=<release>-app-clickhouse -n <n
 
 4. Remove the exported data files from your local machine.
 
-## Rollback
+### Rollback
 
 If issues arise after switching, revert to the built-in instance:
 

@@ -210,20 +210,11 @@ Template containing common environment variables that are used by several servic
       name: {{ include "portkey.clickhouseSecretsName" . }}
       key: clickhouse_tls
 - name: CLICKHOUSE_REPLICATION_ENABLED
-  valueFrom:
-    secretKeyRef:
-      name: {{ include "portkey.clickhouseSecretsName" . }}
-      key: clickhouse_replication_enabled
+  value: {{ .Values.clickhouse.external.replicationEnabled | toString | quote }}
 - name: CLICKHOUSE_SHARDING_ENABLED
-  valueFrom:
-    secretKeyRef:
-      name: {{ include "portkey.clickhouseSecretsName" . }}
-      key: clickhouse_sharding_enabled
+  value: {{ .Values.clickhouse.external.shardingEnabled | toString | quote }}
 - name: CLICKHOUSE_CLUSTER_NAME
-  valueFrom:
-    secretKeyRef:
-      name: {{ include "portkey.clickhouseSecretsName" . }}
-      key: clickhouse_cluster_name
+  value: {{ .Values.clickhouse.external.clusterName | quote }}
 - name: DB_NAME
   valueFrom:
     secretKeyRef:
@@ -513,20 +504,11 @@ Template containing common environment variables that are used by several servic
       name: {{ include "portkey.clickhouseSecretsName" . }}
       key: clickhouse_tls
 - name: ANALYTICS_STORE_REPLICATION_ENABLED
-  valueFrom:
-    secretKeyRef:
-      name: {{ include "portkey.clickhouseSecretsName" . }}
-      key: clickhouse_replication_enabled
+  value: {{ .Values.clickhouse.external.replicationEnabled | toString | quote }}
 - name: ANALYTICS_STORE_SHARDING_ENABLED
-  valueFrom:
-    secretKeyRef:
-      name: {{ include "portkey.clickhouseSecretsName" . }}
-      key: clickhouse_sharding_enabled
+  value: {{ .Values.clickhouse.external.shardingEnabled | toString | quote }}
 - name: ANALYTICS_STORE_CLUSTER_NAME
-  valueFrom:
-    secretKeyRef:
-      name: {{ include "portkey.clickhouseSecretsName" . }}
-      key: clickhouse_cluster_name
+  value: {{ .Values.clickhouse.external.clusterName | quote }}
 - name: ANALYTICS_DB
   valueFrom:
     secretKeyRef:

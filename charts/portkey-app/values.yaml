@@ -671,6 +671,18 @@ clickhouse:
     shardingEnabled: false
     clusterName: "portkey"
     existingSecretName: ""
+  migration:
+    # Enable to keep the old in-cluster ClickHouse alive while switching to external.
+    # A post-upgrade Job will automatically copy historical data to the new external instance.
+    # After migration completes, set this to false and run helm upgrade again to remove the old instance.
+    enabled: false
+    # Credentials for the old in-cluster ClickHouse. If empty, falls back to external.user/password.
+    oldCredentials:
+      user: ""
+      password: ""
+    resources: {}
+    backoffLimit: 3
+    activeDeadlineSeconds: 7200
   customConfig:
     enabled: false
   retention:
