@@ -53,11 +53,21 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Gateway selector labels — adds component label for pod metadata and Service
+selectors. Deployment matchLabels uses portkeyenterprise.selectorLabels
+(without component) to avoid requiring Deployment recreation on upgrade.
+*/}}
+{{- define "gateway.selectorLabels" -}}
+{{ include "portkeyenterprise.selectorLabels" . }}
+app.kubernetes.io/component: gateway
+{{- end }}
+
+{{/*
 Gateway labels
 */}}
 {{- define "gateway.labels" -}}
 {{- include "portkeyenterprise.labels" . | nindent 4 }}
-{{- include "portkeyenterprise.selectorLabels" . | nindent 4 }}
+{{- include "gateway.selectorLabels" . | nindent 4 }}
 {{- end }}
 
 {{/*
