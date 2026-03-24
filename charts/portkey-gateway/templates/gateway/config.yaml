@@ -6,11 +6,11 @@ metadata:
   name: {{ include "portkeyenterprise.fullname" . }}
   labels:
     {{- include "gateway.labels" . }}
-data:    
+data:
 {{- range $key, $val := .Values.environment.data }}
-  {{ $key }}: {{- if $val }} {{ $val | b64enc }} {{- else }} "" {{- end }}
+  {{ $key }}: {{- if not (kindIs "invalid" $val) }} {{ $val | toString | b64enc }} {{- else }} "" {{- end }}
 {{- end -}}
-{{- else -}}  
+{{- else -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -19,7 +19,7 @@ metadata:
     {{- include "gateway.labels" . }}
 data:
 {{- range $key, $val := .Values.environment.data }}
-  {{ $key }}: {{ $val }}
+  {{ $key }}: {{ $val | toString | quote }}
 {{- end -}}
 {{- end -}}
 {{- end -}}
