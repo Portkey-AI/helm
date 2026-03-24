@@ -53,11 +53,24 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Gateway selector labels — extends the base selector labels with a component
+label for disambiguation from dataservice pods. Used in Service selectors
+and pod labels. The Deployment matchLabels use portkeyenterprise.selectorLabels
+(without component) to avoid a breaking change on existing installations.
+Users who want the component label in matchLabels can add it via
+.Values.selectorLabels and accept the one-time Deployment recreation.
+*/}}
+{{- define "gateway.selectorLabels" -}}
+{{ include "portkeyenterprise.selectorLabels" . }}
+app.kubernetes.io/component: gateway
+{{- end }}
+
+{{/*
 Gateway labels
 */}}
 {{- define "gateway.labels" -}}
 {{- include "portkeyenterprise.labels" . | nindent 4 }}
-{{- include "portkeyenterprise.selectorLabels" . | nindent 4 }}
+{{- include "gateway.selectorLabels" . | nindent 4 }}
 {{- end }}
 
 {{/*
@@ -85,7 +98,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if hasKey .Values.dataservice.deployment.selectorLabels "app.kubernetes.io/component" }}
 app.kubernetes.io/component: {{ get .Values.dataservice.deployment.selectorLabels "app.kubernetes.io/component" }}
 {{- else }}
-app.kubernetes.io/component: {{ include "portkeyenterprise.fullname" . }}-{{ .Values.dataservice.name }}
+app.kubernetes.io/component: dataservice
 {{- end }}
 {{- end }}
 
