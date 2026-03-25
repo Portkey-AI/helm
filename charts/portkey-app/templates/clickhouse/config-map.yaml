@@ -36,16 +36,20 @@ data:
       {{- end }}
     </clickhouse>
   {{- if not .Values.clickhouse.external.existingSecretName }}
+  {{- $chUser := .Values.clickhouse.external.user }}
+  {{- if and .Values.clickhouse.migration.enabled .Values.clickhouse.external.enabled .Values.clickhouse.migration.oldCredentials.user }}
+  {{- $chUser = .Values.clickhouse.migration.oldCredentials.user }}
+  {{- end }}
   users.xml: |
     <clickhouse>
       <users>
-        <{{ .Values.clickhouse.external.user }}>
+        <{{ $chUser }}>
           <access_management>1</access_management>
           <named_collection_control>1</named_collection_control>
           <show_named_collections>1</show_named_collections>
           <show_named_collections_secrets>1</show_named_collections_secrets>
           <profile>default</profile>
-        </{{ .Values.clickhouse.external.user }}>
+        </{{ $chUser }}>
       </users>
       <profiles>
         <default>

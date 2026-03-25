@@ -104,7 +104,7 @@ When `shardingEnabled: true`, the backend additionally creates `_local` tables a
 
 `clusterName` must match the cluster name in your ClickHouse deployment. When using the Altinity Helm chart, the cluster name is the same as the Helm release name (truncated to 15 characters). For example, `helm install portkey altinity/clickhouse ...` creates a cluster named `portkey`.
 
-> **Note:** The release name should only contain alphanumeric characters and underscores (`_`). Other special characters (e.g. `-`, `.`, `+`) are not supported in ClickHouse cluster names.
+> **Note:** When using the Altinity Helm chart, the cluster name is derived from the Helm release name. Avoid hyphens in the release name as ClickHouse treats them as the minus operator in SQL. Use only alphanumeric characters and underscores (e.g. `helm install portkey_ch` not `helm install portkey-ch`).
 
 Then deploy or upgrade Portkey:
 
