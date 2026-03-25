@@ -130,7 +130,7 @@ Secret name for the old in-cluster ClickHouse during migration.
 Falls back to the migration oldCredentials secret, then to the main clickhouse secret.
 */}}
 {{- define "portkey.clickhouseOldSecretsName" -}}
-{{- if .Values.clickhouse.migration.oldCredentials.existingSecretName }}
+{{- if and .Values.clickhouse.migration.enabled .Values.clickhouse.migration.oldCredentials.existingSecretName }}
 {{- .Values.clickhouse.migration.oldCredentials.existingSecretName }}
 {{- else }}
 {{- include "portkey.clickhouseSecretsName" . }}
