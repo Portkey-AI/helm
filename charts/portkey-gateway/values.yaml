@@ -214,6 +214,17 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+# startupProbe is optional and rendered only when defined.
+# Useful for slow-starting containers to avoid premature liveness kills.
+# Example:
+# startupProbe:
+#   httpGet:
+#     path: /v1/health
+#     port: 8787
+#   initialDelaySeconds: 10
+#   periodSeconds: 5
+#   failureThreshold: 30
+
 livenessProbe:
   httpGet:
     path: /v1/health
