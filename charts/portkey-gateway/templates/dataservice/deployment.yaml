@@ -41,7 +41,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- if .Values.dataservice.deployment.terminationGracePeriodSeconds }}
+      {{- if hasKey .Values.dataservice.deployment "terminationGracePeriodSeconds" }}
       terminationGracePeriodSeconds: {{ .Values.dataservice.deployment.terminationGracePeriodSeconds }}
       {{- end }}
       imagePullSecrets:
