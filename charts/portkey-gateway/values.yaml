@@ -248,8 +248,8 @@ autoscaling:
       periodSeconds: 2
       # policies:
       # - type: Pods
-      #   value: 4
-      #   periodSeconds: 15
+      #   value: 2
+      #   periodSeconds: 2
     scaleDown:
       stabilizationWindowSeconds: 300
       # selectPolicy: Min
