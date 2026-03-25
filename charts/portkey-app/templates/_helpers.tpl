@@ -126,6 +126,18 @@ the user or some other secret provisioning mechanism
 {{- end }}
 
 {{/*
+Secret name for the old in-cluster ClickHouse during migration.
+Falls back to the migration oldCredentials secret, then to the main clickhouse secret.
+*/}}
+{{- define "portkey.clickhouseOldSecretsName" -}}
+{{- if .Values.clickhouse.migration.oldCredentials.existingSecretName }}
+{{- .Values.clickhouse.migration.oldCredentials.existingSecretName }}
+{{- else }}
+{{- include "portkey.clickhouseSecretsName" . }}
+{{- end }}
+{{- end }}
+
+{{/*
 Name of the secret containing the secrets for mysql. This can be overridden by a secrets file created by
 the user or some other secret provisioning mechanism
 */}}

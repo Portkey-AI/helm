@@ -38,10 +38,50 @@ spec:
               value: {{ include "portkey.fullname" . }}-{{ .Values.clickhouse.name }}
             - name: OLD_CH_PORT
               value: {{ .Values.clickhouse.containerNativePort | quote }}
+            {{- if .Values.clickhouse.migration.oldCredentials.existingSecretName }}
+            - name: OLD_CH_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.clickhouse.migration.oldCredentials.existingSecretName }}
+                  key: clickhouse_user
+            - name: OLD_CH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.clickhouse.migration.oldCredentials.existingSecretName }}
+                  key: clickhouse_password
+            {{- else }}
             - name: OLD_CH_USER
               value: {{ .Values.clickhouse.migration.oldCredentials.user | default .Values.clickhouse.external.user | quote }}
             - name: OLD_CH_PASSWORD
               value: {{ .Values.clickhouse.migration.oldCredentials.password | default .Values.clickhouse.external.password | quote }}
+            {{- end }}
+            {{- if .Values.clickhouse.external.existingSecretName }}
+            - name: NEW_CH_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.clickhouse.external.existingSecretName }}
+                  key: clickhouse_host
+            - name: NEW_CH_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.clickhouse.external.existingSecretName }}
+                  key: clickhouse_native_port
+            - name: NEW_CH_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.clickhouse.external.existingSecretName }}
+                  key: clickhouse_user
+            - name: NEW_CH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.clickhouse.external.existingSecretName }}
+                  key: clickhouse_password
+            - name: CH_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.clickhouse.external.existingSecretName }}
+                  key: clickhouse_db
+            {{- else }}
             - name: NEW_CH_HOST
               value: {{ .Values.clickhouse.external.host | quote }}
             - name: NEW_CH_PORT
@@ -52,6 +92,9 @@ spec:
               value: {{ .Values.clickhouse.external.password | quote }}
             - name: CH_DATABASE
               value: {{ .Values.clickhouse.external.database | quote }}
+            {{- end }}
+            - name: MAX_BLOCK_SIZE
+              value: {{ .Values.clickhouse.migration.maxBlockSize | default 65536 | quote }}
           command:
             - /bin/bash
             - -ce
@@ -110,12 +153,19 @@ spec:
                   continue
                 fi
 
+                echo "Truncating ${CH_DATABASE}.${table} on new CH (idempotent retry)..."
+                clickhouse-client --host "${NEW_CH_HOST}" --port "${NEW_CH_PORT}" \
+                  --user "${NEW_CH_USER}" --password "${NEW_CH_PASSWORD}" \
+                  --query "TRUNCATE TABLE ${CH_DATABASE}.${table}"
+
                 echo "Copying data..."
                 clickhouse-client --host "${OLD_CH_HOST}" --port "${OLD_CH_PORT}" \
                   --user "${OLD_CH_USER}" --password "${OLD_CH_PASSWORD}" \
+                  --max_block_size=${MAX_BLOCK_SIZE} --max_insert_block_size=${MAX_BLOCK_SIZE} \
                   --query "SELECT * FROM ${CH_DATABASE}.${table} FORMAT Native" \
                 | clickhouse-client --host "${NEW_CH_HOST}" --port "${NEW_CH_PORT}" \
                   --user "${NEW_CH_USER}" --password "${NEW_CH_PASSWORD}" \
+                  --max_insert_block_size=${MAX_BLOCK_SIZE} \
                   --query "INSERT INTO ${CH_DATABASE}.${table} FORMAT Native"
 
                 NEW_COUNT=$(clickhouse-client --host "${NEW_CH_HOST}" --port "${NEW_CH_PORT}" \

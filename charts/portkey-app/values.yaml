@@ -676,10 +676,12 @@ clickhouse:
     # A post-upgrade Job will automatically copy historical data to the new external instance.
     # After migration completes, set this to false and run helm upgrade again to remove the old instance.
     enabled: false
-    # Credentials for the old in-cluster ClickHouse. If empty, falls back to external.user/password.
+    # Credentials for the old in-cluster ClickHouse.
     oldCredentials:
+      existingSecretName: ""
       user: ""
       password: ""
+    maxBlockSize: 65536
     resources: {}
     backoffLimit: 3
     activeDeadlineSeconds: 7200
