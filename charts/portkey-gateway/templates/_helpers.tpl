@@ -59,7 +59,10 @@ selectors. Deployment matchLabels uses portkeyenterprise.selectorLabels
 */}}
 {{- define "gateway.selectorLabels" -}}
 {{ include "portkeyenterprise.selectorLabels" . }}
+{{- $selectorLabels := default (dict) .Values.selectorLabels -}}
+{{- if not (hasKey $selectorLabels "app.kubernetes.io/component") }}
 app.kubernetes.io/component: gateway
+{{- end }}
 {{- end }}
 
 {{/*
