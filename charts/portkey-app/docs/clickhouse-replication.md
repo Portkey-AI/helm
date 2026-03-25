@@ -134,18 +134,18 @@ stringData:
   clickhouse_native_port: "9000"
   clickhouse_db: "default"
   clickhouse_tls: "false"
-  clickhouse_replication_enabled: "true"
-  clickhouse_sharding_enabled: "false"
-  clickhouse_cluster_name: "portkey_cluster"
 ```
 
-Then reference it in your values:
+Then reference it in your values. Note that `replicationEnabled`, `shardingEnabled`, and `clusterName` must be set in values even when using an existing secret:
 
 ```yaml
 clickhouse:
   external:
     enabled: true
     existingSecretName: "portkey-clickhouse-external"
+    replicationEnabled: true
+    shardingEnabled: false
+    clusterName: "portkey"
 ```
 
 ## Environment Variables
