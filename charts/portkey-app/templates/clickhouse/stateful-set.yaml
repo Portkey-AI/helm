@@ -118,7 +118,7 @@ spec:
                   key: clickhouse_password
             {{- else }}
             - name: CLICKHOUSE_DB
-              value: {{ .Values.clickhouse.external.database | quote }}
+              value: {{ .Values.clickhouse.migration.oldCredentials.database | default .Values.clickhouse.external.database | quote }}
             - name: CLICKHOUSE_USER
               value: {{ .Values.clickhouse.migration.oldCredentials.user | quote }}
             - name: CLICKHOUSE_PASSWORD

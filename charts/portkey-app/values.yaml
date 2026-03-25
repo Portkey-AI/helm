@@ -681,6 +681,7 @@ clickhouse:
       existingSecretName: ""
       user: ""
       password: ""
+      database: ""
     maxBlockSize: 65536
     resources: {}
     backoffLimit: 3

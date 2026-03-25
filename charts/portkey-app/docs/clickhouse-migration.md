@@ -56,7 +56,7 @@ clickhouse:
       existingSecretName: "clickhouse-secret-old"
 ```
 
-The old credentials secret must have `clickhouse_user` and `clickhouse_password` keys. The new credentials secret must have all standard keys (`clickhouse_host`, `clickhouse_port`, `clickhouse_native_port`, `clickhouse_user`, `clickhouse_password`, `clickhouse_db`).
+The old credentials secret must have `clickhouse_user`, `clickhouse_password`, and `clickhouse_db` keys. The new credentials secret must have all standard keys (`clickhouse_host`, `clickhouse_port`, `clickhouse_native_port`, `clickhouse_user`, `clickhouse_password`, `clickhouse_db`).
 
 If old and new ClickHouse share the same credentials, omit `oldCredentials` entirely -- it falls back to the external credentials.
 
@@ -77,7 +77,7 @@ This will:
 The `helm upgrade` command will block until the migration Job completes. You can monitor progress in another terminal:
 
 ```bash
-kubectl logs -f job/<release>-app-clickhouse-migration -n <namespace>
+kubectl logs -f job/<release>-portkey-app-clickhouse-migration -n <namespace>
 ```
 
 ### Step 2: Verify
@@ -118,7 +118,7 @@ helm upgrade portkey portkey/portkey-app \
 This deletes the old StatefulSet, Service, ConfigMap, and ServiceAccount. If persistence was enabled, clean up the PVC:
 
 ```bash
-kubectl delete pvc -l app.kubernetes.io/component=<release>-app-clickhouse -n <namespace>
+kubectl delete pvc -l app.kubernetes.io/component=<release>-portkey-app-clickhouse -n <namespace>
 ```
 
 ### Configuration Reference
@@ -129,6 +129,7 @@ kubectl delete pvc -l app.kubernetes.io/component=<release>-app-clickhouse -n <n
 | `clickhouse.migration.oldCredentials.existingSecretName` | `""` | Secret with old CH credentials (`clickhouse_user`, `clickhouse_password` keys) |
 | `clickhouse.migration.oldCredentials.user` | `""` | Old CH username (plain value, used when no secret is set) |
 | `clickhouse.migration.oldCredentials.password` | `""` | Old CH password (plain value, used when no secret is set) |
+| `clickhouse.migration.oldCredentials.database` | `""` | Old CH database name (falls back to `external.database` if empty) |
 | `clickhouse.migration.maxBlockSize` | `65536` | Number of rows per block during data transfer (controls memory usage) |
 | `clickhouse.migration.resources` | `{}` | Resource requests/limits for the Job pod |
 | `clickhouse.migration.backoffLimit` | `3` | Number of retries on failure |
@@ -138,9 +139,9 @@ kubectl delete pvc -l app.kubernetes.io/component=<release>-app-clickhouse -n <n
 
 ### Failure Handling
 
-- The Job truncates each table on the new CH before copying, so retries never cause duplicate data.
+- The Job uses a timestamp cutoff per table (the max timestamp from the old CH). It deletes only rows at or before that cutoff on the new CH, then re-copies them. Rows written to the new CH after the upgrade are never touched, so there is no data loss. Retries are idempotent because the same cutoff range is always targeted.
 - If the Job fails, `helm upgrade` reports failure. The old ClickHouse is still alive (migration mode keeps it running), so no data is lost.
-- Check Job logs: `kubectl logs job/<release>-app-clickhouse-migration -n <namespace>`
+- Check Job logs: `kubectl logs job/<release>-portkey-app-clickhouse-migration -n <namespace>`
 - Fix the issue and re-run `helm upgrade` with the same values (the hook-delete-policy `before-hook-creation` cleans up the old Job automatically).
 
 ### Rollback
@@ -188,7 +189,7 @@ Follow the [ClickHouse Replication](clickhouse-replication.md) guide to deploy a
 Old (built-in) instance:
 
 ```bash
-kubectl port-forward svc/<release>-app-clickhouse 9000:9000 -n <namespace>
+kubectl port-forward svc/<release>-portkey-app-clickhouse 9000:9000 -n <namespace>
 ```
 
 New (replicated) cluster:
@@ -275,7 +276,7 @@ done
 1. Delete the PVC if persistence was enabled:
 
 ```bash
-kubectl delete pvc -l app.kubernetes.io/component=<release>-app-clickhouse -n <namespace>
+kubectl delete pvc -l app.kubernetes.io/component=<release>-portkey-app-clickhouse -n <namespace>
 ```
 
 2. Remove the exported data files from your local machine.

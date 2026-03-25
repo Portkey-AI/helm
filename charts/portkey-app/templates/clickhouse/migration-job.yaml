@@ -10,7 +10,7 @@ metadata:
     {{- include "portkey.annotations" . | nindent 4 }}
     "helm.sh/hook": post-upgrade
     "helm.sh/hook-weight": "1"
-    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   backoffLimit: {{ .Values.clickhouse.migration.backoffLimit | default 3 }}
   activeDeadlineSeconds: {{ .Values.clickhouse.migration.activeDeadlineSeconds | default 7200 }}
@@ -126,11 +126,13 @@ spec:
               done
               echo "New CH is reachable."
 
+              DB=$(echo "${CH_DATABASE}" | sed 's/`/``/g')
+
               echo "--- Waiting for tables to exist on new ClickHouse ---"
               for table in "${TABLES[@]}"; do
                 until clickhouse-client --host "${NEW_CH_HOST}" --port "${NEW_CH_PORT}" \
                   --user "${NEW_CH_USER}" --password "${NEW_CH_PASSWORD}" \
-                  --query "SELECT 1 FROM ${CH_DATABASE}.${table} LIMIT 0" >/dev/null 2>&1; do
+                  --query "SELECT 1 FROM \`${DB}\`.\`${table}\` LIMIT 0" >/dev/null 2>&1; do
                   echo "Table ${CH_DATABASE}.${table} not yet created on new CH, retrying in 10s..."
                   sleep 10
                 done
@@ -138,13 +140,21 @@ spec:
               done
               echo ""
 
+              declare -A TS_COL=(
+                [generations]=created_at
+                [feedbacks]=created_at
+                [generation_hooks]=created_at
+                [audit_logs]=timestamp
+              )
+
               FAILED=0
               for table in "${TABLES[@]}"; do
                 echo "=== Migrating ${CH_DATABASE}.${table} ==="
+                ts_col="${TS_COL[$table]}"
 
                 OLD_COUNT=$(clickhouse-client --host "${OLD_CH_HOST}" --port "${OLD_CH_PORT}" \
                   --user "${OLD_CH_USER}" --password "${OLD_CH_PASSWORD}" \
-                  --query "SELECT count() FROM ${CH_DATABASE}.${table}")
+                  --query "SELECT count() FROM \`${DB}\`.\`${table}\`")
                 echo "Rows in old CH: ${OLD_COUNT}"
 
                 if [ "${OLD_COUNT}" -eq 0 ]; then
@@ -153,24 +163,41 @@ spec:
                   continue
                 fi
 
-                echo "Truncating ${CH_DATABASE}.${table} on new CH (idempotent retry)..."
+                CUTOFF=$(clickhouse-client --host "${OLD_CH_HOST}" --port "${OLD_CH_PORT}" \
+                  --user "${OLD_CH_USER}" --password "${OLD_CH_PASSWORD}" \
+                  --query "SELECT max(\`${ts_col}\`) FROM \`${DB}\`.\`${table}\`")
+                echo "Cutoff timestamp (max ${ts_col} on old CH): ${CUTOFF}"
+
+                echo "Deleting rows <= cutoff on new CH (idempotent retry)..."
                 clickhouse-client --host "${NEW_CH_HOST}" --port "${NEW_CH_PORT}" \
                   --user "${NEW_CH_USER}" --password "${NEW_CH_PASSWORD}" \
-                  --query "TRUNCATE TABLE ${CH_DATABASE}.${table}"
+                  --query "ALTER TABLE \`${DB}\`.\`${table}\` DELETE WHERE \`${ts_col}\` <= '${CUTOFF}'"
 
-                echo "Copying data..."
+                echo "Waiting for mutations to finish..."
+                while true; do
+                  PENDING=$(clickhouse-client --host "${NEW_CH_HOST}" --port "${NEW_CH_PORT}" \
+                    --user "${NEW_CH_USER}" --password "${NEW_CH_PASSWORD}" \
+                    --query "SELECT count() FROM system.mutations WHERE database = '${CH_DATABASE}' AND table = '${table}' AND is_done = 0")
+                  if [ "${PENDING}" -eq 0 ]; then
+                    break
+                  fi
+                  echo "  ${PENDING} mutation(s) still running, waiting 5s..."
+                  sleep 5
+                done
+
+                echo "Copying data (WHERE ${ts_col} <= '${CUTOFF}')..."
                 clickhouse-client --host "${OLD_CH_HOST}" --port "${OLD_CH_PORT}" \
                   --user "${OLD_CH_USER}" --password "${OLD_CH_PASSWORD}" \
                   --max_block_size=${MAX_BLOCK_SIZE} --max_insert_block_size=${MAX_BLOCK_SIZE} \
-                  --query "SELECT * FROM ${CH_DATABASE}.${table} FORMAT Native" \
+                  --query "SELECT * FROM \`${DB}\`.\`${table}\` WHERE \`${ts_col}\` <= '${CUTOFF}' FORMAT Native" \
                 | clickhouse-client --host "${NEW_CH_HOST}" --port "${NEW_CH_PORT}" \
                   --user "${NEW_CH_USER}" --password "${NEW_CH_PASSWORD}" \
                   --max_insert_block_size=${MAX_BLOCK_SIZE} \
-                  --query "INSERT INTO ${CH_DATABASE}.${table} FORMAT Native"
+                  --query "INSERT INTO \`${DB}\`.\`${table}\` FORMAT Native"
 
                 NEW_COUNT=$(clickhouse-client --host "${NEW_CH_HOST}" --port "${NEW_CH_PORT}" \
                   --user "${NEW_CH_USER}" --password "${NEW_CH_PASSWORD}" \
-                  --query "SELECT count() FROM ${CH_DATABASE}.${table}")
+                  --query "SELECT count() FROM \`${DB}\`.\`${table}\` WHERE \`${ts_col}\` <= '${CUTOFF}'")
 
                 if [ "${NEW_COUNT}" -ge "${OLD_COUNT}" ]; then
                   echo "Verification passed: old=${OLD_COUNT} new=${NEW_COUNT}"
