@@ -19,7 +19,7 @@ metadata:
     {{- include "gateway.labels" . }}
 data:
 {{- range $key, $val := .Values.environment.data }}
-  {{ $key }}: {{ $val | toString | quote }}
+  {{ $key }}: {{- if not (kindIs "invalid" $val) }} {{ $val | toString | quote }} {{- else }} "" {{- end }}
 {{- end -}}
 {{- end -}}
 {{- end -}}
