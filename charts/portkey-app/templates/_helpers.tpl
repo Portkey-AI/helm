@@ -252,48 +252,42 @@ Template containing common environment variables that are used by several servic
 {{- if .Values.config.oauth.enabled }}
 - name: AUTH_MODE
   value: "SSO"
-{{- if .Values.config.oauth.oauthType }}
 - name: AUTH_SSO_TYPE
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthType
-{{- end }}
-{{- if .Values.config.oauth.oauthIssuerUrl }}
+      optional: true
 - name: OIDC_ISSUER
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthIssuerUrl
-{{- end }}
-{{- if .Values.config.oauth.oauthClientId }}
+      optional: true
 - name: OIDC_CLIENTID
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthClientId
-{{- end }}
-{{- if .Values.config.oauth.oauthClientSecret }}
+      optional: true
 - name: OIDC_CLIENT_SECRET
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthClientSecret
-{{- end }}
-{{- if .Values.config.oauth.oauthRedirectURI }}
+      optional: true
 - name: OIDC_REDIRECT_URI
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthRedirectURI
-{{- end }}
-{{- if .Values.config.oauth.oauthMetadataXml }}
+      optional: true
 - name: SAML_METADATA_XML
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthMetadataXml
-{{- end }}
+      optional: true
 {{- end }}
 {{- if .Values.config.noAuth.enabled }}
 - name: AUTH_MODE
