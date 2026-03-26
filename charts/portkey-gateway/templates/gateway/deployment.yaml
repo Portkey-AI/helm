@@ -68,12 +68,23 @@ spec:
               containerPort: {{ include "mcp.containerPort" . }}
               protocol: TCP
             {{- end }}
+          {{- if .Values.envFrom }}
+          envFrom:
+            {{- toYaml .Values.envFrom | nindent 12 }}
+          {{- end }}
           env:
             {{- if .Values.dataservice.enabled }}
               - name: DATASERVICE_BASEPATH
                 value: http://{{ include "portkeyenterprise.fullname" . }}-{{ .Values.dataservice.name }}:{{ .Values.dataservice.service.port }}
             {{- end }}
             {{- include "portkeyenterprise.commonEnv" . | nindent 12 }}
+            {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
