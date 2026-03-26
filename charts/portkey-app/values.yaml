@@ -668,7 +668,21 @@ clickhouse:
     password: ""
     database: "default"
     tls: false
+    replicationEnabled: false
+    shardingEnabled: false
+    clusterName: "portkey"
     existingSecretName: ""
+  migration:
+    # Enable to keep the old in-cluster ClickHouse alive while switching to external.
+    # This preserves the StatefulSet, Service, ConfigMap, and ServiceAccount so you can
+    # manually export data before decommissioning. Set to false after migration is complete.
+    enabled: false
+    # Credentials for the old in-cluster ClickHouse (prevents the old pod from picking up new external credentials).
+    oldCredentials:
+      existingSecretName: ""
+      user: ""
+      password: ""
+      database: ""
   customConfig:
     enabled: false
   retention:
