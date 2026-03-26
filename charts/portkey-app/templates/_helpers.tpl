@@ -257,31 +257,37 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthType
+      optional: true
 - name: OIDC_ISSUER
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthIssuerUrl
+      optional: true
 - name: OIDC_CLIENTID
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthClientId
+      optional: true
 - name: OIDC_CLIENT_SECRET
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthClientSecret
+      optional: true
 - name: OIDC_REDIRECT_URI
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthRedirectURI
+      optional: true
 - name: SAML_METADATA_XML
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthMetadataXml
+      optional: true
 {{- end }}
 {{- if .Values.config.noAuth.enabled }}
 - name: AUTH_MODE
