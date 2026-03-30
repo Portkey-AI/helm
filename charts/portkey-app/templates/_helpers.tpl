@@ -126,6 +126,18 @@ the user or some other secret provisioning mechanism
 {{- end }}
 
 {{/*
+Secret name for the old in-cluster ClickHouse during migration.
+Falls back to the migration oldCredentials secret, then to the main clickhouse secret.
+*/}}
+{{- define "portkey.clickhouseOldSecretsName" -}}
+{{- if and .Values.clickhouse.migration.enabled .Values.clickhouse.migration.oldCredentials.existingSecretName }}
+{{- .Values.clickhouse.migration.oldCredentials.existingSecretName }}
+{{- else }}
+{{- include "portkey.clickhouseSecretsName" . }}
+{{- end }}
+{{- end }}
+
+{{/*
 Name of the secret containing the secrets for mysql. This can be overridden by a secrets file created by
 the user or some other secret provisioning mechanism
 */}}
@@ -209,6 +221,12 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.clickhouseSecretsName" . }}
       key: clickhouse_tls
+- name: CLICKHOUSE_REPLICATION_ENABLED
+  value: {{ .Values.clickhouse.external.replicationEnabled | toString | quote }}
+- name: CLICKHOUSE_SHARDING_ENABLED
+  value: {{ .Values.clickhouse.external.shardingEnabled | toString | quote }}
+- name: CLICKHOUSE_CLUSTER_NAME
+  value: {{ .Values.clickhouse.external.clusterName | quote }}
 - name: DB_NAME
   valueFrom:
     secretKeyRef:
@@ -491,6 +509,12 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.clickhouseSecretsName" . }}
       key: clickhouse_tls
+- name: ANALYTICS_STORE_REPLICATION_ENABLED
+  value: {{ .Values.clickhouse.external.replicationEnabled | toString | quote }}
+- name: ANALYTICS_STORE_SHARDING_ENABLED
+  value: {{ .Values.clickhouse.external.shardingEnabled | toString | quote }}
+- name: ANALYTICS_STORE_CLUSTER_NAME
+  value: {{ .Values.clickhouse.external.clusterName | quote }}
 - name: ANALYTICS_DB
   valueFrom:
     secretKeyRef:

@@ -1,4 +1,4 @@
-{{- if not .Values.clickhouse.external.enabled }}
+{{- if or (not .Values.clickhouse.external.enabled) .Values.clickhouse.migration.enabled }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -48,7 +48,7 @@ spec:
             - sh
             - -c
             - |
-              cat > /etc/clickhouse-server/users.d/users.xml << EOF
+              cat > /etc/clickhouse-server/users.d/00-users.xml << EOF
               <clickhouse>
                 <users>
                   <${CLICKHOUSE_USER}>
@@ -72,11 +72,16 @@ spec:
               </clickhouse>
               EOF
           env:
+            {{- if and .Values.clickhouse.migration.enabled .Values.clickhouse.external.enabled .Values.clickhouse.migration.oldCredentials.user }}
+            - name: CLICKHOUSE_USER
+              value: {{ .Values.clickhouse.migration.oldCredentials.user | quote }}
+            {{- else }}
             - name: CLICKHOUSE_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "portkey.clickhouseSecretsName" . }}
+                  name: {{ include "portkey.clickhouseOldSecretsName" . }}
                   key: clickhouse_user
+            {{- end }}
           volumeMounts:
             - name: clickhouse-users-config
               mountPath: /etc/clickhouse-server/users.d
@@ -94,6 +99,32 @@ spec:
              {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
+            {{- if and .Values.clickhouse.migration.enabled .Values.clickhouse.external.enabled }}
+            {{- if or .Values.clickhouse.migration.oldCredentials.existingSecretName (not .Values.clickhouse.migration.oldCredentials.user) }}
+            - name: CLICKHOUSE_DB
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "portkey.clickhouseOldSecretsName" . }}
+                  key: clickhouse_db
+            - name: CLICKHOUSE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "portkey.clickhouseOldSecretsName" . }}
+                  key: clickhouse_user
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "portkey.clickhouseOldSecretsName" . }}
+                  key: clickhouse_password
+            {{- else }}
+            - name: CLICKHOUSE_DB
+              value: {{ .Values.clickhouse.migration.oldCredentials.database | default .Values.clickhouse.external.database | quote }}
+            - name: CLICKHOUSE_USER
+              value: {{ .Values.clickhouse.migration.oldCredentials.user | quote }}
+            - name: CLICKHOUSE_PASSWORD
+              value: {{ .Values.clickhouse.migration.oldCredentials.password | quote }}
+            {{- end }}
+            {{- else }}
             - name: CLICKHOUSE_DB
               valueFrom:
                 secretKeyRef:
@@ -109,6 +140,7 @@ spec:
                 secretKeyRef:
                   name: {{ include "portkey.clickhouseSecretsName" . }}
                   key: clickhouse_password
+            {{- end }}
             {{- with .Values.clickhouse.statefulSet.extraEnv }}
                {{- toYaml . | nindent 12 }}
              {{- end }}
