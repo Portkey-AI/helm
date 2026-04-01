@@ -9,6 +9,9 @@ on:
 
 jobs:
   lint-and-template:
+    permissions:
+      contents: read
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
