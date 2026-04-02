@@ -124,14 +124,18 @@ Merged imagePullSecrets from both .Values.imagePullSecrets and .Values.imageCred
 {{- define "portkeyenterprise.imagePullSecrets" -}}
 {{- $names := list -}}
 {{- range .Values.imagePullSecrets -}}
+  {{- $name := "" -}}
   {{- if kindIs "string" . -}}
-    {{- $names = append $names . -}}
+    {{- $name = . -}}
   {{- else -}}
-    {{- $names = append $names .name -}}
+    {{- $name = .name -}}
+  {{- end -}}
+  {{- if and $name (not (has $name $names)) -}}
+    {{- $names = append $names $name -}}
   {{- end -}}
 {{- end -}}
 {{- range .Values.imageCredentials -}}
-  {{- if not (has .name $names) -}}
+  {{- if and .name (not (has .name $names)) -}}
     {{- $names = append $names .name -}}
   {{- end -}}
 {{- end -}}
