@@ -48,10 +48,11 @@ fullnameOverride: ""
 
 selectorLabels: {}
 
-# Use this to reference a pre-existing registry secret
+# Use this to reference one or more pre-existing registry secrets.
+# imagePullSecrets is expected to be a list of objects with a `name` field, for example:
+# imagePullSecrets:
+#   - name: portkeyenterpriseregistrycredentials
 imagePullSecrets: []
-# - name: portkeyenterpriseregistrycredentials
-
 
 # Use this to have the chart create a docker registry secret
 imageCredentials:

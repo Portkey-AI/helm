@@ -122,21 +122,23 @@ Create the name of the service account to use
 Merged imagePullSecrets from both .Values.imagePullSecrets and .Values.imageCredentials
 */}}
 {{- define "portkeyenterprise.imagePullSecrets" -}}
-{{- $secrets := list -}}
 {{- $names := list -}}
 {{- range .Values.imagePullSecrets -}}
-  {{- $secrets = append $secrets . -}}
-  {{- $names = append $names .name -}}
+  {{- if kindIs "string" . -}}
+    {{- $names = append $names . -}}
+  {{- else -}}
+    {{- $names = append $names .name -}}
+  {{- end -}}
 {{- end -}}
 {{- range .Values.imageCredentials -}}
   {{- if not (has .name $names) -}}
-    {{- $secrets = append $secrets (dict "name" .name) -}}
+    {{- $names = append $names .name -}}
   {{- end -}}
 {{- end -}}
-{{- if $secrets }}
+{{- if $names }}
 imagePullSecrets:
-{{- range $secrets }}
-  - name: {{ .name }}
+{{- range $names }}
+  - name: {{ . }}
 {{- end }}
 {{- end -}}
 {{- end -}}
