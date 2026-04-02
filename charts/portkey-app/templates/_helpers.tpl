@@ -126,6 +126,18 @@ the user or some other secret provisioning mechanism
 {{- end }}
 
 {{/*
+Secret name for the old in-cluster ClickHouse during migration.
+Falls back to the migration oldCredentials secret, then to the main clickhouse secret.
+*/}}
+{{- define "portkey.clickhouseOldSecretsName" -}}
+{{- if and .Values.clickhouse.migration.enabled .Values.clickhouse.migration.oldCredentials.existingSecretName }}
+{{- .Values.clickhouse.migration.oldCredentials.existingSecretName }}
+{{- else }}
+{{- include "portkey.clickhouseSecretsName" . }}
+{{- end }}
+{{- end }}
+
+{{/*
 Name of the secret containing the secrets for mysql. This can be overridden by a secrets file created by
 the user or some other secret provisioning mechanism
 */}}
@@ -209,6 +221,12 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.clickhouseSecretsName" . }}
       key: clickhouse_tls
+- name: CLICKHOUSE_REPLICATION_ENABLED
+  value: {{ .Values.clickhouse.external.replicationEnabled | toString | quote }}
+- name: CLICKHOUSE_SHARDING_ENABLED
+  value: {{ .Values.clickhouse.external.shardingEnabled | toString | quote }}
+- name: CLICKHOUSE_CLUSTER_NAME
+  value: {{ .Values.clickhouse.external.clusterName | quote }}
 - name: DB_NAME
   valueFrom:
     secretKeyRef:
@@ -252,48 +270,42 @@ Template containing common environment variables that are used by several servic
 {{- if .Values.config.oauth.enabled }}
 - name: AUTH_MODE
   value: "SSO"
-{{- if .Values.config.oauth.oauthType }}
 - name: AUTH_SSO_TYPE
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthType
-{{- end }}
-{{- if .Values.config.oauth.oauthIssuerUrl }}
+      optional: true
 - name: OIDC_ISSUER
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthIssuerUrl
-{{- end }}
-{{- if .Values.config.oauth.oauthClientId }}
+      optional: true
 - name: OIDC_CLIENTID
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthClientId
-{{- end }}
-{{- if .Values.config.oauth.oauthClientSecret }}
+      optional: true
 - name: OIDC_CLIENT_SECRET
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthClientSecret
-{{- end }}
-{{- if .Values.config.oauth.oauthRedirectURI }}
+      optional: true
 - name: OIDC_REDIRECT_URI
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthRedirectURI
-{{- end }}
-{{- if .Values.config.oauth.oauthMetadataXml }}
+      optional: true
 - name: SAML_METADATA_XML
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.secretsName" . }}
       key: oauthMetadataXml
-{{- end }}
+      optional: true
 {{- end }}
 {{- if .Values.config.noAuth.enabled }}
 - name: AUTH_MODE
@@ -497,6 +509,12 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.clickhouseSecretsName" . }}
       key: clickhouse_tls
+- name: ANALYTICS_STORE_REPLICATION_ENABLED
+  value: {{ .Values.clickhouse.external.replicationEnabled | toString | quote }}
+- name: ANALYTICS_STORE_SHARDING_ENABLED
+  value: {{ .Values.clickhouse.external.shardingEnabled | toString | quote }}
+- name: ANALYTICS_STORE_CLUSTER_NAME
+  value: {{ .Values.clickhouse.external.clusterName | quote }}
 - name: ANALYTICS_DB
   valueFrom:
     secretKeyRef:
