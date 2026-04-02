@@ -18,10 +18,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      imagePullSecrets: 
-      {{- range .Values.imageCredentials }}
-      - name: {{ .name }}
-      {{- end }}
+      {{- include "portkeyenterprise.imagePullSecrets" . | nindent 6 }}
       containers:
         - name: redis
           image: "{{ .Values.images.redisImage.repository }}:{{ .Values.images.redisImage.tag }}"

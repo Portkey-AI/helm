@@ -43,13 +43,17 @@ images:
     repository: "docker.io/milvusdb/milvus"
     pullPolicy: IfNotPresent
     tag: "v2.3.21"
-
-imagePullSecrets: [portkeyenterpriseregistrycredentials]
 nameOverride: ""
 fullnameOverride: ""
 
 selectorLabels: {}
 
+# Use this to reference a pre-existing registry secret
+imagePullSecrets: []
+# - name: portkeyenterpriseregistrycredentials
+
+
+# Use this to have the chart create a docker registry secret
 imageCredentials:
 - name: portkeyenterpriseregistrycredentials
   create: true
