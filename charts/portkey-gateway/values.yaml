@@ -264,7 +264,8 @@ autoscaling:
 volumes: []
 # - name: shared-folder
 #   configMap:
-#     name: resource-config
+#     # Use your release's fullname: kubectl get configmap -l app.kubernetes.io/managed-by=Helm
+#     name: my-release-gateway-resource-config
 
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts: []

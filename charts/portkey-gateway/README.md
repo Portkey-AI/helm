@@ -330,7 +330,7 @@ MONGO_GENERATION_HOOKS_COLLECTION_NAME: "<Mongo Collection for Hooks>"
 volumes:
 - name: shared-folder
   configMap:
-    name: resource-config
+    name: <release-fullname>-resource-config  # e.g. my-release-gateway-resource-config
 volumeMounts:
 - name: shared-folder
   mountPath: /etc/shared/document_db.pem
