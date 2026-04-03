@@ -119,35 +119,6 @@ Create the name of the service account to use
 
 
 {{/*
-Merged imagePullSecrets from both .Values.imagePullSecrets and .Values.imageCredentials
-*/}}
-{{- define "portkeyenterprise.imagePullSecrets" -}}
-{{- $names := list -}}
-{{- range .Values.imagePullSecrets -}}
-  {{- $name := "" -}}
-  {{- if kindIs "string" . -}}
-    {{- $name = . -}}
-  {{- else -}}
-    {{- $name = .name -}}
-  {{- end -}}
-  {{- if and $name (not (has $name $names)) -}}
-    {{- $names = append $names $name -}}
-  {{- end -}}
-{{- end -}}
-{{- range .Values.imageCredentials -}}
-  {{- if and .name (not (has .name $names)) -}}
-    {{- $names = append $names .name -}}
-  {{- end -}}
-{{- end -}}
-{{- if $names }}
-imagePullSecrets:
-{{- range $names }}
-  - name: {{ . }}
-{{- end }}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Create the image pull credentials
 Supports both username/password and direct auth token
 */}}
