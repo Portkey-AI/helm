@@ -41,7 +41,10 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      imagePullSecrets: 
+      {{- if hasKey .Values.dataservice.deployment "terminationGracePeriodSeconds" }}
+      terminationGracePeriodSeconds: {{ .Values.dataservice.deployment.terminationGracePeriodSeconds }}
+      {{- end }}
+      imagePullSecrets:
       {{- range .Values.imageCredentials }}
       - name: {{ .name }}
       {{- end }}
@@ -53,6 +56,10 @@ spec:
           {{- with .Values.dataservice.deployment.command }}
           command:
             {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.dataservice.envFrom }}
+          envFrom:
+            {{- toYaml .Values.dataservice.envFrom | nindent 12 }}
           {{- end }}
           env:
             - name: GATEWAY_BASE_URL
