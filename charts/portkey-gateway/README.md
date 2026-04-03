@@ -7,8 +7,8 @@
 ## Quick Start
 
 ### 1. Docker Registry Access
+Update your `values.yaml` with the provided Docker credentials:
 
-**Option A:** Have the chart create the registry secret:
 ```yaml
 imageCredentials:
 - name: portkeyenterpriseregistrycredentials
@@ -16,13 +16,6 @@ imageCredentials:
   registry: https://index.docker.io/v1/
   username: <shared by portkey>
   password: <shared by portkey>
-```
-
-**Option B:** Reference a pre-existing secret (e.g. created via `kubectl create secret docker-registry`):
-```yaml
-imagePullSecrets:
-  - name: my-registry-secret
-imageCredentials: []
 ```
 
 ### 2. Core Configuration

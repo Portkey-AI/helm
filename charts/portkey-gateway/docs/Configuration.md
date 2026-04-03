@@ -31,21 +31,19 @@
 | `images.milvusImage.repository` | string | `"docker.io/milvusdb/milvus"` | Milvus container image repository |
 | `images.milvusImage.pullPolicy` | string | `"IfNotPresent"` | Image pull policy for Milvus |
 | `images.milvusImage.tag` | string | `"v2.3.21"` | Milvus image tag |
-| `imagePullSecrets` | array | `[]` | Reference pre-existing registry secrets. Supports both string (`["my-secret"]`) and object (`[{name: "my-secret"}]`) forms |
+| `imagePullSecrets` | array | `[portkeyenterpriseregistrycredentials]` | Kubernetes secrets for pulling private images |
 
 ### Image Credentials
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
 | `imageCredentials[].name` | string | `"portkeyenterpriseregistrycredentials"` | Name of the image pull secret |
-| `imageCredentials[].create` | boolean | `true` | Whether to create the secret via the chart |
+| `imageCredentials[].create` | boolean | `true` | Whether to create the secret |
 | `imageCredentials[].registry` | string | `"https://index.docker.io/v1/"` | Docker registry URL |
 | `imageCredentials[].username` | string | `"<docker-user>"` | Docker registry username |
 | `imageCredentials[].password` | string | `"<docker-pwd>"` | Docker registry password |
 | `imageCredentials[].email` | string | `""` | Email for Docker registry (optional) |
 | `imageCredentials[].auth` | string | `""` | Base64 encoded auth token (alternative to username/password) |
-
-> **Note:** You can use `imagePullSecrets` to reference a secret created outside the chart, or `imageCredentials` to have the chart create one. Both can be used together — names are merged and deduplicated automatically. To use only a pre-existing secret, set `imageCredentials: []`.
 
 ### Vault Integration
 

@@ -39,7 +39,10 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- include "portkeyenterprise.imagePullSecrets" . | nindent 6 }}
+      imagePullSecrets: 
+      {{- range .Values.imageCredentials }}
+      - name: {{ .name }}
+      {{- end }}
       containers:
         - name: minio
           image: "{{ .Values.images.minioImage.repository }}:{{ .Values.images.minioImage.tag }}"

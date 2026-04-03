@@ -41,7 +41,10 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- include "portkeyenterprise.imagePullSecrets" . | nindent 6 }}
+      imagePullSecrets: 
+      {{- range .Values.imageCredentials }}
+      - name: {{ .name }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.dataservice.deployment.podSecurityContext | nindent 8 }}
       serviceAccountName: {{ include "dataservice.serviceAccountName" . }}
