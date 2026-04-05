@@ -42,7 +42,7 @@ Here's an overview of the key components:
 
 >We strongly recommend using a externally managed database service for production use.
 
-### 1. Redis
+### 1. Redis (minimum version: 6.2)
 - In-memory data structure store, used for caching.
 - Portkey uses Redis to cache data and reduce the load on the gateway and backend service.
 

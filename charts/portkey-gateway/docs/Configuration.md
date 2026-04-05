@@ -194,7 +194,7 @@ environment:
 | `environment.data.ANALYTICS_STORE_PASSWORD` | string | `""` | Analytics store password (consider using secretKeys) |
 | `environment.data.ANALYTICS_LOG_TABLE` | string | `""` | Table name for analytics logs |
 | `environment.data.ANALYTICS_FEEDBACK_TABLE` | string | `""` | Table name for feedback data |
-| `environment.data.CACHE_STORE` | string | `"redis"` | Cache storage backend |
+| `environment.data.CACHE_STORE` | string | `"redis"` | Cache storage backend (minimum Redis version: 6.2) |
 | `environment.data.REDIS_URL` | string | `"redis://redis:6379"` | Redis connection URL (consider using secretKeys if contains auth) |
 | `environment.data.REDIS_TLS_ENABLED` | string | `"false"` | Enable TLS for Redis connection |
 | `environment.data.REDIS_MODE` | string | `""` | Redis deployment mode (standalone/cluster) |
@@ -390,6 +390,8 @@ environment:
 | `dataservice.autoscaling.behavior.scaleDown.periodSeconds` | integer | `60` | Scale down period |
 
 ### Redis Configuration
+
+> **Note**: Minimum supported Redis version is **6.2**.
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|

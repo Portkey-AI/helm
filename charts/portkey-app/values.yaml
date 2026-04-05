@@ -575,6 +575,7 @@ mysql:
     labels: {}
     annotations: {}
 
+# Minimum supported Redis version: 6.2
 redis:
   name: "redis"
   external:

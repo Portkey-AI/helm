@@ -136,6 +136,7 @@ environment:
     ANALYTICS_STORE_PASSWORD: 
     ANALYTICS_LOG_TABLE: 
     ANALYTICS_FEEDBACK_TABLE: 
+    # -- Minimum supported Redis version: 6.2
     CACHE_STORE: redis
     REDIS_URL: redis://redis:6379
     REDIS_TLS_ENABLED: "false"
@@ -427,6 +428,7 @@ dataservice:
         periodSeconds: 60
 
 # Redis-specific configuration section
+# Minimum supported Redis version: 6.2
 redis:
   name: "redis"  
   serviceType: NodePort  
