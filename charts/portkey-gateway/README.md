@@ -349,6 +349,8 @@ volumeMounts:
 
 ## Cache Store
 
+> **Note**: Minimum supported Redis version is **6.2**.
+
 ### Redis (In-Cluster)
 Simple deployments, development
 

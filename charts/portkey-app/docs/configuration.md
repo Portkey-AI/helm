@@ -69,6 +69,8 @@ The credentials passed here will be used for the internal mysql instance.
 
 #### Redis
 
+> **Note**: Minimum supported Redis version is **6.2**.
+
 ```yaml
 redis:
   external:

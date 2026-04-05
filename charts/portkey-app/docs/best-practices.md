@@ -5,7 +5,7 @@
 2. **API Key Management**: Rotate regularly, use different keys for each environment.
 
 ## Infrastructure
-1. **External Databases**: Use managed services for MySQL, Redis, and ClickHouse for better scaling and backups.
+1. **External Databases**: Use managed services for MySQL, Redis (minimum version: 6.2), and ClickHouse for better scaling and backups.
 2. **Load Balancing**: Implement a managed load balancer with SSL termination for improved security and performance.
 
 ## Monitoring and Logging
