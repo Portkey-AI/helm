@@ -44,10 +44,7 @@ spec:
       {{- if hasKey .Values.dataservice.deployment "terminationGracePeriodSeconds" }}
       terminationGracePeriodSeconds: {{ .Values.dataservice.deployment.terminationGracePeriodSeconds }}
       {{- end }}
-      imagePullSecrets:
-      {{- range .Values.imageCredentials }}
-      - name: {{ .name }}
-      {{- end }}
+      {{- include "portkeyenterprise.imagePullSecrets" . | nindent 6 }}
       securityContext:
         {{- toYaml .Values.dataservice.deployment.podSecurityContext | nindent 8 }}
       serviceAccountName: {{ include "dataservice.serviceAccountName" . }}
