@@ -44,12 +44,19 @@ images:
     pullPolicy: IfNotPresent
     tag: "v2.3.21"
 
-imagePullSecrets: [portkeyenterpriseregistrycredentials]
 nameOverride: ""
 fullnameOverride: ""
 
 selectorLabels: {}
 
+# Use this to reference one or more pre-existing registry secrets.
+# Supports both object and string forms:
+# imagePullSecrets:
+#   - name: portkeyenterpriseregistrycredentials
+#   - my-other-secret
+imagePullSecrets: []
+
+# Use this to have the chart create a docker registry secret
 imageCredentials:
 - name: portkeyenterpriseregistrycredentials
   create: true
