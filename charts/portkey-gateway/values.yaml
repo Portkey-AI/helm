@@ -257,16 +257,27 @@ autoscaling:
   maxReplicas: 20
   targetCPUUtilizationPercentage: 60
   targetMemoryUtilizationPercentage: 60
+  # customMetrics: []
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 0
+      # selectPolicy: Max
       podScaleUpValue: 2
       percentScaleUpValue: 100
       periodSeconds: 2
+      # policies:
+      # - type: Pods
+      #   value: 2
+      #   periodSeconds: 2
     scaleDown:
       stabilizationWindowSeconds: 300
+      # selectPolicy: Min
       podScaleDownValue: 1
       periodSeconds: 60
+      # policies:
+      # - type: Pods
+      #   value: 1
+      #   periodSeconds: 60
 
 # Additional volumes on the output Deployment definition.
 volumes: []
@@ -430,11 +441,16 @@ dataservice:
 # Redis-specific configuration section
 # Minimum supported Redis version: 6.2
 redis:
-  name: "redis"  
-  serviceType: NodePort  
+  name: "redis"
+  serviceType: NodePort
   servicePort: 6379
   containerPort: 6379
   resources: {}
+  # Set to false to skip deploying in-cluster Redis when using an external Redis/ElastiCache instance.
+  # When deployLocal is set to false, you MUST also configure Redis connection env vars
+  # (e.g. environment.data.REDIS_URL, or REDIS_HOST/REDIS_PORT) to point to your external Redis;
+  # otherwise the deployment will still try to connect to the default in-cluster service (redis://redis:6379).
+  deployLocal: true
 
 # MinIO configuration section
 minio:
