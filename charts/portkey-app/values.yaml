@@ -89,6 +89,7 @@ config:
   disableTestimonial: false
   internalGatewayURL: ""
   loginDisclaimer: ""
+  onboardingSupportMessage: ""
   
   noAuth:
     enabled: true
