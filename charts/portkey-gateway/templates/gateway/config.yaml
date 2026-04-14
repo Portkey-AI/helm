@@ -8,7 +8,7 @@ metadata:
     {{- include "gateway.labels" . }}
 data:
 {{- range $key, $val := .Values.environment.data }}
-  {{ $key }}: {{- if not (kindIs "invalid" $val) }} {{ $val | toString | b64enc }} {{- else }} "" {{- end }}
+  {{ $key }}: {{- if $val }} {{ $val | b64enc }} {{- else }} "" {{- end }}
 {{- end -}}
 {{- else -}}
 apiVersion: v1

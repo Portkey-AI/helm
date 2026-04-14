@@ -148,7 +148,7 @@ environment:
     FINETUNES_AWS_ROLE_ARN: 
     SERVER_MODE: ""
     MCP_PORT: "8788"
-    MCP_GATEWAY_BASE_URL: ""
+    MCP_GATEWAY_BASE_URL: 
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -331,6 +331,24 @@ affinity: {}
 #       - "www.example.com"
 hostAlias: []
 
+# DNS policy for the gateway pod.
+# Valid values: ClusterFirst (default), ClusterFirstWithHostNet, Default, None
+# NOTE: When set to "None", dnsConfig must be provided with at least one nameserver.
+dnsPolicy: ""
+
+# Custom DNS configuration for the gateway pod.
+# Only applied when dnsPolicy is set.
+# Example:
+# dnsConfig:
+#   nameservers:
+#     - 1.2.3.4
+#   searches:
+#     - ns1.svc.cluster.local
+#   options:
+#     - name: ndots
+#       value: "5"
+dnsConfig: {}
+
 # if you want to restart instance automatically
 autoRestart: false
 
@@ -397,6 +415,21 @@ dataservice:
     #       - "example.com"
     #       - "www.example.com"
     hostAlias: []
+    # DNS policy for the dataservice pod.
+    # Valid values: ClusterFirst (default), ClusterFirstWithHostNet, Default, None
+    # NOTE: When set to "None", dnsConfig must be provided with at least one nameserver.
+    dnsPolicy: ""
+    # Custom DNS configuration for the dataservice pod.
+    # Example:
+    # dnsConfig:
+    #   nameservers:
+    #     - 1.2.3.4
+    #   searches:
+    #     - ns1.svc.cluster.local
+    #   options:
+    #     - name: ndots
+    #       value: "5"
+    dnsConfig: {}
   service:
     type: ClusterIP
     port: 8081
