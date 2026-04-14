@@ -1,4 +1,4 @@
-{{- if eq .Values.environment.data.CACHE_STORE "redis" }}
+{{- if and (eq .Values.environment.data.CACHE_STORE "redis") .Values.redis.deployLocal }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
