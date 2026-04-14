@@ -122,3 +122,13 @@ spec:
       hostAliases:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.dnsPolicy }}
+      {{- if and (eq .Values.dnsPolicy "None") (empty .Values.dnsConfig.nameservers) }}
+        {{- fail "gateway: dnsPolicy \"None\" requires at least one entry in dnsConfig.nameservers" }}
+      {{- end }}
+      dnsPolicy: {{ .Values.dnsPolicy }}
+      {{- end }}
+      {{- with .Values.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
