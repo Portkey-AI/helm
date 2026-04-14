@@ -148,7 +148,7 @@ environment:
     FINETUNES_AWS_ROLE_ARN: 
     SERVER_MODE: ""
     MCP_PORT: "8788"
-    MCP_GATEWAY_BASE_URL: 
+    MCP_GATEWAY_BASE_URL: ""
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -337,7 +337,7 @@ hostAlias: []
 dnsPolicy: ""
 
 # Custom DNS configuration for the gateway pod.
-# Only applied when dnsPolicy is set.
+# Required when dnsPolicy is "None" (must include at least one nameserver).
 # Example:
 # dnsConfig:
 #   nameservers:
