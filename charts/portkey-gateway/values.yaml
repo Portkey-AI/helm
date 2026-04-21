@@ -372,7 +372,8 @@ dataservice:
     replicas: 1
     # terminationGracePeriodSeconds: 30
     labels: {}
-    selectorLabels: {}
+    selectorLabels:
+      app.kubernetes.io/name: dataservice
     annotations: {}
     podSecurityContext: {}
     securityContext: {}
