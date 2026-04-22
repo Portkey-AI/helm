@@ -176,19 +176,34 @@ Trust Relationship:
 }
 ```
 
-**Method 2: EKS IRSA**
+**Method 2: EKS IRSA (Recommended)**
 ```yaml
 LOG_STORE: s3_assume
 LOG_STORE_REGION: "<AWS Bucket Region>"
 LOG_STORE_GENERATIONS_BUCKET: "<AWS Bucket Name>"
 ```
 
-**Method 3: EC2 Instance Metadata (IMDS)**
+Attach the role ARN to the pod's ServiceAccount:
+```yaml
+serviceAccount:
+  create: true
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>"
+```
+
+**Method 3: EC2 Instance Metadata Service (IMDSv2 only)**
+
+> ⚠️ **Security notice**
+> - Only use IMDS when IRSA is not available. IRSA (Method 2) is strongly preferred.
+> - Node EC2 instances **must** enforce IMDSv2 (`HttpTokens=required`) with `HttpPutResponseHopLimit=1`.
+>   This prevents an SSRF or RCE in a pod from stealing the node's IAM role credentials.
+> - Do **not** set `AWS_IMDS_V1=true`. IMDSv1 fallback is deprecated and is an SSRF amplifier.
+> - Also enable the chart's `networkPolicy` (see `values.yaml`) to block pod egress to `169.254.169.254`.
+
 ```yaml
 LOG_STORE: s3_assume
 LOG_STORE_REGION: "us-east-1"
 LOG_STORE_GENERATIONS_BUCKET: "<AWS Bucket Name>"
-AWS_IMDS_V1: true  # Only if using IMDS v1
 ```
 </details>
 
@@ -396,7 +411,10 @@ For AWS Bedrock integration, configure Assumed Role Access.
 
 ### Quick Setup
 
-**Required IAM Policy:**
+**Required IAM Policy (least-privilege):**
+
+Scope `Resource` to the specific foundation models / inference profiles you actually invoke. Avoid `"Resource": "*"` in production.
+
 ```json
 {
   "Version": "2012-10-17",
@@ -407,11 +425,16 @@ For AWS Bedrock integration, configure Assumed Role Access.
         "bedrock:InvokeModel",
         "bedrock:InvokeModelWithResponseStream"
       ],
-      "Resource": "*"
+      "Resource": [
+        "arn:aws:bedrock:<REGION>::foundation-model/anthropic.claude-3-7-sonnet-*",
+        "arn:aws:bedrock:<REGION>:<ACCOUNT_ID>:inference-profile/*"
+      ]
     }
   ]
 }
 ```
+
+> `"Resource": "*"` is only acceptable for short-lived exploration; for production always list the specific model ARNs.
 
 ### Configuration Options
 

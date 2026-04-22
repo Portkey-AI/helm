@@ -10,7 +10,7 @@ Alternatively you can use an access token and secret key id, but using assumed r
 
 ## Step 1: Create Bedrock IAM Policy
 
-Create an IAM policy with the necessary Bedrock permissions:
+Create an IAM policy with the necessary Bedrock permissions. Scope `Resource` to the specific foundation models / inference profiles you actually invoke — avoid `"Resource": "*"` in production:
 
 ```json
 {
@@ -22,13 +22,16 @@ Create an IAM policy with the necessary Bedrock permissions:
         "bedrock:InvokeModel",
         "bedrock:InvokeModelWithResponseStream"
       ],
-      "Resource": "*"
+      "Resource": [
+        "arn:aws:bedrock:<REGION>::foundation-model/anthropic.claude-3-7-sonnet-*",
+        "arn:aws:bedrock:<REGION>:<ACCOUNT_ID>:inference-profile/*"
+      ]
     }
   ]
 }
 ```
 
-**Note:** You can make the `Resource` field more granular by specifying specific model ARNs instead of using `"*"`.
+> **Least-privilege note:** `"Resource": "*"` is only acceptable for short-lived exploration. For production, list the specific foundation-model ARNs you invoke. Overly broad Bedrock permissions combined with a pod compromise could be used to exfiltrate data through any model in the account.
 
 ## Step 2: Role Configuration Options
 
@@ -77,13 +80,20 @@ environment:
     AWS_ASSUME_ROLE_REGION: <your-region>
 ```
 
-### Method 2: IRSA (IAM Roles for Service Accounts) for EKS
+### Method 2: IRSA (IAM Roles for Service Accounts) for EKS — Recommended
 - Use the role attached to your EKS service account as the principal role
 - No additional environment variables needed for authentication
+- Eliminates SSRF-to-IMDS credential theft on EKS worker nodes
 
 ### Method 3: IMDS (Instance Metadata Service) for EC2
 - Use the role attached to your EC2 instance as the principal role
 - No additional environment variables needed for authentication
+
+> ⚠️ **Security notice**
+> - Use IRSA (Method 2) on EKS instead of IMDS whenever possible.
+> - If you must use IMDS, the node **must** enforce IMDSv2 (`HttpTokens=required`, `HttpPutResponseHopLimit=1`) to prevent SSRF from a pod reaching the metadata endpoint and stealing node credentials.
+> - Do **not** set `AWS_IMDS_V1=true`. IMDSv1 fallback is deprecated and is a direct SSRF amplifier.
+> - Also enable the chart's `networkPolicy` to block pod egress to `169.254.169.254`.
 
 ## Step 4: Virtual Key Creation
 
