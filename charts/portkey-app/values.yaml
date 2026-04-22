@@ -15,6 +15,40 @@ commonLabels: {}
 # -- Common environment variables that will be applied to all deployments/statefulsets created by the chart. Be careful not to override values already specified by the chart.
 commonEnv: []
 
+# -- NetworkPolicy to mitigate SSRF -> AWS IMDS credential theft.
+# When enabled, blocks egress to 169.254.169.254 from all pods deployed by this chart.
+# Requires a NetworkPolicy-enforcing CNI (Calico, Cilium, etc.).
+networkPolicy:
+  enabled: false
+  # Also block the full link-local range 169.254.0.0/16.
+  blockLinkLocal: false
+  # Additional CIDRs to deny from pod egress (e.g., internal metadata services).
+  additionalBlockedCidrs: []
+  # - 169.254.170.2/32  # ECS task metadata endpoint
+
+# -- Recommended hardened pod/container security context defaults.
+# These are not applied by default; copy into individual component
+# `deployment.podSecurityContext` / `deployment.securityContext` blocks
+# (backend, gateway, dataservice, frontend, etc.) to enable.
+#
+# podSecurityContext:
+#   runAsNonRoot: true
+#   runAsUser: 1000
+#   fsGroup: 2000
+#   seccompProfile:
+#     type: RuntimeDefault
+#
+# securityContext:
+#   allowPrivilegeEscalation: false
+#   readOnlyRootFilesystem: true
+#   runAsNonRoot: true
+#   runAsUser: 1000
+#   capabilities:
+#     drop:
+#       - ALL
+#   seccompProfile:
+#     type: RuntimeDefault
+
 imageCredentials:
   - name: portkeyenterpriseregistrycredentials
     create: true

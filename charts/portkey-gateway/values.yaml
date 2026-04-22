@@ -165,15 +165,37 @@ podAnnotations: {}
 podLabels: {}
 
 podSecurityContext: {}
+  # Recommended hardened defaults (uncomment and adapt):
+  # runAsNonRoot: true
+  # runAsUser: 1000
   # fsGroup: 2000
+  # seccompProfile:
+  #   type: RuntimeDefault
 
 securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
+  # Recommended hardened defaults (uncomment and adapt):
+  # allowPrivilegeEscalation: false
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
+  # capabilities:
+  #   drop:
+  #     - ALL
+  # seccompProfile:
+  #   type: RuntimeDefault
+
+# NetworkPolicy to mitigate SSRF -> AWS IMDS credential theft.
+# Blocks pod egress to 169.254.169.254 (EC2 Instance Metadata Service).
+# Requires a NetworkPolicy-enforcing CNI (Calico, Cilium, etc.).
+networkPolicy:
+  # Set to true to install egress NetworkPolicies for gateway and dataservice.
+  enabled: false
+  # Also block the full link-local range 169.254.0.0/16.
+  blockLinkLocal: false
+  # Additional CIDRs to deny from pod egress (e.g., internal metadata services).
+  additionalBlockedCidrs: []
+  # - 169.254.170.2/32  # ECS task metadata endpoint
+  # - fd00:ec2::254/128 # IMDS IPv6
 
 service:
   type: NodePort

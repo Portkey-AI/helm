@@ -1,0 +1,37 @@
+{{- /*
+Egress NetworkPolicy to mitigate SSRF -> AWS IMDS credential theft (F-17).
+
+When enabled, this policy blocks egress to the link-local IMDS address
+(169.254.169.254) from every pod deployed by this chart (matched via the
+chart-wide selectorLabels).
+
+Requires a NetworkPolicy-enforcing CNI (Calico, Cilium, AWS VPC CNI with
+NetworkPolicy support, etc.). Policies that only declare Egress are
+additive — they do not deny unrelated traffic.
+*/ -}}
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "portkey.fullname" . }}-block-imds
+  labels:
+    {{- include "portkey.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "portkey.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 169.254.169.254/32
+              {{- if .Values.networkPolicy.blockLinkLocal }}
+              - 169.254.0.0/16
+              {{- end }}
+              {{- with .Values.networkPolicy.additionalBlockedCidrs }}
+              {{- toYaml . | nindent 14 }}
+              {{- end }}
+{{- end }}
