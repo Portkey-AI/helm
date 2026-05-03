@@ -211,6 +211,16 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.clickhouse.statefulSet.dnsPolicy }}
+      {{- if and (eq .Values.clickhouse.statefulSet.dnsPolicy "None") (empty .Values.clickhouse.statefulSet.dnsConfig.nameservers) }}
+        {{- fail "clickhouse: dnsPolicy \"None\" requires at least one entry in clickhouse.statefulSet.dnsConfig.nameservers" }}
+      {{- end }}
+      dnsPolicy: {{ .Values.clickhouse.statefulSet.dnsPolicy }}
+      {{- end }}
+      {{- with .Values.clickhouse.statefulSet.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         {{- if .Values.clickhouse.external.existingSecretName }}
         - name: clickhouse-users-config

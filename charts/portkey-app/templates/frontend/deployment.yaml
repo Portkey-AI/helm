@@ -135,6 +135,16 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.frontend.deployment.dnsPolicy }}
+      {{- if and (eq .Values.frontend.deployment.dnsPolicy "None") (empty .Values.frontend.deployment.dnsConfig.nameservers) }}
+        {{- fail "frontend: dnsPolicy \"None\" requires at least one entry in frontend.deployment.dnsConfig.nameservers" }}
+      {{- end }}
+      dnsPolicy: {{ .Values.frontend.deployment.dnsPolicy }}
+      {{- end }}
+      {{- with .Values.frontend.deployment.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         {{- with .Values.frontend.deployment.volumes }}
           {{- toYaml . | nindent 8 }}

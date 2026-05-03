@@ -134,6 +134,16 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.gateway.deployment.dnsPolicy }}
+      {{- if and (eq .Values.gateway.deployment.dnsPolicy "None") (empty .Values.gateway.deployment.dnsConfig.nameservers) }}
+        {{- fail "gateway: dnsPolicy \"None\" requires at least one entry in gateway.deployment.dnsConfig.nameservers" }}
+      {{- end }}
+      dnsPolicy: {{ .Values.gateway.deployment.dnsPolicy }}
+      {{- end }}
+      {{- with .Values.gateway.deployment.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.gateway.deployment.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

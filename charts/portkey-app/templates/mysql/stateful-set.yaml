@@ -138,6 +138,16 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.mysql.statefulSet.dnsPolicy }}
+      {{- if and (eq .Values.mysql.statefulSet.dnsPolicy "None") (empty .Values.mysql.statefulSet.dnsConfig.nameservers) }}
+        {{- fail "mysql: dnsPolicy \"None\" requires at least one entry in mysql.statefulSet.dnsConfig.nameservers" }}
+      {{- end }}
+      dnsPolicy: {{ .Values.mysql.statefulSet.dnsPolicy }}
+      {{- end }}
+      {{- with .Values.mysql.statefulSet.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.mysql.statefulSet.volumes }}
       volumes:
           {{- toYaml . | nindent 8 }}
