@@ -156,6 +156,16 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.backend.deployment.dnsPolicy }}
+      {{- if and (eq .Values.backend.deployment.dnsPolicy "None") (empty .Values.backend.deployment.dnsConfig.nameservers) }}
+        {{- fail "backend: dnsPolicy \"None\" requires at least one entry in backend.deployment.dnsConfig.nameservers" }}
+      {{- end }}
+      dnsPolicy: {{ .Values.backend.deployment.dnsPolicy }}
+      {{- end }}
+      {{- with .Values.backend.deployment.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.backend.deployment.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
