@@ -257,16 +257,27 @@ autoscaling:
   maxReplicas: 20
   targetCPUUtilizationPercentage: 60
   targetMemoryUtilizationPercentage: 60
+  # customMetrics: []
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 0
+      # selectPolicy: Max
       podScaleUpValue: 2
       percentScaleUpValue: 100
       periodSeconds: 2
+      # policies:
+      # - type: Pods
+      #   value: 2
+      #   periodSeconds: 2
     scaleDown:
       stabilizationWindowSeconds: 300
+      # selectPolicy: Min
       podScaleDownValue: 1
       periodSeconds: 60
+      # policies:
+      # - type: Pods
+      #   value: 1
+      #   periodSeconds: 60
 
 # Additional volumes on the output Deployment definition.
 volumes: []
