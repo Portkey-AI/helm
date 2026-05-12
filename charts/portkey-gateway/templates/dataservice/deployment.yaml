@@ -29,6 +29,7 @@ spec:
       {{- if .Values.dataservice.deployment.autoRestart }}
         rollme: {{ randAlphaNum 5 | quote }}
       {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/gateway/config.yaml") . | sha256sum }}
       {{- if .Values.useVaultInjection }}
         {{- include "portkeyenterprise.vaultAnnotations" . | nindent 8 }}
       {{- end }}
