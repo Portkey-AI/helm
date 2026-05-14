@@ -9,8 +9,8 @@ minio:
   name: "minio"
   authKey:
     create: true
-    accessKey: "portkey"
-    secretKey: "portkey123"
+    accessKey: "<minio-access-key>"
+    secretKey: "<minio-secret-key>"
   persistence:
     enabled: true
     size: 10Gi
