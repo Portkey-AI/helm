@@ -35,7 +35,7 @@ environment:
     VECTOR_STORE: "milvus"
     VECTOR_STORE_ADDRESS: "http://milvus:19530"
     VECTOR_STORE_COLLECTION_NAME: "textEmbedding3Small"
-    VECTOR_STORE_API_KEY: "<root>:Milvus"
+    VECTOR_STORE_API_KEY: "<milvus-username>:<milvus-password>"
     SEMANTIC_CACHE_EMBEDDINGS_URL: "<embeddings endpoint>"
     SEMANTIC_CACHE_EMBEDDING_MODEL: "<embeddings model>"
     SEMANTIC_CACHE_EMBEDDING_API_KEY: "<embeddings api key>"
@@ -65,8 +65,8 @@ You can use a client like [Attu](https://github.com/zilliztech/attu) to connect 
 | Field | Value |
 |-------|-------|
 | Host | `localhost:19530` |
-| Username | `root` |
-| Password | `Milvus` |
+| Username | `<milvus-username>` |
+| Password | `<milvus-password>` |
 
 ## Create Collection
 
@@ -74,7 +74,7 @@ Create the required collection for semantic caching. The example below creates a
 
 ```sh
 curl --location --request POST 'http://localhost:19530/v2/vectordb/collections/create' \
---header 'Authorization: Bearer root:Milvus' \
+--header 'Authorization: Bearer <milvus-username>:<milvus-password>' \
 --header 'Content-Type: application/json' \
 --data '{
   "collectionName": "textEmbedding3Small",
@@ -124,7 +124,7 @@ Confirm the collection was created successfully:
 
 ```sh
 curl --location --request POST 'http://localhost:19530/v2/vectordb/collections/describe' \
---header 'Authorization: Bearer root:Milvus' \
+--header 'Authorization: Bearer <milvus-username>:<milvus-password>' \
 --header 'Content-Type: application/json' \
 --data '{
     "collectionName": "textEmbedding3Small"

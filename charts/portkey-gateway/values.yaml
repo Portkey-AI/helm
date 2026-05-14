@@ -478,8 +478,8 @@ minio:
   authKey:
     create: true
     existingSecret: ""
-    accessKey: "minioadmin"
-    secretKey: "minioadmin123"
+    accessKey: "<minio-access-key>"
+    secretKey: "<minio-secret-key>"
   statefulSet:
     labels: {}
     annotations: {}
