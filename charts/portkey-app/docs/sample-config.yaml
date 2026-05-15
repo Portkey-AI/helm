@@ -7,7 +7,7 @@ imageCredentials:
 imagePullSecrets: [portkeyenterpriseregistrycredentials]
 
 config:
-  jwtPrivateKey: "some_random_string"
+  jwtPrivateKey: "<some-random-string>"
   noAuth:
     enabled: true
 
@@ -23,10 +23,10 @@ logStorage:
 mysql:
   external:
     enabled: false
-    user: "portkey"
-    password: "portkey@123"
+    user: "<mysql-username>"
+    password: "<mysql-password>"
     database: "portkey"
-    rootPassword: "portkey@123"
+    rootPassword: "<mysql-root-password>"
 
 redis:
   external:
@@ -38,5 +38,5 @@ redis:
 clickhouse:
   external:
     enabled: false
-    user: "default"
-    password: "portkey@123"
+    user: "<clickhouse-username>"
+    password: "<clickhouse-password>"

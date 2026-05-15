@@ -49,7 +49,7 @@ config:
 
 ```yaml
 config:
-  jwtPrivateKey: "secret123"
+  jwtPrivateKey: "<some-random-string"
   controlPlaneURL: "https://frontend.example.com"
   noAuth:
     enabled: false
@@ -59,7 +59,7 @@ config:
     oauthIssuerUrl: "https://idp.example.com/saml/metadata"
     # In your Idp setup
     # SAML Assertion Consumer Service (ACS) URL:
-    #   https://frontend.example.com/albus/v2/auth/saml/callback/bf0afde9-b14c-4da6-a716-76b215b76812
+    #   https://frontend.example.com/albus/v2/auth/saml/callback/<uuid>
     # SAML Audience URI (SP Entity ID):
     #   https://frontend.example.com/albus/v2/auth/saml
 ```
@@ -97,7 +97,7 @@ config:
 
 ```yaml
 config:
-  jwtPrivateKey: "secret123"
+  jwtPrivateKey: "<some-random-string>"
   controlPlaneURL: "https://frontend.example.com"
   noAuth:
     enabled: false
@@ -105,8 +105,8 @@ config:
     enabled: true
     oauthType: oidc
     oauthIssuerUrl: "https://accounts.example-oidc.com"
-    oauthClientId: "my-client-id"
-    oauthClientSecret: "my-client-secret"
+    oauthClientId: "<oidc-client-id>"
+    oauthClientSecret: "<oidc-client-secret>"
     oauthRedirectURI: "https://frontend.example.com/v2/auth/callback"
     # Register this redirect URI in your OIDC client:
     #   https://frontend.example.com/v2/auth/callback

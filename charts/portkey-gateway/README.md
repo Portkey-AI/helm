@@ -149,7 +149,9 @@ IAM Policy for S3 Access:
     {
       "Effect": "Allow",
       "Action": ["s3:GetObject", "s3:PutObject"],
-      "Resource": ["arn:aws:s3:::<LOG_STORE_GENERATIONS_BUCKET>", "arn:aws:s3:::<LOG_STORE_GENERATIONS_BUCKET>/*"]
+      "Resource": [
+        "arn:aws:s3:::<LOG_STORE_GENERATIONS_BUCKET>", "arn:aws:s3:::<LOG_STORE_GENERATIONS_BUCKET>/*"
+      ]
     }
   ]
 }
@@ -407,7 +409,10 @@ For AWS Bedrock integration, configure Assumed Role Access.
         "bedrock:InvokeModel",
         "bedrock:InvokeModelWithResponseStream"
       ],
-      "Resource": "*"
+      "Resource": [
+        "arn:aws:bedrock:<region>::foundation-model/<model-id>",
+        "arn:aws:bedrock:<region>:<account-id>:provisioned-model/<model-id>"
+      ]
     }
   ]
 }
