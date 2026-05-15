@@ -28,7 +28,7 @@ Ensure you replace `your_username` and `your_password` with your actual Docker r
 ```yaml
 config:
   logStore: "s3"
-  jwtPrivateKey: "some-string-here"
+  jwtPrivateKey: "<some-random-string>"
   noAuth:
     enabled: true
 ```
@@ -84,8 +84,8 @@ No additional configuration needed for redis.
 clickhouse:
   external:
     enabled: false
-    user: "default"
-    password: "password"
+    user: "<clickhouse-username>"
+    password: "<clickhouse-password>"
 ```
 The credentials passed here will be used for the internal clickhouse instance.
 

@@ -35,7 +35,7 @@ clickhouse:
     host: "<new-clickhouse-host>"
     port: "8123"
     nativePort: "9000"
-    user: "default"
+    user: "<new-ch-username>"
     password: "<new-ch-password>"
     database: "default"
     replicationEnabled: true
@@ -44,7 +44,7 @@ clickhouse:
   migration:
     enabled: true
     oldCredentials:
-      user: "default"
+      user: "<old-ch-username>"
       password: "<old-ch-password>"
       database: "default"
 ```

@@ -89,7 +89,7 @@ clickhouse:
     host: "<clickhouse-service-name>.<namespace>.svc.cluster.local"
     port: "8123"
     nativePort: "9000"
-    user: "default"
+    user: "<your-clickhouse-username>"
     password: "<your-clickhouse-password>"
     database: "default"
     tls: false
@@ -127,7 +127,7 @@ metadata:
 type: Opaque
 stringData:
   store: "clickhouse"
-  clickhouse_user: "default"
+  clickhouse_user: "<username>"
   clickhouse_password: "<password>"
   clickhouse_host: "<host>"
   clickhouse_port: "8123"
