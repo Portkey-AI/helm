@@ -22,7 +22,10 @@ Create an IAM policy with the necessary Bedrock permissions:
         "bedrock:InvokeModel",
         "bedrock:InvokeModelWithResponseStream"
       ],
-      "Resource": "*"
+      "Resource": [
+        "arn:aws:bedrock:<region>::foundation-model/<model-id>",
+        "arn:aws:bedrock:<region>:<account-id>:provisioned-model/<model-id>"
+      ]
     }
   ]
 }

@@ -82,7 +82,7 @@ config:
   existingSecretName: ""
   defaultGatewayURL: ""
   defaultGatewayClientAuth: ""
-  jwtPrivateKey: "abcd"
+  jwtPrivateKey: "<some-random-string>"
   controlPlaneURL: ""
   containerProtocol: "http"
   disableOrgCreation: false

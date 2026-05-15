@@ -25,7 +25,7 @@ images:
     tag: "1.16.2" # get latest version from https://portkey.ai/docs/changelog/enterprise 
 
 config:
-  jwtPrivateKey: "<some_random_string>" # Set to a random string for the jwt private key used for signing the frontend jwt tokens
+  jwtPrivateKey: "<some-random-string>" # Set to a strong secret for the JWT private key used for signing the frontend JWT tokens
   disableOrgCreation: false # Set to true to disable organization creation post installation and first time login
   disableTestimonial: true # Set to true to disable testimonial section in the frontend
   noAuth:
@@ -99,7 +99,7 @@ frontend:
 mysql:
   external:
     enabled: false
-    user: "portkey"
+    user: "<mysql-username>"
     password: "<mysql-password>"
     database: "<mysql-database>"
     rootPassword: "<mysql-root-password>" # Set the same password as the password for the user
@@ -120,7 +120,7 @@ redis:
 clickhouse:
   external:
     enabled: false
-    user: "<clickhouse-user>"
+    user: "<clickhouse-username>"
     password: "<clickhouse-password>"
     database: "default" # has to be default for the clickhouse instance
     containerNativePort: 9000
