@@ -156,6 +156,18 @@ the user or some other secret provisioning mechanism
 {{- include "portkey.fullname" . }}-{{ .Values.gateway.name }}
 {{- end }}
 
+{{/*
+Name of the secret containing the log storage credentials. Falls back to the
+gateway secret when no existing secret is provided.
+*/}}
+{{- define "portkey.logStoreSecretsName" -}}
+{{- if .Values.logStorage.existingSecretName }}
+{{- .Values.logStorage.existingSecretName }}
+{{- else }}
+{{- include "portkey.gatewaySecretsName" . }}
+{{- end }}
+{{- end }}
+
 {{- define "portkey.gatewayClientAuth" -}}
 {{- .Values.config.defaultGatewayClientAuth | default "client_auth-PRIVATE_SEVICE" | quote }}
 {{- end }}
@@ -352,96 +364,96 @@ Template containing common environment variables that are used by several servic
 - name: LOG_STORE
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStore
 {{- if .Values.logStorage.mongo.enabled}}
 - name: MONGO_DB_CONNECTION_URL
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: mongoConnectionUrl
 - name: MONGO_DATABASE
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: mongoDatabase
 - name: MONGO_COLLECTION_NAME
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: mongoGenerationsCollection
 - name: MONGO_GENERATION_HOOKS_COLLECTION_NAME
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: mongoHooksCollection
 {{- end }}
 {{- if or .Values.logStorage.s3Compat.enabled }}
 - name: LOG_STORE_BASEPATH
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreBasePath
 {{- end }}      
 {{- if or .Values.logStorage.s3Compat.enabled .Values.logStorage.s3Assume.enabled }}
 - name: LOG_STORE_ACCESS_KEY
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreAccessKey
 - name: LOG_STORE_SECRET_KEY
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreSecretKey
 - name: LOG_STORE_REGION
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreRegion
 - name: LOG_STORE_GENERATIONS_BUCKET
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreGenerationsBucket
 {{- end }}
 {{- if .Values.logStorage.s3Assume.enabled }}
 - name: LOG_STORE_AWS_ROLE_ARN
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreAwsRoleArn
 - name: LOG_STORE_AWS_EXTERNAL_ID
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreExternalId
 {{- end }}
 {{- if .Values.logStorage.azure.enabled}}
 - name: AZURE_AUTH_MODE
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: azureAuthMode
 - name: AZURE_MANAGED_CLIENT_ID
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: azureManagedClientId
 - name: AZURE_STORAGE_ACCOUNT
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: azureStorageAccount
 - name: AZURE_STORAGE_KEY
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: azureStorageKey
 - name: AZURE_STORAGE_CONTAINER
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: azureStorageContainer
 {{- end }}
 {{- end }}

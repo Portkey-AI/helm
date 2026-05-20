@@ -118,6 +118,9 @@ config:
 # logStorage:
   # -- S3 specific configuration
 logStorage:
+  # -- Existing Kubernetes Secret to read log storage credentials from.
+  # See docs/secret-manager-integration.md for the required keys per backend.
+  existingSecretName: ""
   logStore: ""
   s3Compat:
     enabled: false

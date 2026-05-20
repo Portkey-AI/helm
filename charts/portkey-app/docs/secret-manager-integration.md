@@ -157,6 +157,23 @@ spec:
             objectAlias: smtpPassword
           - path: smtpFrom
             objectAlias: smtpFrom
+      # Example for S3-compatible log storage. Adjust keys for your backend
+      # (mongo / s3_assume / azure). See the table at the bottom of this section.
+      - objectName: "arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:myapp/portkey-log-storage"
+        objectType: "secretsmanager"
+        jmesPath:
+          - path: logStore
+            objectAlias: logStore
+          - path: logStoreAccessKey
+            objectAlias: logStoreAccessKey
+          - path: logStoreSecretKey
+            objectAlias: logStoreSecretKey
+          - path: logStoreRegion
+            objectAlias: logStoreRegion
+          - path: logStoreGenerationsBucket
+            objectAlias: logStoreGenerationsBucket
+          - path: logStoreBasePath
+            objectAlias: logStoreBasePath
   secretObjects:
     - secretName: portkey-mysql
       type: Opaque
@@ -230,6 +247,21 @@ spec:
           key: smtpPassword
         - objectName: smtpFrom
           key: smtpFrom
+    - secretName: portkey-log-storage
+      type: Opaque
+      data:
+        - objectName: logStore
+          key: logStore
+        - objectName: logStoreAccessKey
+          key: logStoreAccessKey
+        - objectName: logStoreSecretKey
+          key: logStoreSecretKey
+        - objectName: logStoreRegion
+          key: logStoreRegion
+        - objectName: logStoreGenerationsBucket
+          key: logStoreGenerationsBucket
+        - objectName: logStoreBasePath
+          key: logStoreBasePath
 ```
 
 Apply:
@@ -305,7 +337,28 @@ config:
     enabled: true
   smtp:
     enabled: true
+
+logStorage:
+  # Re-use an existing Kubernetes Secret instead of inlining credentials in values.
+  existingSecretName: "portkey-log-storage"
+  s3Compat:
+    enabled: true
 ```
+
+### Expected keys per log storage backend
+The Secret referenced by `logStorage.existingSecretName` must contain the keys
+for the backend you have enabled:
+
+| Backend     | Required keys                                                                                                                                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `s3Compat`  | `logStore`, `logStoreAccessKey`, `logStoreSecretKey`, `logStoreRegion`, `logStoreGenerationsBucket`, `logStoreBasePath`                                       |
+| `s3Assume`  | `logStore`, `logStoreAccessKey`, `logStoreSecretKey`, `logStoreRegion`, `logStoreGenerationsBucket`, `logStoreAwsRoleArn`, `logStoreExternalId`                |
+| `mongo`     | `logStore`, `mongoConnectionUrl`, `mongoDatabase`, `mongoGenerationsCollection`, `mongoHooksCollection`                                                       |
+| `azure`     | `logStore`, `azureAuthMode`, `azureManagedClientId`, `azureStorageAccount`, `azureStorageKey`, `azureStorageContainer`                                        |
+
+The `logStore` key encodes the backend type (e.g. `s3_compat`, `s3_assume`,
+`mongo`, `azure`). `bedrockAssumed.*` credentials are unaffected by this
+setting and continue to live in the chart-managed gateway Secret.
 
 ## Option B: Mount-only (read from files; no Kubernetes Secrets sync)
 Create a `SecretProviderClass` without `secretObjects` (files only):
