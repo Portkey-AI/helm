@@ -118,7 +118,7 @@ config:
 # logStorage:
   # -- S3 specific configuration
 logStorage:
-  # -- Existing Kubernetes Secret to read log storage credentials from.
+  # -- Existing Kubernetes Secret holding log storage credentials.
   # See docs/secret-manager-integration.md for the required keys per backend.
   existingSecretName: ""
   logStore: ""
@@ -163,6 +163,9 @@ logStorage:
 
 bedrockAssumed:
   enabled: false
+  # -- Existing Kubernetes Secret holding bedrockAssumed credentials.
+  # See docs/secret-manager-integration.md for required keys.
+  existingSecretName: ""
   AWS_ASSUME_ROLE_ACCESS_KEY_ID: ""
   AWS_ASSUME_ROLE_SECRET_ACCESS_KEY: ""
   AWS_ASSUME_ROLE_REGION: ""

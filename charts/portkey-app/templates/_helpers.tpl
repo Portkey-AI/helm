@@ -157,12 +157,25 @@ the user or some other secret provisioning mechanism
 {{- end }}
 
 {{/*
-Name of the secret containing the log storage credentials. Falls back to the
-gateway secret when no existing secret is provided.
+Name of the Secret holding log storage credentials.
+Overridable via logStorage.existingSecretName.
 */}}
 {{- define "portkey.logStoreSecretsName" -}}
 {{- if .Values.logStorage.existingSecretName }}
 {{- .Values.logStorage.existingSecretName }}
+{{- else }}
+{{- include "portkey.gatewaySecretsName" . }}
+{{- end }}
+{{- end }}
+
+{{/*
+Name of the Secret holding bedrockAssumed credentials.
+Overridable via bedrockAssumed.existingSecretName; otherwise the keys
+live in the chart-managed gateway Secret.
+*/}}
+{{- define "portkey.bedrockSecretsName" -}}
+{{- if .Values.bedrockAssumed.existingSecretName }}
+{{- .Values.bedrockAssumed.existingSecretName }}
 {{- else }}
 {{- include "portkey.gatewaySecretsName" . }}
 {{- end }}
@@ -466,17 +479,17 @@ Template containing common environment variables that are used by several servic
 - name: AWS_ASSUME_ROLE_ACCESS_KEY_ID
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.bedrockSecretsName" . }}
       key: bedrockAssumedAccessKey
 - name: AWS_ASSUME_ROLE_SECRET_ACCESS_KEY
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.bedrockSecretsName" . }}
       key: bedrockAssumedSecretKey
 - name: AWS_ASSUME_ROLE_REGION
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.bedrockSecretsName" . }}
       key: bedrockAssumedRegion
 {{- end }}
 - name: ALBUS_BASEPATH

@@ -174,6 +174,16 @@ spec:
             objectAlias: logStoreGenerationsBucket
           - path: logStoreBasePath
             objectAlias: logStoreBasePath
+      # Optional — only if bedrockAssumed.enabled = true.
+      - objectName: "arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:myapp/portkey-bedrock"
+        objectType: "secretsmanager"
+        jmesPath:
+          - path: bedrockAssumedAccessKey
+            objectAlias: bedrockAssumedAccessKey
+          - path: bedrockAssumedSecretKey
+            objectAlias: bedrockAssumedSecretKey
+          - path: bedrockAssumedRegion
+            objectAlias: bedrockAssumedRegion
   secretObjects:
     - secretName: portkey-mysql
       type: Opaque
@@ -262,6 +272,16 @@ spec:
           key: logStoreGenerationsBucket
         - objectName: logStoreBasePath
           key: logStoreBasePath
+    # Optional — only if bedrockAssumed.enabled = true.
+    - secretName: portkey-bedrock
+      type: Opaque
+      data:
+        - objectName: bedrockAssumedAccessKey
+          key: bedrockAssumedAccessKey
+        - objectName: bedrockAssumedSecretKey
+          key: bedrockAssumedSecretKey
+        - objectName: bedrockAssumedRegion
+          key: bedrockAssumedRegion
 ```
 
 Apply:
@@ -339,26 +359,31 @@ config:
     enabled: true
 
 logStorage:
-  # Re-use an existing Kubernetes Secret instead of inlining credentials in values.
+  # Re-use an existing Kubernetes Secret for log storage credentials.
   existingSecretName: "portkey-log-storage"
   s3Compat:
     enabled: true
+
+bedrockAssumed:
+  enabled: true
+  # Optional — re-use an existing Kubernetes Secret for bedrockAssumed.
+  existingSecretName: "portkey-bedrock"
 ```
 
-### Expected keys per log storage backend
-The Secret referenced by `logStorage.existingSecretName` must contain the keys
-for the backend you have enabled:
+### Expected keys per existing Secret
 
-| Backend     | Required keys                                                                                                                                                |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `s3Compat`  | `logStore`, `logStoreAccessKey`, `logStoreSecretKey`, `logStoreRegion`, `logStoreGenerationsBucket`, `logStoreBasePath`                                       |
-| `s3Assume`  | `logStore`, `logStoreAccessKey`, `logStoreSecretKey`, `logStoreRegion`, `logStoreGenerationsBucket`, `logStoreAwsRoleArn`, `logStoreExternalId`                |
-| `mongo`     | `logStore`, `mongoConnectionUrl`, `mongoDatabase`, `mongoGenerationsCollection`, `mongoHooksCollection`                                                       |
-| `azure`     | `logStore`, `azureAuthMode`, `azureManagedClientId`, `azureStorageAccount`, `azureStorageKey`, `azureStorageContainer`                                        |
+| Override                              | Secret must contain                                                                                                                            |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `logStorage.existingSecretName`       | The keys for whichever backend is enabled:                                                                                                     |
+| · `s3Compat.enabled: true`            | `logStore`, `logStoreAccessKey`, `logStoreSecretKey`, `logStoreRegion`, `logStoreGenerationsBucket`, `logStoreBasePath`                         |
+| · `s3Assume.enabled: true`            | `logStore`, `logStoreAccessKey`, `logStoreSecretKey`, `logStoreRegion`, `logStoreGenerationsBucket`, `logStoreAwsRoleArn`, `logStoreExternalId` |
+| · `mongo.enabled: true`               | `logStore`, `mongoConnectionUrl`, `mongoDatabase`, `mongoGenerationsCollection`, `mongoHooksCollection`                                         |
+| · `azure.enabled: true`               | `logStore`, `azureAuthMode`, `azureManagedClientId`, `azureStorageAccount`, `azureStorageKey`, `azureStorageContainer`                          |
+| `bedrockAssumed.existingSecretName`   | `bedrockAssumedAccessKey`, `bedrockAssumedSecretKey`, `bedrockAssumedRegion`                                                                   |
 
-The `logStore` key encodes the backend type (e.g. `s3_compat`, `s3_assume`,
-`mongo`, `azure`). `bedrockAssumed.*` credentials are unaffected by this
-setting and continue to live in the chart-managed gateway Secret.
+The `logStore` key value encodes the backend type — one of `s3_compat`,
+`s3_assume`, `mongo`, or `azure`. The two overrides are independent: you can
+use an existing Secret for one and let the chart manage the other.
 
 ## Option B: Mount-only (read from files; no Kubernetes Secrets sync)
 Create a `SecretProviderClass` without `secretObjects` (files only):
