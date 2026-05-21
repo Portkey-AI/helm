@@ -33,7 +33,7 @@ config:
   controlPlaneURL: "<frontend-lb-endpoint>" # Set to the control plane URL of the frontend lb  
 
 logStorage:
-  logStore: "s3Compat"
+  logStore: "s3_custom"
   s3Compat:
     enabled: true
     LOG_STORE_ACCESS_KEY: "<s3-access-key>"

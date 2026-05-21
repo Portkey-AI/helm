@@ -381,7 +381,7 @@ bedrockAssumed:
 | · `azure.enabled: true`               | `logStore`, `azureAuthMode`, `azureManagedClientId`, `azureStorageAccount`, `azureStorageKey`, `azureStorageContainer`                          |
 | `bedrockAssumed.existingSecretName`   | `bedrockAssumedAccessKey`, `bedrockAssumedSecretKey`, `bedrockAssumedRegion`                                                                   |
 
-The `logStore` key value encodes the backend type — one of `s3_compat`,
+The `logStore` key value encodes the backend type — one of `s3`, `s3_custom`,
 `s3_assume`, `mongo`, or `azure`. The two overrides are independent: you can
 use an existing Secret for one and let the chart manage the other.
 
