@@ -85,5 +85,6 @@ data:
       VITE_DISABLE_TESTIMONIAL: "{{- if .Values.config.disableTestimonial }}ON{{- else }}OFF{{- end }}",
       VITE_LOGIN_DISCLAIMER: {{- .Values.config.loginDisclaimer | quote }},
       VITE_CONFIGS_URL: "/albus/v2/utils/model-configs",
-      VITE_ONBOARDING_SUPPORT_MESSAGE: {{- .Values.config.onboardingSupportMessage | quote }}
+      VITE_ONBOARDING_SUPPORT_MESSAGE: {{- .Values.config.onboardingSupportMessage | quote }},
+      VITE_PRESELECT_LOGIN_PERMISSION: "ON"
     };
