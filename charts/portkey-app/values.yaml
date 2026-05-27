@@ -32,19 +32,19 @@ images:
   backendImage:
     repository: "docker.io/portkeyai/backend"
     pullPolicy: Always
-    tag: "1.15.0"
+    tag: "1.17.0"
   frontendImage:
     repository: "docker.io/portkeyai/frontend"
     pullPolicy: Always
-    tag: "1.8.2"
+    tag: "1.9.2"
   dataserviceImage:
     repository: "docker.io/portkeyai/data-service"
     pullPolicy: Always
-    tag: "1.7.0"
+    tag: "1.8.0"
   gatewayImage:
     repository: "docker.io/portkeyai/gateway_enterprise"
     pullPolicy: Always
-    tag: "2.7.1"
+    tag: "2.9.0"
   mysqlImage:
     repository: "docker.io/mysql"
     pullPolicy: IfNotPresent
