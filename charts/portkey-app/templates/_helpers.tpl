@@ -90,10 +90,35 @@ HTTP/HTTPS protocol
 {{- end }}
 
 {{/*
+Validate that the JWT private key is set when the chart manages the secret.
+Skipped when an existing secret is supplied via config.existingSecretName.
+*/}}
+{{- define "portkey.validateJwtPrivateKey" -}}
+{{- if not .Values.config.existingSecretName }}
+{{- if not .Values.config.jwtPrivateKey }}
+{{- fail "config.jwtPrivateKey must not be empty. Set a strong secret used for signing the frontend JWT tokens, or provide it via config.existingSecretName." }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Validate that an authentication mode is explicitly selected.
+Either config.oauth.enabled must be true, or config.noAuth.enabled must be
+explicitly opted into. Running with neither leaves the app without an auth mode.
+*/}}
+{{- define "portkey.validateAuthMode" -}}
+{{- if and (not .Values.config.oauth.enabled) (not .Values.config.noAuth.enabled) }}
+{{- fail "No authentication mode selected. Set config.oauth.enabled=true to use SSO, or explicitly opt into config.noAuth.enabled=true to run without authentication." }}
+{{- end }}
+{{- end }}
+
+{{/*
 Name of the secret containing the secrets for this chart. This can be overridden by a secrets file created by
 the user or some other secret provisioning mechanism
 */}}
 {{- define "portkey.secretsName" -}}
+{{- include "portkey.validateJwtPrivateKey" . -}}
+{{- include "portkey.validateAuthMode" . -}}
 {{- if .Values.config.existingSecretName }}
 {{- .Values.config.existingSecretName }}
 {{- else }}
@@ -154,6 +179,31 @@ the user or some other secret provisioning mechanism
 */}}
 {{- define "portkey.gatewaySecretsName" -}}
 {{- include "portkey.fullname" . }}-{{ .Values.gateway.name }}
+{{- end }}
+
+{{/*
+Name of the Secret holding log storage credentials.
+Overridable via logStorage.existingSecretName.
+*/}}
+{{- define "portkey.logStoreSecretsName" -}}
+{{- if .Values.logStorage.existingSecretName }}
+{{- .Values.logStorage.existingSecretName }}
+{{- else }}
+{{- include "portkey.gatewaySecretsName" . }}
+{{- end }}
+{{- end }}
+
+{{/*
+Name of the Secret holding bedrockAssumed credentials.
+Overridable via bedrockAssumed.existingSecretName; otherwise the keys
+live in the chart-managed gateway Secret.
+*/}}
+{{- define "portkey.bedrockSecretsName" -}}
+{{- if .Values.bedrockAssumed.existingSecretName }}
+{{- .Values.bedrockAssumed.existingSecretName }}
+{{- else }}
+{{- include "portkey.gatewaySecretsName" . }}
+{{- end }}
 {{- end }}
 
 {{- define "portkey.gatewayClientAuth" -}}
@@ -352,96 +402,96 @@ Template containing common environment variables that are used by several servic
 - name: LOG_STORE
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStore
 {{- if .Values.logStorage.mongo.enabled}}
 - name: MONGO_DB_CONNECTION_URL
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: mongoConnectionUrl
 - name: MONGO_DATABASE
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: mongoDatabase
 - name: MONGO_COLLECTION_NAME
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: mongoGenerationsCollection
 - name: MONGO_GENERATION_HOOKS_COLLECTION_NAME
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: mongoHooksCollection
 {{- end }}
 {{- if or .Values.logStorage.s3Compat.enabled }}
 - name: LOG_STORE_BASEPATH
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreBasePath
 {{- end }}      
 {{- if or .Values.logStorage.s3Compat.enabled .Values.logStorage.s3Assume.enabled }}
 - name: LOG_STORE_ACCESS_KEY
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreAccessKey
 - name: LOG_STORE_SECRET_KEY
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreSecretKey
 - name: LOG_STORE_REGION
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreRegion
 - name: LOG_STORE_GENERATIONS_BUCKET
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreGenerationsBucket
 {{- end }}
 {{- if .Values.logStorage.s3Assume.enabled }}
 - name: LOG_STORE_AWS_ROLE_ARN
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreAwsRoleArn
 - name: LOG_STORE_AWS_EXTERNAL_ID
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreExternalId
 {{- end }}
 {{- if .Values.logStorage.azure.enabled}}
 - name: AZURE_AUTH_MODE
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: azureAuthMode
 - name: AZURE_MANAGED_CLIENT_ID
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: azureManagedClientId
 - name: AZURE_STORAGE_ACCOUNT
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: azureStorageAccount
 - name: AZURE_STORAGE_KEY
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: azureStorageKey
 - name: AZURE_STORAGE_CONTAINER
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.logStoreSecretsName" . }}
       key: azureStorageContainer
 {{- end }}
 {{- end }}
@@ -454,17 +504,17 @@ Template containing common environment variables that are used by several servic
 - name: AWS_ASSUME_ROLE_ACCESS_KEY_ID
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.bedrockSecretsName" . }}
       key: bedrockAssumedAccessKey
 - name: AWS_ASSUME_ROLE_SECRET_ACCESS_KEY
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.bedrockSecretsName" . }}
       key: bedrockAssumedSecretKey
 - name: AWS_ASSUME_ROLE_REGION
   valueFrom:
     secretKeyRef:
-      name: {{ include "portkey.gatewaySecretsName" . }}
+      name: {{ include "portkey.bedrockSecretsName" . }}
       key: bedrockAssumedRegion
 {{- end }}
 - name: ALBUS_BASEPATH
@@ -609,6 +659,7 @@ Template containing common environment variables that are used by several servic
 - name: ENABLE_GRAFANA
   value: {{ if .Values.apm.grafana.enabled }} "true" {{ else }} "false" {{ end }}
 - name: ENABLE_PROMETHEUS
+
   value: {{ if .Values.apm.grafana.prometheus.enabled }} "true" {{ else }} "false" {{ end }}
 {{- if .Values.apm.grafana.prometheus.enabled }}
 - name: PROMETHEUS_GATEWAY_URL

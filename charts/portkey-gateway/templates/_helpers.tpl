@@ -519,9 +519,26 @@ app.kubernetes.io/component: minio
 {{- end }}
 
 {{/*
+Validate that MinIO credentials are set when the chart manages the auth key secret.
+Only enforced when MinIO is enabled and authKey.create is true. Skipped when an
+existing secret is supplied via minio.authKey.existingSecret.
+*/}}
+{{- define "minio.validateAuthKey" -}}
+{{- if and .Values.minio.enabled .Values.minio.authKey.create (not .Values.minio.authKey.existingSecret) }}
+{{- if not .Values.minio.authKey.accessKey }}
+{{- fail "minio.authKey.accessKey must not be empty when minio.enabled and minio.authKey.create are true. Set it, or provide credentials via minio.authKey.existingSecret." }}
+{{- end }}
+{{- if not .Values.minio.authKey.secretKey }}
+{{- fail "minio.authKey.secretKey must not be empty when minio.enabled and minio.authKey.create are true. Set it, or provide credentials via minio.authKey.existingSecret." }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
 MinIO auth key secret name
 */}}
 {{- define "minio.secretName" -}}
+{{- include "minio.validateAuthKey" . -}}
 {{- if .Values.minio.authKey.existingSecret -}}
 {{- .Values.minio.authKey.existingSecret -}}
 {{- else -}}
