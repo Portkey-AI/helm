@@ -82,7 +82,7 @@ config:
   existingSecretName: ""
   defaultGatewayURL: ""
   defaultGatewayClientAuth: ""
-  jwtPrivateKey: "<some-random-string>"
+  jwtPrivateKey: ""                              # Set to a strong secret for the JWT private key used for signing the frontend JWT tokens
   controlPlaneURL: ""
   containerProtocol: "http"
   disableOrgCreation: false
@@ -92,7 +92,7 @@ config:
   onboardingSupportMessage: ""
   
   noAuth:
-    enabled: true
+    enabled: false
 
   oauth:
     enabled: false

@@ -90,10 +90,39 @@ HTTP/HTTPS protocol
 {{- end }}
 
 {{/*
+Validate that the JWT private key is set when the chart manages the secret.
+Skipped when an existing secret is supplied via config.existingSecretName.
+*/}}
+{{- define "portkey.validateJwtPrivateKey" -}}
+{{- if not .Values.config.existingSecretName }}
+{{- if not .Values.config.jwtPrivateKey }}
+{{- fail "config.jwtPrivateKey must not be empty. Set a strong secret used for signing the frontend JWT tokens, or provide it via config.existingSecretName." }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Validate that exactly one authentication mode is selected.
+Either config.oauth.enabled (SSO) or config.noAuth.enabled must be true, but not both.
+Enabling neither leaves the app without an auth mode; enabling both produces an
+invalid/ambiguous configuration (e.g. AUTH_MODE concatenates to "SSONO_AUTH").
+*/}}
+{{- define "portkey.validateAuthMode" -}}
+{{- if and .Values.config.oauth.enabled .Values.config.noAuth.enabled }}
+{{- fail "Both config.oauth.enabled and config.noAuth.enabled are true. Exactly one authentication mode must be selected: set config.oauth.enabled=true for SSO, or config.noAuth.enabled=true to run without authentication." }}
+{{- end }}
+{{- if and (not .Values.config.oauth.enabled) (not .Values.config.noAuth.enabled) }}
+{{- fail "No authentication mode selected. Set config.oauth.enabled=true to use SSO, or explicitly opt into config.noAuth.enabled=true to run without authentication." }}
+{{- end }}
+{{- end }}
+
+{{/*
 Name of the secret containing the secrets for this chart. This can be overridden by a secrets file created by
 the user or some other secret provisioning mechanism
 */}}
 {{- define "portkey.secretsName" -}}
+{{- include "portkey.validateJwtPrivateKey" . -}}
+{{- include "portkey.validateAuthMode" . -}}
 {{- if .Values.config.existingSecretName }}
 {{- .Values.config.existingSecretName }}
 {{- else }}

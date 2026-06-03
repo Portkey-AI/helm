@@ -7,7 +7,7 @@ imageCredentials:
 imagePullSecrets: [portkeyenterpriseregistrycredentials]
 
 config:
-  jwtPrivateKey: "<some-random-string>"
+  jwtPrivateKey: ""   # Required: set a strong secret for signing frontend JWT tokens, or provide it via config.existingSecretName
   noAuth:
     enabled: true
 
