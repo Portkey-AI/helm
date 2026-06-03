@@ -519,9 +519,34 @@ app.kubernetes.io/component: minio
 {{- end }}
 
 {{/*
+Validate MinIO auth key configuration.
+- Fails fast if both minio.authKey.create and minio.authKey.existingSecret are set,
+  since the chart can either create the Secret or consume an existing one, not both.
+- Validates accessKey/secretKey only when the chart is actually creating the Secret
+  (create=true and no existingSecret).
+Only enforced when MinIO is enabled.
+*/}}
+{{- define "minio.validateAuthKey" -}}
+{{- if .Values.minio.enabled }}
+{{- if and .Values.minio.authKey.create .Values.minio.authKey.existingSecret }}
+{{- fail "minio.authKey.create and minio.authKey.existingSecret are mutually exclusive. Set create=true to have the chart create the Secret, or provide existingSecret (with create=false) to use your own." }}
+{{- end }}
+{{- if .Values.minio.authKey.create }}
+{{- if not .Values.minio.authKey.accessKey }}
+{{- fail "minio.authKey.accessKey must not be empty when minio.authKey.create is true. Set it, or provide credentials via minio.authKey.existingSecret (with create=false)." }}
+{{- end }}
+{{- if not .Values.minio.authKey.secretKey }}
+{{- fail "minio.authKey.secretKey must not be empty when minio.authKey.create is true. Set it, or provide credentials via minio.authKey.existingSecret (with create=false)." }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
 MinIO auth key secret name
 */}}
 {{- define "minio.secretName" -}}
+{{- include "minio.validateAuthKey" . -}}
 {{- if .Values.minio.authKey.existingSecret -}}
 {{- .Values.minio.authKey.existingSecret -}}
 {{- else -}}
