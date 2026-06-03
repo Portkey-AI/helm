@@ -539,7 +539,7 @@ frontend:
         periodSeconds: 60
 
   service:
-    type: ClusterIP
+    type: LoadBalancer
     httpPort: 80
     httpsPort: 443
     labels: {}
