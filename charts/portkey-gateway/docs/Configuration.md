@@ -412,10 +412,12 @@ environment:
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `minio.authKey.create` | boolean | `true` | Create MinIO credentials secret |
-| `minio.authKey.existingSecret` | string | `""` | Use existing secret for MinIO credentials |
-| `minio.authKey.accessKey` | string | `"minioadmin"` | MinIO root username / access key |
-| `minio.authKey.secretKey` | string | `"minioadmin123"` | MinIO root password / secret key |
+| `minio.authKey.create` | boolean | `true` | Create MinIO credentials secret. Mutually exclusive with `existingSecret` |
+| `minio.authKey.existingSecret` | string | `""` | Use an existing secret for MinIO credentials instead of creating one |
+| `minio.authKey.accessKey` | string | `""` | MinIO root username / access key. **Required** when `create: true` (no default) |
+| `minio.authKey.secretKey` | string | `""` | MinIO root password / secret key. **Required** when `create: true` (no default) |
+
+> **Note:** When MinIO is enabled with `authKey.create: true`, both `accessKey` and `secretKey` must be set explicitly — the chart no longer ships default credentials and rendering will fail fast if either is empty. Alternatively, set `authKey.existingSecret` (with `create: false`) to supply credentials from a pre-existing Secret. Setting both `create: true` and `existingSecret` is rejected.
 
 #### MinIO StatefulSet
 
