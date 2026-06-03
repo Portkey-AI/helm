@@ -102,11 +102,15 @@ Skipped when an existing secret is supplied via config.existingSecretName.
 {{- end }}
 
 {{/*
-Validate that an authentication mode is explicitly selected.
-Either config.oauth.enabled must be true, or config.noAuth.enabled must be
-explicitly opted into. Running with neither leaves the app without an auth mode.
+Validate that exactly one authentication mode is selected.
+Either config.oauth.enabled (SSO) or config.noAuth.enabled must be true, but not both.
+Enabling neither leaves the app without an auth mode; enabling both produces an
+invalid/ambiguous configuration (e.g. AUTH_MODE concatenates to "SSONO_AUTH").
 */}}
 {{- define "portkey.validateAuthMode" -}}
+{{- if and .Values.config.oauth.enabled .Values.config.noAuth.enabled }}
+{{- fail "Both config.oauth.enabled and config.noAuth.enabled are true. Exactly one authentication mode must be selected: set config.oauth.enabled=true for SSO, or config.noAuth.enabled=true to run without authentication." }}
+{{- end }}
 {{- if and (not .Values.config.oauth.enabled) (not .Values.config.noAuth.enabled) }}
 {{- fail "No authentication mode selected. Set config.oauth.enabled=true to use SSO, or explicitly opt into config.noAuth.enabled=true to run without authentication." }}
 {{- end }}

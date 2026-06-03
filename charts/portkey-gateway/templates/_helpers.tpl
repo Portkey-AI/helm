@@ -519,17 +519,25 @@ app.kubernetes.io/component: minio
 {{- end }}
 
 {{/*
-Validate that MinIO credentials are set when the chart manages the auth key secret.
-Only enforced when MinIO is enabled and authKey.create is true. Skipped when an
-existing secret is supplied via minio.authKey.existingSecret.
+Validate MinIO auth key configuration.
+- Fails fast if both minio.authKey.create and minio.authKey.existingSecret are set,
+  since the chart can either create the Secret or consume an existing one, not both.
+- Validates accessKey/secretKey only when the chart is actually creating the Secret
+  (create=true and no existingSecret).
+Only enforced when MinIO is enabled.
 */}}
 {{- define "minio.validateAuthKey" -}}
-{{- if and .Values.minio.enabled .Values.minio.authKey.create (not .Values.minio.authKey.existingSecret) }}
+{{- if .Values.minio.enabled }}
+{{- if and .Values.minio.authKey.create .Values.minio.authKey.existingSecret }}
+{{- fail "minio.authKey.create and minio.authKey.existingSecret are mutually exclusive. Set create=true to have the chart create the Secret, or provide existingSecret (with create=false) to use your own." }}
+{{- end }}
+{{- if .Values.minio.authKey.create }}
 {{- if not .Values.minio.authKey.accessKey }}
-{{- fail "minio.authKey.accessKey must not be empty when minio.enabled and minio.authKey.create are true. Set it, or provide credentials via minio.authKey.existingSecret." }}
+{{- fail "minio.authKey.accessKey must not be empty when minio.authKey.create is true. Set it, or provide credentials via minio.authKey.existingSecret (with create=false)." }}
 {{- end }}
 {{- if not .Values.minio.authKey.secretKey }}
-{{- fail "minio.authKey.secretKey must not be empty when minio.enabled and minio.authKey.create are true. Set it, or provide credentials via minio.authKey.existingSecret." }}
+{{- fail "minio.authKey.secretKey must not be empty when minio.authKey.create is true. Set it, or provide credentials via minio.authKey.existingSecret (with create=false)." }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
