@@ -638,7 +638,6 @@ Template containing common environment variables that are used by several servic
 - name: ENABLE_GRAFANA
   value: {{ if .Values.apm.grafana.enabled }} "true" {{ else }} "false" {{ end }}
 - name: ENABLE_PROMETHEUS
-
   value: {{ if .Values.apm.grafana.prometheus.enabled }} "true" {{ else }} "false" {{ end }}
 {{- if .Values.apm.grafana.prometheus.enabled }}
 - name: PROMETHEUS_GATEWAY_URL

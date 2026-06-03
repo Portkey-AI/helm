@@ -49,7 +49,7 @@ config:
 
 ```yaml
 config:
-  jwtPrivateKey: "<some-random-string"
+  jwtPrivateKey: ""   # Required: set a strong secret, or provide it via config.existingSecretName
   controlPlaneURL: "https://frontend.example.com"
   noAuth:
     enabled: false
@@ -97,7 +97,7 @@ config:
 
 ```yaml
 config:
-  jwtPrivateKey: "<some-random-string>"
+  jwtPrivateKey: ""   # Required: set a strong secret, or provide it via config.existingSecretName
   controlPlaneURL: "https://frontend.example.com"
   noAuth:
     enabled: false

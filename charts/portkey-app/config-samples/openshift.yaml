@@ -25,7 +25,7 @@ images:
     tag: "1.16.2" # get latest version from https://portkey.ai/docs/changelog/enterprise 
 
 config:
-  jwtPrivateKey: "<some-random-string>" # Set to a strong secret for the JWT private key used for signing the frontend JWT tokens
+  jwtPrivateKey: "" # Required: set a strong secret for signing the frontend JWT tokens, or provide it via config.existingSecretName
   disableOrgCreation: false # Set to true to disable organization creation post installation and first time login
   disableTestimonial: true # Set to true to disable testimonial section in the frontend
   noAuth:
