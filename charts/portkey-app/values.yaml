@@ -179,7 +179,11 @@ backend:
     labels: {}
     annotations: {}
     podSecurityContext: {}
-    securityContext: {}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
     # resources:
     #   limits:
     #     cpu: 1000m
@@ -279,7 +283,11 @@ gateway:
     labels: {}
     annotations: {}
     podSecurityContext: {}
-    securityContext: {}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
     resources:
       limits:
         cpu: 1000m
@@ -376,7 +384,11 @@ dataservice:
     labels: {}
     annotations: {}
     podSecurityContext: {}
-    securityContext: {}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
     # resources:
     #   limits:
     #     cpu: 1000m
@@ -470,7 +482,11 @@ frontend:
     labels: {}
     annotations: {}
     podSecurityContext: {}
-    securityContext: {}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 101
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
     # resources:
     #   limits:
     #     cpu: 1000m
