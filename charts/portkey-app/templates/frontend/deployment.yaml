@@ -113,6 +113,8 @@ spec:
               mountPath: /var/cache/nginx
             - name: run
               mountPath: /run
+            - name: tmp
+              mountPath: /tmp
           {{- with .Values.frontend.deployment.extraContainerConfig }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -155,6 +157,8 @@ spec:
         - name: nginx-cache
           emptyDir: {}
         - name: run
+          emptyDir: {}
+        - name: tmp
           emptyDir: {}
             # items:
             #   - key: nginx.conf
