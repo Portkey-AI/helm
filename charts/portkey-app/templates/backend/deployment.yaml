@@ -55,8 +55,6 @@ spec:
             {{- include "logStore.commonEnv" . | nindent 12 }}
             - name: PORT
               value: {{ .Values.backend.containerPort | quote }}
-            - name: PM2_HOME
-              value: /tmp/.pm2
             - name: PRIVATE_DEPLOYMENT
               value: "ON"
             - name: SERVICE_NAME
@@ -132,12 +130,10 @@ spec:
             {{- toYaml .Values.backend.deployment.resources | nindent 12 }}
           securityContext:
             {{- toYaml .Values.backend.deployment.securityContext | nindent 12 }}
+          {{- with .Values.backend.deployment.volumeMounts }}
           volumeMounts:
-            {{- with .Values.backend.deployment.volumeMounts }}
               {{- toYaml . | nindent 12 }}
-            {{- end }}
-            - name: tmp
-              mountPath: /tmp
+          {{- end }}
           {{- with .Values.backend.deployment.extraContainerConfig }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -170,9 +166,7 @@ spec:
       dnsConfig:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.backend.deployment.volumes }}
       volumes:
-        {{- with .Values.backend.deployment.volumes }}
-          {{- toYaml . | nindent 8 }}
-        {{- end }}
-        - name: tmp
-          emptyDir: {}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
