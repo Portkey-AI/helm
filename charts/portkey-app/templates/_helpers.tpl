@@ -214,12 +214,23 @@ live in the chart-managed gateway Secret.
 {{- .Values.config.defaultGatewayClientAuth | default "client_auth-PRIVATE_SEVICE" | quote }}
 {{- end }}
 
+{{- define "portkey.clientAuthEnv" -}}
+- name: PORTKEY_CLIENT_AUTH
+{{- if .Values.config.existingSecretName }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.secretsName" . }}
+      key: PORTKEY_CLIENT_AUTH
+{{- else }}
+  value: {{ include "portkey.gatewayClientAuth" . }}
+{{- end }}
+{{- end }}
+
 {{/*
 Template containing common environment variables that are used by several services.
 */}}
 {{- define "portkey.commonEnv" -}}
-- name: PORTKEY_CLIENT_AUTH
-  value: {{ include "portkey.gatewayClientAuth" . }}
+{{- include "portkey.clientAuthEnv" . }}
 - name: REDIS_URL
   valueFrom:
     secretKeyRef:
@@ -502,8 +513,7 @@ Template containing common environment variables that are used by several servic
 
 {{- define "gateway.commonEnv" -}}
 {{- include "logStore.commonEnv" . }}
-- name: PORTKEY_CLIENT_AUTH
-  value: {{ include "portkey.gatewayClientAuth" . }}
+{{ include "portkey.clientAuthEnv" . }}
 {{- if .Values.bedrockAssumed.enabled }}
 - name: AWS_ASSUME_ROLE_ACCESS_KEY_ID
   valueFrom:
