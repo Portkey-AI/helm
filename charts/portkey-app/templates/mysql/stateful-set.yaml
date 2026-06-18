@@ -14,6 +14,9 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  {{- if not (kindIs "invalid" .Values.mysql.statefulSet.revisionHistoryLimit) }}
+  revisionHistoryLimit: {{ .Values.mysql.statefulSet.revisionHistoryLimit }}
+  {{- end }}
   serviceName: {{ include "portkey.fullname" . }}-{{ .Values.mysql.name }}
   replicas: {{ .Values.mysql.statefulSet.replicas | default 1 }}
   selector:

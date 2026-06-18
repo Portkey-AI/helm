@@ -14,6 +14,9 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  {{- if not (kindIs "invalid" .Values.redis.statefulSet.revisionHistoryLimit) }}
+  revisionHistoryLimit: {{ .Values.redis.statefulSet.revisionHistoryLimit }}
+  {{- end }}
   serviceName: {{ include "portkey.fullname" . }}-{{ .Values.redis.name }}
   replicas: {{ .Values.redis.statefulSet.replicas | default 1 }}
   selector:

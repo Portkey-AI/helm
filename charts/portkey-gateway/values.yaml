@@ -4,6 +4,9 @@
 
 replicaCount: 1
 
+# -- Number of old ReplicaSets to retain to allow rollback. Defaults to 10.
+revisionHistoryLimit: 10
+
 # Deployment strategy configuration
 # Example:
 # strategy:
@@ -372,6 +375,8 @@ dataservice:
   deployment:
     autoRestart: true
     replicas: 1
+    # -- Number of old ReplicaSets to retain to allow rollback. Defaults to 10.
+    revisionHistoryLimit: 10
     # terminationGracePeriodSeconds: 30
     labels: {}
     selectorLabels: {}
@@ -473,6 +478,8 @@ redis:
   serviceType: NodePort  
   servicePort: 6379
   containerPort: 6379
+  # -- Number of old ReplicaSets to retain to allow rollback. Defaults to 10.
+  revisionHistoryLimit: 10
   resources: {}
 
 # MinIO configuration section
@@ -487,6 +494,8 @@ minio:
     accessKey: ""
     secretKey: ""
   statefulSet:
+    # -- Number of old ControllerRevisions to retain to allow rollback. Defaults to 10.
+    revisionHistoryLimit: 10
     labels: {}
     annotations: {}
     podSecurityContext: {}
@@ -525,6 +534,8 @@ milvus:
       annotations: {}
     resources: {}
     statefulSet:
+      # -- Number of old ControllerRevisions to retain to allow rollback. Defaults to 10.
+      revisionHistoryLimit: 10
       labels: {}
       annotations: {}
       podSecurityContext: {}
@@ -546,6 +557,8 @@ milvus:
       annotations: {}
     resources: {}
     statefulSet:
+      # -- Number of old ControllerRevisions to retain to allow rollback. Defaults to 10.
+      revisionHistoryLimit: 10
       labels: {}
       annotations: {}
       podSecurityContext: {}

@@ -13,6 +13,9 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  {{- if not (kindIs "invalid" .Values.backend.deployment.revisionHistoryLimit) }}
+  revisionHistoryLimit: {{ .Values.backend.deployment.revisionHistoryLimit }}
+  {{- end }}
   {{- if not .Values.backend.autoscaling.enabled }}
   replicas: {{ .Values.backend.deployment.replicas }}
   {{- end }}
