@@ -30,11 +30,11 @@ config:
   logStore: "s3"
   jwtPrivateKey: ""   # Required: set a strong secret, or provide it via config.existingSecretName
   noAuth:
-    enabled: true
+    enabled: false
 ```
 -  Set the log store as s3
 - JWT Private Key is required for session management. The chart fails to render if `config.jwtPrivateKey` is empty and `config.existingSecretName` is not set, so set a strong secret (or provide it via `config.existingSecretName`).
-- If you are installing for the first time you should set noAuth.enabled true. This will allow you to access the application without any authentication, post which you can configure OAuth and switch it on.
+- If you are installing for the first time you should set noAuth.enabled true. This will allow you to access the application without any authentication, post which you should configure OAuth and switch it on.
 - Strongly recommended to use OAuth for authentication in production.
 
 ### Blob Storage Configuration
