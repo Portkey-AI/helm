@@ -61,7 +61,7 @@ spec:
             - name: "gateway"
               containerPort: {{ include "gateway.containerPort" . }}
               protocol: TCP
-            {{- if include "mcp.enabled" . }}
+            {{- if eq (include "mcp.enabled" .) "true" }}
             - name: "mcp"
               containerPort: {{ include "mcp.containerPort" . }}
               protocol: TCP
