@@ -226,19 +226,22 @@ resources: {}
 
 # startupProbe is optional and rendered only when defined.
 # Useful for slow-starting containers to avoid premature liveness kills.
+# When httpGet.port is omitted, it defaults to the active server port:
+# the gateway port (PORT) in gateway/all mode, or the MCP port (MCP_PORT) in mcp mode.
 # Example:
 # startupProbe:
 #   httpGet:
 #     path: /v1/health
-#     port: 8787
+#     # port omitted -> auto-selected based on SERVER_MODE
 #   initialDelaySeconds: 10
 #   periodSeconds: 5
 #   failureThreshold: 30
 
+# For httpGet probes, omit httpGet.port to auto-target the active server port
+# (gateway port in gateway/all mode, MCP port in mcp mode). Set it explicitly to override.
 livenessProbe:
   httpGet:
     path: /v1/health
-    port: 8787
   initialDelaySeconds: 5
   periodSeconds: 60
   timeoutSeconds: 3
@@ -246,7 +249,6 @@ livenessProbe:
 readinessProbe:
   httpGet:
     path: /v1/health
-    port: 8787
   initialDelaySeconds: 5
   periodSeconds: 60
   timeoutSeconds: 3

@@ -491,6 +491,19 @@ gateway.containerPort
 {{- end -}}
 
 {{/*
+gateway.primaryPort
+→ Returns the port the running server listens on.
+Gateway port when gateway is enabled, otherwise the MCP port.
+*/}}
+{{- define "gateway.primaryPort" -}}
+{{- if eq (include "gateway.enabled" .) "true" -}}
+{{- include "gateway.containerPort" . -}}
+{{- else -}}
+{{- include "mcp.containerPort" . -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Milvus etcd labels
 */}}
 {{- define "milvus-etcd.labels" -}}

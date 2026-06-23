@@ -252,16 +252,18 @@ environment:
 
 ### Health Probes
 
+> **Probe port auto-selection:** For `httpGet` probes, omit `httpGet.port` to have it default to the active server port — the gateway port (`PORT`, default `8787`) in `gateway`/`all` mode, or the MCP port (`MCP_PORT`, default `8788`) in `mcp` mode. Set `httpGet.port` explicitly to override. This prevents probes from targeting a port the process isn't listening on (e.g. probing `8787` while running in `mcp`-only mode).
+
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
 | `livenessProbe.httpGet.path` | string | `"/v1/health"` | Liveness probe HTTP path |
-| `livenessProbe.httpGet.port` | integer | `8787` | Liveness probe port |
+| `livenessProbe.httpGet.port` | integer | active server port | Liveness probe port (auto-selected from `SERVER_MODE` when omitted) |
 | `livenessProbe.initialDelaySeconds` | integer | `5` | Initial delay before liveness probe |
 | `livenessProbe.periodSeconds` | integer | `60` | Liveness probe check interval |
 | `livenessProbe.timeoutSeconds` | integer | `3` | Liveness probe timeout |
 | `livenessProbe.failureThreshold` | integer | `3` | Liveness probe failure threshold |
 | `readinessProbe.httpGet.path` | string | `"/v1/health"` | Readiness probe HTTP path |
-| `readinessProbe.httpGet.port` | integer | `8787` | Readiness probe port |
+| `readinessProbe.httpGet.port` | integer | active server port | Readiness probe port (auto-selected from `SERVER_MODE` when omitted) |
 | `readinessProbe.initialDelaySeconds` | integer | `5` | Initial delay before readiness probe |
 | `readinessProbe.periodSeconds` | integer | `60` | Readiness probe check interval |
 | `readinessProbe.timeoutSeconds` | integer | `3` | Readiness probe timeout |
