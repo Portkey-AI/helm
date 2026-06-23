@@ -422,7 +422,7 @@ mcp.enabled
 {{/*
 gateway.enabled
 → Returns true when SERVER_MODE is empty/missing or "all"
-→ Returns false when SERVER_MODE is "mcp"
+→ Returns false for any other value
 */}}
 {{- define "gateway.enabled" -}}
 {{- $serverMode := include "mcp.serverMode" . -}}
