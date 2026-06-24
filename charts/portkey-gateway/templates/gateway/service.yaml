@@ -12,10 +12,12 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
+    {{- if eq (include "gateway.enabled" .) "true" }}
     - port: {{ .Values.service.port }}
       targetPort: gateway
       protocol: TCP
       name: gateway
+    {{- end }}
     {{- if eq (include "mcp.enabled" .) "true" }}
     - port: {{ include "mcp.containerPort" . }}
       targetPort: mcp

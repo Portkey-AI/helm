@@ -420,6 +420,20 @@ mcp.enabled
 {{- end -}}
 
 {{/*
+gateway.enabled
+→ Returns true when SERVER_MODE is empty/missing or "all"
+→ Returns false for any other value
+*/}}
+{{- define "gateway.enabled" -}}
+{{- $serverMode := include "mcp.serverMode" . -}}
+{{- if or (eq $serverMode "") (eq $serverMode "all") -}}
+{{- true -}}
+{{- else -}}
+{{- false -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 mcp.containerPort
 → Returns integer port
 Priority: mcpService.containerPort > MCP_PORT env > 8788 default
@@ -473,6 +487,19 @@ gateway.containerPort
 {{- else -}}
 {{- $port | int -}}
 {{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+gateway.primaryPort
+→ Returns the port the running server listens on.
+Gateway port when gateway is enabled, otherwise the MCP port.
+*/}}
+{{- define "gateway.primaryPort" -}}
+{{- if eq (include "gateway.enabled" .) "true" -}}
+{{- include "gateway.containerPort" . -}}
+{{- else -}}
+{{- include "mcp.containerPort" . -}}
 {{- end -}}
 {{- end -}}
 
