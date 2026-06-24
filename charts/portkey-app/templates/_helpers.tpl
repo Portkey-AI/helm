@@ -478,6 +478,7 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreGenerationsBucket
+{{- end }}
 {{- if .Values.logStorage.s3Assume.enabled }}
 - name: LOG_STORE_AWS_ROLE_ARN
   valueFrom:
