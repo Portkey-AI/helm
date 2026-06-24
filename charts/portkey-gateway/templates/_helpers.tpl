@@ -463,6 +463,20 @@ Priority: mcpService.containerPort > MCP_PORT env > 8788 default
 {{- end -}}
 
 {{/*
+mcp.servicePort
+→ Returns the Service (listener) port for the MCP route on the main service.
+Priority: service.mcpPort > MCP container port.
+Lets the listener port differ from the container port (e.g. expose 80 via a LoadBalancer).
+*/}}
+{{- define "mcp.servicePort" -}}
+{{- if .Values.service.mcpPort -}}
+{{- .Values.service.mcpPort | int -}}
+{{- else -}}
+{{- include "mcp.containerPort" . | int -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 gateway.containerPort
 → Returns integer port for gateway
 */}}

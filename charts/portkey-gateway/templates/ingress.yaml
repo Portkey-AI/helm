@@ -39,7 +39,7 @@ spec:
               service:
                 name: {{ include "portkeyenterprise.fullname" . }}
                 port:
-                  number: {{ include "mcp.containerPort" . }}
+                  number: {{ include "mcp.servicePort" . }}
     {{- end }}
     {{- else }}
     - host: {{ .Values.ingress.hostname }}
@@ -52,7 +52,7 @@ spec:
               service:
                 name: {{ include "portkeyenterprise.fullname" . }}
                 port:
-                  number: {{ include "mcp.containerPort" . }}
+                  number: {{ include "mcp.servicePort" . }}
           {{- end }}
           {{- if eq (include "gateway.enabled" .) "true" }}
           - path: {{ .Values.ingress.gatewayPath | default "/" }}

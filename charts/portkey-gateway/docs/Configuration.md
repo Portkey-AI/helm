@@ -229,7 +229,9 @@ environment:
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
 | `service.type` | string | `"NodePort"` | Kubernetes service type |
-| `service.port` | integer | `8787` | Service port |
+| `service.port` | integer | `8787` | Gateway service (listener) port |
+| `service.mcpPort` | integer | MCP container port | MCP service (listener) port; defaults to `MCP_PORT` when unset. Set (e.g. `80`) to expose MCP on a different port than the container, useful with `service.type: LoadBalancer`. |
+| `service.containerPort` | integer | `nil` | Override the gateway container port (defaults to `PORT`) |
 | `service.additionalLabels` | object | `{}` | Additional labels for the service |
 | `service.annotations` | object | `{}` | Annotations for the service |
 
