@@ -214,12 +214,24 @@ live in the chart-managed gateway Secret.
 {{- .Values.config.defaultGatewayClientAuth | default "client_auth-PRIVATE_SEVICE" | quote }}
 {{- end }}
 
+{{- define "portkey.clientAuthEnv" -}}
+- name: PORTKEY_CLIENT_AUTH
+{{- if .Values.config.existingSecretName }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.secretsName" . }}
+      key: PORTKEY_CLIENT_AUTH
+      optional: true
+{{- else }}
+  value: {{ include "portkey.gatewayClientAuth" . }}
+{{- end }}
+{{- end }}
+
 {{/*
 Template containing common environment variables that are used by several services.
 */}}
 {{- define "portkey.commonEnv" -}}
-- name: PORTKEY_CLIENT_AUTH
-  value: {{ include "portkey.gatewayClientAuth" . }}
+{{- include "portkey.clientAuthEnv" . }}
 - name: REDIS_URL
   valueFrom:
     secretKeyRef:
@@ -408,27 +420,32 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStore
+      optional: true
 {{- if .Values.logStorage.mongo.enabled}}
 - name: MONGO_DB_CONNECTION_URL
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.logStoreSecretsName" . }}
       key: mongoConnectionUrl
+      optional: true
 - name: MONGO_DATABASE
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.logStoreSecretsName" . }}
       key: mongoDatabase
+      optional: true
 - name: MONGO_COLLECTION_NAME
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.logStoreSecretsName" . }}
       key: mongoGenerationsCollection
+      optional: true
 - name: MONGO_GENERATION_HOOKS_COLLECTION_NAME
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.logStoreSecretsName" . }}
       key: mongoHooksCollection
+      optional: true
 {{- end }}
 {{- if or .Values.logStorage.s3Compat.enabled }}
 - name: LOG_STORE_BASEPATH
@@ -436,6 +453,7 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreBasePath
+      optional: true
 {{- end }}      
 {{- if or .Values.logStorage.s3Compat.enabled .Values.logStorage.s3Assume.enabled }}
 - name: LOG_STORE_ACCESS_KEY
@@ -443,11 +461,13 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreAccessKey
+      optional: true
 - name: LOG_STORE_SECRET_KEY
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreSecretKey
+      optional: true
 - name: LOG_STORE_REGION
   valueFrom:
     secretKeyRef:
@@ -465,11 +485,13 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreAwsRoleArn
+      optional: true
 - name: LOG_STORE_AWS_EXTERNAL_ID
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.logStoreSecretsName" . }}
       key: logStoreExternalId
+      optional: true
 {{- end }}
 {{- if .Values.logStorage.azure.enabled}}
 - name: AZURE_AUTH_MODE
@@ -482,6 +504,7 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.logStoreSecretsName" . }}
       key: azureManagedClientId
+      optional: true
 - name: AZURE_ENTRA_CLIENT_ID
   valueFrom:
     secretKeyRef:
@@ -507,6 +530,7 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.logStoreSecretsName" . }}
       key: azureStorageKey
+      optional: true
 - name: AZURE_STORAGE_CONTAINER
   valueFrom:
     secretKeyRef:
@@ -517,8 +541,7 @@ Template containing common environment variables that are used by several servic
 
 {{- define "gateway.commonEnv" -}}
 {{- include "logStore.commonEnv" . }}
-- name: PORTKEY_CLIENT_AUTH
-  value: {{ include "portkey.gatewayClientAuth" . }}
+{{ include "portkey.clientAuthEnv" . }}
 {{- if .Values.bedrockAssumed.enabled }}
 - name: AWS_ASSUME_ROLE_ACCESS_KEY_ID
   valueFrom:
