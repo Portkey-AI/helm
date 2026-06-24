@@ -19,7 +19,7 @@ spec:
       name: gateway
     {{- end }}
     {{- if eq (include "mcp.enabled" .) "true" }}
-    - port: {{ include "mcp.servicePort" . }}
+    - port: {{ include "mcp.containerPort" . }}
       targetPort: mcp
       protocol: TCP
       name: mcp

@@ -180,11 +180,6 @@ securityContext:
 service:
   type: NodePort
   port: 8787
-  # Service (listener) port for the MCP route on the main service.
-  # Defaults to the MCP container port (MCP_PORT) when unset.
-  # Set this (e.g. 80) to expose MCP on a different port than the container,
-  # useful with service.type: LoadBalancer.
-  mcpPort:
   containerPort:
   additionalLabels: {}
   annotations: {}
