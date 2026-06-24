@@ -328,7 +328,7 @@ Common Environment Env as Map
 {{- define "logStore.commonEnv" -}}
 {{- $commonEnv := include "portkeyenterprise.commonEnvMap" . | fromYaml -}}
 {{- range $key, $value := $commonEnv }}
-{{- if has $key (list "LOG_STORE" "MONGO_DB_CONNECTION_URL" "MONGO_DATABASE" "MONGO_COLLECTION_NAME" "MONGO_GENERATION_HOOKS_COLLECTION_NAME" "LOG_STORE_ACCESS_KEY" "LOG_STORE_SECRET_KEY" "LOG_STORE_REGION" "LOG_STORE_GENERATIONS_BUCKET" "LOG_STORE_BASEPATH" "LOG_STORE_AWS_ROLE_ARN" "LOG_STORE_AWS_EXTERNAL_ID" "AZURE_AUTH_MODE" "AZURE_STORAGE_ACCOUNT" "AZURE_STORAGE_KEY" "AZURE_STORAGE_CONTAINER") }}
+{{- if has $key (list "LOG_STORE" "MONGO_DB_CONNECTION_URL" "MONGO_DATABASE" "MONGO_COLLECTION_NAME" "MONGO_GENERATION_HOOKS_COLLECTION_NAME" "LOG_STORE_ACCESS_KEY" "LOG_STORE_SECRET_KEY" "LOG_STORE_REGION" "LOG_STORE_GENERATIONS_BUCKET" "LOG_STORE_BASEPATH" "LOG_STORE_AWS_ROLE_ARN" "LOG_STORE_AWS_EXTERNAL_ID" "AZURE_AUTH_MODE" "AZURE_STORAGE_ACCOUNT" "AZURE_STORAGE_KEY" "AZURE_STORAGE_CONTAINER" "AZURE_MANAGED_CLIENT_ID" "AZURE_ENTRA_CLIENT_ID" "AZURE_ENTRA_CLIENT_SECRET" "AZURE_ENTRA_TENANT_ID") }}
 {{- include "portkeyenterprise.renderEnvVar" (list $key $value) | nindent 0 }}
 {{- end }}
 {{- end }}
@@ -420,6 +420,20 @@ mcp.enabled
 {{- end -}}
 
 {{/*
+gateway.enabled
+→ Returns true when SERVER_MODE is empty/missing or "all"
+→ Returns false for any other value
+*/}}
+{{- define "gateway.enabled" -}}
+{{- $serverMode := include "mcp.serverMode" . -}}
+{{- if or (eq $serverMode "") (eq $serverMode "all") -}}
+{{- true -}}
+{{- else -}}
+{{- false -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 mcp.containerPort
 → Returns integer port
 Priority: mcpService.containerPort > MCP_PORT env > 8788 default
@@ -473,6 +487,19 @@ gateway.containerPort
 {{- else -}}
 {{- $port | int -}}
 {{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+gateway.primaryPort
+→ Returns the port the running server listens on.
+Gateway port when gateway is enabled, otherwise the MCP port.
+*/}}
+{{- define "gateway.primaryPort" -}}
+{{- if eq (include "gateway.enabled" .) "true" -}}
+{{- include "gateway.containerPort" . -}}
+{{- else -}}
+{{- include "mcp.containerPort" . -}}
 {{- end -}}
 {{- end -}}
 

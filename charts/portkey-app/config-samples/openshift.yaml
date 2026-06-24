@@ -29,7 +29,7 @@ config:
   disableOrgCreation: false # Set to true to disable organization creation post installation and first time login
   disableTestimonial: true # Set to true to disable testimonial section in the frontend
   noAuth:
-    enabled: true # Set to true to disable authentication and allow access to the application without any authentication
+    enabled: false # Set to true to disable authentication and allow access to the application without any authentication
   controlPlaneURL: "<frontend-lb-endpoint>" # Set to the control plane URL of the frontend lb  
 
 logStorage:

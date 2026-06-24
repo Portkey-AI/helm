@@ -61,7 +61,7 @@ spec:
             - name: "gateway"
               containerPort: {{ include "gateway.containerPort" . }}
               protocol: TCP
-            {{- if include "mcp.enabled" . }}
+            {{- if eq (include "mcp.enabled" .) "true" }}
             - name: "mcp"
               containerPort: {{ include "mcp.containerPort" . }}
               protocol: TCP
@@ -81,12 +81,28 @@ spec:
             {{- end }}
           {{- with .Values.startupProbe }}
           startupProbe:
-            {{- toYaml . | nindent 12 }}
+            {{- $p := deepCopy . }}
+            {{- if and $p.httpGet (not $p.httpGet.port) }}
+            {{- $_ := set $p.httpGet "port" (include "gateway.primaryPort" $ | int) }}
+            {{- end }}
+            {{- toYaml $p | nindent 12 }}
           {{- end }}
+          {{- with .Values.livenessProbe }}
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            {{- $p := deepCopy . }}
+            {{- if and $p.httpGet (not $p.httpGet.port) }}
+            {{- $_ := set $p.httpGet "port" (include "gateway.primaryPort" $ | int) }}
+            {{- end }}
+            {{- toYaml $p | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            {{- $p := deepCopy . }}
+            {{- if and $p.httpGet (not $p.httpGet.port) }}
+            {{- $_ := set $p.httpGet "port" (include "gateway.primaryPort" $ | int) }}
+            {{- end }}
+            {{- toYaml $p | nindent 12 }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.volumeMounts }}

@@ -17,7 +17,7 @@ images:
   gatewayImage:
     repository: "docker.io/portkeyai/gateway_enterprise"
     pullPolicy: IfNotPresent
-    tag: "2.9.0"
+    tag: "2.11.1"
   dataserviceImage:
     repository: "docker.io/portkeyai/data-service"
     pullPolicy: IfNotPresent
@@ -127,6 +127,9 @@ environment:
     AWS_ASSUME_ROLE_REGION:
     AZURE_AUTH_MODE: 
     AZURE_MANAGED_CLIENT_ID: 
+    AZURE_ENTRA_CLIENT_ID:
+    AZURE_ENTRA_CLIENT_SECRET:
+    AZURE_ENTRA_TENANT_ID:
     AZURE_STORAGE_ACCOUNT: 
     AZURE_STORAGE_KEY: 
     AZURE_STORAGE_CONTAINER:
@@ -226,19 +229,22 @@ resources: {}
 
 # startupProbe is optional and rendered only when defined.
 # Useful for slow-starting containers to avoid premature liveness kills.
+# When httpGet.port is omitted, it defaults to the active server port:
+# the gateway port (PORT) in gateway/all mode, or the MCP port (MCP_PORT) in mcp mode.
 # Example:
 # startupProbe:
 #   httpGet:
 #     path: /v1/health
-#     port: 8787
+#     # port omitted -> auto-selected based on SERVER_MODE
 #   initialDelaySeconds: 10
 #   periodSeconds: 5
 #   failureThreshold: 30
 
+# For httpGet probes, omit httpGet.port to auto-target the active server port
+# (gateway port in gateway/all mode, MCP port in mcp mode). Set it explicitly to override.
 livenessProbe:
   httpGet:
     path: /v1/health
-    port: 8787
   initialDelaySeconds: 5
   periodSeconds: 60
   timeoutSeconds: 3
@@ -246,7 +252,6 @@ livenessProbe:
 readinessProbe:
   httpGet:
     path: /v1/health
-    port: 8787
   initialDelaySeconds: 5
   periodSeconds: 60
   timeoutSeconds: 3
