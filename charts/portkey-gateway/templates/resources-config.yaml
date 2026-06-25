@@ -1,7 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: resource-config
+  name: {{ include "portkeyenterprise.fullname" . }}-resource-config
+  labels:
+    {{- include "portkeyenterprise.labels" . | nindent 4 }}
 data:
   document_db.pem: |
     -----BEGIN CERTIFICATE-----
