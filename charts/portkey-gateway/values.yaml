@@ -155,13 +155,13 @@ environment:
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Automatically mount a ServiceAccount's API credentials?
   automount: true
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # Required when create is false. If not set and create is true, a name is generated using the fullname template
   name: ""
 
 podAnnotations: {}
@@ -449,7 +449,8 @@ dataservice:
     loadBalancerSourceRanges: []
     loadBalancerIP: ""
   serviceAccount:
-    create: true
+    create: false
+    # Required when create is false. If not set and create is true, a name is generated using the fullname template
     name: ""
     labels: {}
     annotations: {}
