@@ -104,16 +104,20 @@ Create the name of the service account to use
 {{- define "portkeyenterprise.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
 {{- default (include "portkeyenterprise.fullname" .) .Values.serviceAccount.name }}
+{{- else if not .Values.serviceAccount.name }}
+{{- fail "serviceAccount.name must be set when serviceAccount.create is false" }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
 
 {{- define "dataservice.serviceAccountName" -}}
 {{- if .Values.dataservice.serviceAccount.create -}}
 {{ default (printf "%s-%s" (include "portkeyenterprise.fullname" .) .Values.dataservice.name) .Values.dataservice.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else if not .Values.dataservice.serviceAccount.name -}}
+{{- fail "dataservice.serviceAccount.name must be set when dataservice.serviceAccount.create is false" }}
 {{- else -}}
-{{ default "default" .Values.dataservice.serviceAccount.name }}
+{{ .Values.dataservice.serviceAccount.name | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 {{- end -}}
 
