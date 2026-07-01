@@ -179,6 +179,8 @@ backend:
   deployment:
     autoRestart: true
     replicas: 1
+    # -- Number of old ReplicaSets to retain to allow rollback. Defaults to 10.
+    revisionHistoryLimit: 10
     labels: {}
     annotations: {}
     podSecurityContext: {}
@@ -279,6 +281,8 @@ gateway:
   deployment:
     autoRestart: true
     replicas: 1
+    # -- Number of old ReplicaSets to retain to allow rollback. Defaults to 10.
+    revisionHistoryLimit: 10
     labels: {}
     annotations: {}
     podSecurityContext: {}
@@ -380,6 +384,8 @@ dataservice:
   deployment:
     autoRestart: true
     replicas: 1
+    # -- Number of old ReplicaSets to retain to allow rollback. Defaults to 10.
+    revisionHistoryLimit: 10
     labels: {}
     annotations: {}
     podSecurityContext: {}
@@ -478,6 +484,8 @@ frontend:
   deployment:
     autoRestart: true
     replicas: 1
+    # -- Number of old ReplicaSets to retain to allow rollback. Defaults to 10.
+    revisionHistoryLimit: 10
     labels: {}
     annotations: {}
     podSecurityContext: {}
@@ -599,6 +607,8 @@ mysql:
     podSecurityContext: {}
     securityContext: {}
     replicas: 1
+    # -- Number of old ControllerRevisions to retain to allow rollback. Defaults to 10.
+    revisionHistoryLimit: 10
     # resources:
     #   limits:
     #     cpu: 2000m
@@ -696,6 +706,8 @@ redis:
     podSecurityContext: {}
     securityContext: {}
     replicas: 1
+    # -- Number of old ControllerRevisions to retain to allow rollback. Defaults to 10.
+    revisionHistoryLimit: 10
     # resources:
     #   limits:
     #     cpu: 4000m
@@ -833,6 +845,8 @@ clickhouse:
     podSecurityContext: {}
     securityContext: {}
     replicas: 1
+    # -- Number of old ControllerRevisions to retain to allow rollback. Defaults to 10.
+    revisionHistoryLimit: 10
     # resources:
     #   limits:
     #     cpu: 1000m

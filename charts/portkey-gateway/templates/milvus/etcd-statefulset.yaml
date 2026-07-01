@@ -13,6 +13,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  {{- if not (kindIs "invalid" .Values.milvus.etcd.statefulSet.revisionHistoryLimit) }}
+  revisionHistoryLimit: {{ .Values.milvus.etcd.statefulSet.revisionHistoryLimit }}
+  {{- end }}
   serviceName: milvus-etcd
   replicas: 1
   selector:
