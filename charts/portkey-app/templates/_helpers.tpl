@@ -510,16 +510,19 @@ Template containing common environment variables that are used by several servic
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: azureEntraClientId
+      optional: true
 - name: AZURE_ENTRA_CLIENT_SECRET
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: azureEntraClientSecret
+      optional: true
 - name: AZURE_ENTRA_TENANT_ID
   valueFrom:
     secretKeyRef:
       name: {{ include "portkey.gatewaySecretsName" . }}
       key: azureEntraTenantId
+      optional: true
 - name: AZURE_STORAGE_ACCOUNT
   valueFrom:
     secretKeyRef:
