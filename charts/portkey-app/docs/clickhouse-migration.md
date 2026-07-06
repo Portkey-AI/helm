@@ -1,6 +1,13 @@
-# Migrating ClickHouse from Built-in to External Cluster
+# Migrating ClickHouse from Built-in to External Cluster (BETA)
 
 This guide walks through migrating data from the single-node ClickHouse instance shipped with this chart to an external ClickHouse cluster (e.g. Altinity).
+
+> [!WARNING]
+> **Beta Feature**
+>
+> This migration process is currently **in beta** and is still undergoing validation across different deployment scenarios.
+>
+> While it is expected to work correctly, we recommend exercising caution before using it in production environments. Please validate the migration thoroughly in a non-production environment first. If you choose to use this process in production, do so with appropriate testing, backups, and rollback plans in place.
 
 ---
 

@@ -1,6 +1,13 @@
-# ClickHouse Replication
+# ClickHouse Replication (BETA)
 
 The built-in ClickHouse StatefulSet shipped with this chart runs a single-node instance and does not support replication. For production workloads that require high availability and replicated tables, deploy ClickHouse separately using a dedicated chart and point Portkey at it as an external data store.
+
+> [!WARNING]
+> **Beta Feature**
+>
+> External ClickHouse cluster support is currently in beta and is still undergoing validation across different deployment scenarios.
+>
+> While it is expected to work correctly, we recommend validating your deployment in a non-production environment before rolling it out to production. If you choose to use this feature in production, ensure you have appropriate testing, backups, and rollback procedures in place.
 
 ## Prerequisites
 
