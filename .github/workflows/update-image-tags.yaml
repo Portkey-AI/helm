@@ -1,8 +1,6 @@
 name: Update Image Tags from Changelogs
 
 on:
-  push:
-    branches: [chore/update-image-tags-workflow]
   schedule:
     - cron: '0 8 * * *'  # daily at 08:00 UTC
   workflow_dispatch:       # allow manual trigger from Actions UI
