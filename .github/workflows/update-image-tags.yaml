@@ -18,13 +18,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install yq
-        run: |
-          YQ_VERSION="v4.44.2"
-          wget -qO /usr/local/bin/yq \
-            "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64"
-          chmod +x /usr/local/bin/yq
-
       - name: Fetch latest versions from changelogs
         id: versions
         run: |
@@ -55,12 +48,15 @@ jobs:
           GW_FILE="charts/portkey-gateway/values.yaml"
           APP_FILE="charts/portkey-app/values.yaml"
 
-          echo "gw_gateway=$(yq e '.images.gatewayImage.tag' ${GW_FILE})"           >> "$GITHUB_OUTPUT"
-          echo "gw_dataservice=$(yq e '.images.dataserviceImage.tag' ${GW_FILE})"   >> "$GITHUB_OUTPUT"
-          echo "app_gateway=$(yq e '.images.gatewayImage.tag' ${APP_FILE})"         >> "$GITHUB_OUTPUT"
-          echo "app_dataservice=$(yq e '.images.dataserviceImage.tag' ${APP_FILE})" >> "$GITHUB_OUTPUT"
-          echo "app_backend=$(yq e '.images.backendImage.tag' ${APP_FILE})"         >> "$GITHUB_OUTPUT"
-          echo "app_frontend=$(yq e '.images.frontendImage.tag' ${APP_FILE})"       >> "$GITHUB_OUTPUT"
+          # Read-only extraction: grep the image block then pull the tag line value
+          get_tag() { grep -A4 "$1:" "$2" | grep 'tag:' | head -1 | sed 's/.*tag:[[:space:]]*"\(.*\)"/\1/'; }
+
+          echo "gw_gateway=$(get_tag gatewayImage ${GW_FILE})"           >> "$GITHUB_OUTPUT"
+          echo "gw_dataservice=$(get_tag dataserviceImage ${GW_FILE})"   >> "$GITHUB_OUTPUT"
+          echo "app_gateway=$(get_tag gatewayImage ${APP_FILE})"         >> "$GITHUB_OUTPUT"
+          echo "app_dataservice=$(get_tag dataserviceImage ${APP_FILE})" >> "$GITHUB_OUTPUT"
+          echo "app_backend=$(get_tag backendImage ${APP_FILE})"         >> "$GITHUB_OUTPUT"
+          echo "app_frontend=$(get_tag frontendImage ${APP_FILE})"       >> "$GITHUB_OUTPUT"
 
       - name: Patch image tags
         env:
@@ -72,15 +68,21 @@ jobs:
           GW_FILE="charts/portkey-gateway/values.yaml"
           APP_FILE="charts/portkey-app/values.yaml"
 
+          # sed range: from the image key line to the first tag: line after it.
+          # Only rewrites that one tag: line — every other byte in the file is untouched.
+          set_tag() {
+            sed -i "/$1:/,/tag:/ s|\(^[[:space:]]*tag: \).*|\1\"$2\"|" "$3"
+          }
+
           # portkey-gateway chart
-          yq e ".images.gatewayImage.tag = \"${GATEWAY_VER}\""         -i "${GW_FILE}"
-          yq e ".images.dataserviceImage.tag = \"${DATASERVICE_VER}\"" -i "${GW_FILE}"
+          set_tag gatewayImage     "${GATEWAY_VER}"     "${GW_FILE}"
+          set_tag dataserviceImage "${DATASERVICE_VER}" "${GW_FILE}"
 
           # portkey-app chart
-          yq e ".images.gatewayImage.tag = \"${GATEWAY_VER}\""         -i "${APP_FILE}"
-          yq e ".images.dataserviceImage.tag = \"${DATASERVICE_VER}\"" -i "${APP_FILE}"
-          yq e ".images.backendImage.tag = \"${BACKEND_VER}\""         -i "${APP_FILE}"
-          yq e ".images.frontendImage.tag = \"${FRONTEND_VER}\""       -i "${APP_FILE}"
+          set_tag gatewayImage     "${GATEWAY_VER}"     "${APP_FILE}"
+          set_tag dataserviceImage "${DATASERVICE_VER}" "${APP_FILE}"
+          set_tag backendImage     "${BACKEND_VER}"     "${APP_FILE}"
+          set_tag frontendImage    "${FRONTEND_VER}"    "${APP_FILE}"
 
       - name: Check for changes
         id: diff
