@@ -15,7 +15,7 @@ Follow the [Gateway Registration guide](http://localhost:3000/self-hosting/hybri
 Update your `values.yaml` with the appropriate storage backends:
 
 - **Log Store** — See [Log Store Configuration](./docs/LogStore.md) for AWS S3, Azure Blob Storage, GCS, and S3-compatible options
-- **Cache Store** — See [Redis Configuration](./docs/Redis.md) for AWS ElastiCache, Azure Managed Redis, GCP Memorystore, and in-cluster Redis
+- **Cache Store** — See [Redis Configuration](./docs/CacheStore.md) for AWS ElastiCache, Azure Managed Redis, GCP Memorystore, and in-cluster Redis
 - **Vector Store** *(Optional)* — See [Vector Store Setup](./docs/VectorStore.md) for semantic caching with Milvus
 - **OTEL** *(Optional)* — See [OTEL Configuration](#otel-opentelemetry) to push analytics to OpenTelemetry-compatible endpoints
 
@@ -24,7 +24,7 @@ Update your `values.yaml` with the appropriate storage backends:
 ```bash
 helm repo add portkey-ai https://portkey-ai.github.io/helm
 helm repo update
-helm upgrade --install portkey-ai portkey-ai/gateway \
+helm upgrade --install portkey-ai portkey-ai/airs-gw \
   -f ./values.yaml \
   -n portkeyai \
   --create-namespace

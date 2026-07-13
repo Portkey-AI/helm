@@ -171,18 +171,15 @@ environment:
 | `environment.data.LOG_STORE_SECRET_KEY` | string | `""` | Secret key for log storage (consider using secretKeys) |
 | `environment.data.LOG_STORE_GENERATIONS_BUCKET` | string | `""` | S3/Azure bucket for generation logs |
 | `environment.data.LOG_STORE_BASEPATH` | string | `""` | Base path within log storage bucket |
-| `environment.data.LOG_STORE_AWS_ROLE_ARN` | string | `""` | AWS IAM role ARN for log storage |
-| `environment.data.LOG_STORE_AWS_EXTERNAL_ID` | string | `""` | External ID for AWS role assumption |
 | `environment.data.AWS_ASSUME_ROLE_ACCESS_KEY_ID` | string | `""` | Access key for AWS role assumption (consider using secretKeys) |
 | `environment.data.AWS_ASSUME_ROLE_SECRET_ACCESS_KEY` | string | `""` | Secret key for AWS role assumption (consider using secretKeys) |
 | `environment.data.AWS_ASSUME_ROLE_REGION` | string | `""` | AWS region for role assumption |
-| `environment.data.AZURE_AUTH_MODE` | string | `""` | Azure authentication mode (`managed`, `entra`, or empty for storage key) |
+| `environment.data.AZURE_AUTH_MODE` | string | `""` | Azure authentication mode (`workload`, `managed`, `entra`) |
 | `environment.data.AZURE_MANAGED_CLIENT_ID` | string | `""` | Azure managed identity client ID (used when `AZURE_AUTH_MODE=managed`) |
 | `environment.data.AZURE_ENTRA_CLIENT_ID` | string | `""` | Azure Entra (service principal) client ID (used when `AZURE_AUTH_MODE=entra`) |
 | `environment.data.AZURE_ENTRA_CLIENT_SECRET` | string | `""` | Azure Entra client secret (used when `AZURE_AUTH_MODE=entra`, consider using secretKeys) |
 | `environment.data.AZURE_ENTRA_TENANT_ID` | string | `""` | Azure Entra tenant ID (used when `AZURE_AUTH_MODE=entra`) |
 | `environment.data.AZURE_STORAGE_ACCOUNT` | string | `""` | Azure storage account name |
-| `environment.data.AZURE_STORAGE_KEY` | string | `""` | Azure storage account key (consider using secretKeys) |
 | `environment.data.AZURE_STORAGE_CONTAINER` | string | `""` | Azure storage container name |
 | `environment.data.CACHE_STORE` | string | `"redis"` | Cache storage backend (minimum Redis version: 6.2) |
 | `environment.data.REDIS_URL` | string | `"redis://redis:6379"` | Redis connection URL (consider using secretKeys if contains auth) |
