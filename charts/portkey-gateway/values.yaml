@@ -18,11 +18,11 @@ strategy: {}
 
 images:
   gatewayImage:
-    repository: "prisma-airs-gw.portkey.ai/portkeyai/gateway_enterprise"
+    repository: "registry.airs-gw.portkey.ai/gateway_enterprise"
     pullPolicy: IfNotPresent
     tag: "2.11.1"
   dataserviceImage:
-    repository: "docker.io/portkeyai/data-service"
+    repository: "registry.airs-gw.portkey.ai/data-service"
     pullPolicy: IfNotPresent
     tag: "1.8.0"
   # Add Redis image configuration
