@@ -150,7 +150,6 @@ environment:
     PORT: "8787"
     LOG_STORE: "s3"
     LOG_STORE_REGION: "us-east-1"
-    ANALYTICS_STORE: "control_plane"
 ```
 
 **Benefits:**
@@ -167,12 +166,6 @@ environment:
 | `environment.data.SERVICE_NAME` | string | `"portkeyenterprise"` | Service name identifier |
 | `environment.data.PORT` | string | `"8787"` | Gateway service port |
 | `environment.data.LOG_STORE` | string | `""` | Log storage backend (e.g., s3, azure) |
-| `environment.data.MONGO_DB_CONNECTION_URL` | string | `""` | ⚠️ **Maintenance Mode** - MongoDB connection URL (consider using secretKeys) |
-| `environment.data.MONGO_DATABASE` | string | `""` | ⚠️ **Maintenance Mode** - MongoDB database name |
-| `environment.data.MONGO_COLLECTION_NAME` | string | `""` | ⚠️ **Maintenance Mode** - MongoDB collection for logs |
-| `environment.data.MONGO_GENERATIONS_HOOKS_COLLECTION_NAME` | string | `""` | ⚠️ **Maintenance Mode** - MongoDB collection for generation hooks |
-
-> **Note**: MongoDB as LOG_STORE is in maintenance mode. Known limitations include: 16MB document size limit, no streaming support for writes, and bulk insert performance issues. We recommend using S3-compatible storage for new deployments.
 | `environment.data.LOG_STORE_REGION` | string | `""` | AWS/Azure region for log storage |
 | `environment.data.LOG_STORE_ACCESS_KEY` | string | `""` | Access key for log storage (consider using secretKeys) |
 | `environment.data.LOG_STORE_SECRET_KEY` | string | `""` | Secret key for log storage (consider using secretKeys) |
@@ -191,12 +184,6 @@ environment:
 | `environment.data.AZURE_STORAGE_ACCOUNT` | string | `""` | Azure storage account name |
 | `environment.data.AZURE_STORAGE_KEY` | string | `""` | Azure storage account key (consider using secretKeys) |
 | `environment.data.AZURE_STORAGE_CONTAINER` | string | `""` | Azure storage container name |
-| `environment.data.ANALYTICS_STORE` | string | `"clickhouse"` | Analytics storage backend |
-| `environment.data.ANALYTICS_STORE_ENDPOINT` | string | `""` | Analytics store endpoint URL |
-| `environment.data.ANALYTICS_STORE_USER` | string | `""` | Analytics store username |
-| `environment.data.ANALYTICS_STORE_PASSWORD` | string | `""` | Analytics store password (consider using secretKeys) |
-| `environment.data.ANALYTICS_LOG_TABLE` | string | `""` | Table name for analytics logs |
-| `environment.data.ANALYTICS_FEEDBACK_TABLE` | string | `""` | Table name for feedback data |
 | `environment.data.CACHE_STORE` | string | `"redis"` | Cache storage backend (minimum Redis version: 6.2) |
 | `environment.data.REDIS_URL` | string | `"redis://redis:6379"` | Redis connection URL (consider using secretKeys if contains auth) |
 | `environment.data.REDIS_TLS_ENABLED` | string | `"false"` | Enable TLS for Redis connection |

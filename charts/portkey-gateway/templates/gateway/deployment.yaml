@@ -79,6 +79,7 @@ spec:
                 value: http://{{ include "portkeyenterprise.fullname" . }}-{{ .Values.dataservice.name }}:{{ .Values.dataservice.service.port }}
             {{- end }}
             {{- include "portkeyenterprise.commonEnv" . | nindent 12 }}
+            {{- include "portkeyenterprise.builtinDefaults" . | nindent 12 }}
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

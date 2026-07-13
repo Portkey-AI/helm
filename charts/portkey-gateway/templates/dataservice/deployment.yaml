@@ -66,6 +66,7 @@ spec:
             - name: GATEWAY_BASE_URL
               value: http://{{ include "portkeyenterprise.fullname" . }}:{{ .Values.service.port }}
             {{- include "dataservice.commonEnv" . | nindent 12 }}
+            {{- include "portkeyenterprise.builtinDefaults" . | nindent 12 }}
             {{- include "controlPlane.commonEnv" . | nindent 12 }}
             {{- include "cacheStore.commonEnv" . | nindent 12 }}
             {{- include "logStore.commonEnv" . | nindent 12 }}
@@ -80,15 +81,27 @@ spec:
               protocol: TCP
           {{- with .Values.dataservice.deployment.startupProbe }}
           startupProbe:
-            {{- toYaml . | nindent 12 }}
+            {{- $p := deepCopy . }}
+            {{- if and $p.httpGet (not $p.httpGet.port) }}
+            {{- $_ := set $p.httpGet "port" ($.Values.dataservice.containerPort | int) }}
+            {{- end }}
+            {{- toYaml $p | nindent 12 }}
           {{- end }}
           {{- with .Values.dataservice.deployment.livenessProbe }}
           livenessProbe:
-            {{- toYaml . | nindent 12 }}
+            {{- $p := deepCopy . }}
+            {{- if and $p.httpGet (not $p.httpGet.port) }}
+            {{- $_ := set $p.httpGet "port" ($.Values.dataservice.containerPort | int) }}
+            {{- end }}
+            {{- toYaml $p | nindent 12 }}
           {{- end }}
           {{- with .Values.dataservice.deployment.readinessProbe }}
           readinessProbe:
-            {{- toYaml . | nindent 12 }}
+            {{- $p := deepCopy . }}
+            {{- if and $p.httpGet (not $p.httpGet.port) }}
+            {{- $_ := set $p.httpGet "port" ($.Values.dataservice.containerPort | int) }}
+            {{- end }}
+            {{- toYaml $p | nindent 12 }}
           {{- end }}
           resources:
             {{- toYaml .Values.dataservice.deployment.resources | nindent 12 }}

@@ -40,9 +40,6 @@ environment:
 
 Choose your storage backends from the options below. You'll need to configure: 
 
-**Analytics Store**
-- For storing the LLM requests analytics data
-
 **Log Store** 
 - For storing the raw LLM request/response data (including analytics)
 
@@ -52,33 +49,15 @@ Choose your storage backends from the options below. You'll need to configure:
 **Vector Store** *(Optional)*
 - For semantic caching with Milvus. See [Vector Store Setup](./docs/VectorStore.md)
 
+**OTEL** *(Optional)*
+- Push analytics to OpenTelemetry-compatible endpoints
+
 ---
 
-## Analytics Store
+## OTEL (OpenTelemetry) - Optional
 
-### Option 1: Control Plane (Recommended)
-Simplest setup - no additional configuration needed:
-```yaml
-ANALYTICS_STORE: control_plane
-```
+Push analytics data to OTEL-compatible endpoints alongside any storage configuration.
 
-### Option 2: ClickHouse
-<details>
-<summary>Detailed ClickHouse Analytics Setup</summary>
-
-```yaml
-ANALYTICS_STORE: clickhouse
-ANALYTICS_STORE_ENDPOINT: "<shared by portkey>"
-ANALYTICS_STORE_USER: "<shared by portkey>"
-ANALYTICS_STORE_PASSWORD: "<shared by portkey>"
-ANALYTICS_LOG_TABLE: "<shared by portkey>"
-ANALYTICS_FEEDBACK_TABLE: "<shared by portkey>"
-ANALYTICS_GENERATION_HOOKS_TABLE: "<shared by portkey>"
-```
-</details>
-
-### Additional: OTEL (OpenTelemetry) - Optional
-Can be used alongside either option above to push analytics data to OTEL-compatible endpoints:
 <details>
 <summary>Detailed OTEL Metrics Setup</summary>
 
@@ -304,46 +283,6 @@ AZURE_STORAGE_CONTAINER: "<Azure Storage Container>"
 AZURE_ENTRA_CLIENT_ID: "<Azure Entra Client Id>"
 AZURE_ENTRA_CLIENT_SECRET: "<Azure Entra Client Secret>"
 AZURE_ENTRA_TENANT_ID: "<Azure Entra Tenant Id>"
-```
-</details>
-
-### MongoDB (⚠️ Maintenance Mode)
-
-> **⚠️ MAINTENANCE MODE NOTICE**
-> 
-> MongoDB as a LOG_STORE is now in **maintenance mode**. We recommend using S3-compatible storage (AWS S3, Azure Blob, GCS, etc.) for new deployments.
->
-> **Known Limitations:**
-> - **16MB document size limit**: MongoDB has a maximum document size of 16MB, which can be exceeded by large LLM request/response payloads
-> - **No streaming support**: MongoDB doesn't support streaming writes, requiring the entire document to be buffered before insert
-> - **Bulk insert limitations**: Large batch operations may face performance issues and transaction timeouts
->
-> Existing MongoDB deployments will continue to be supported, but no new features will be added.
-
-<details>
-<summary>Detailed MongoDB setup</summary>
-
-**Simple Setup**
-```yaml
-LOG_STORE: mongo
-MONGO_DB_CONNECTION_URL: "mongodb://user:pass@host:port/db"
-MONGO_DATABASE: "<Mongo DB>"
-MONGO_COLLECTION_NAME: "<Mongo Collection>"
-MONGO_GENERATION_HOOKS_COLLECTION_NAME: "<Mongo Collection for Hooks>"
-```
-
-**For PEM file authentication:**
-1. Add your PEM file to `resources-config.yaml`
-2. Configure volume mounting in `values.yaml`:
-```yaml
-volumes:
-- name: shared-folder
-  configMap:
-    name: resource-config
-volumeMounts:
-- name: shared-folder
-  mountPath: /etc/shared/document_db.pem
-  subPath: document_db.pem
 ```
 </details>
 

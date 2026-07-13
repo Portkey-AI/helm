@@ -18,7 +18,7 @@ strategy: {}
 
 images:
   gatewayImage:
-    repository: "docker.io/portkeyai/gateway_enterprise"
+    repository: "prisma-airs-gw.portkey.ai/portkeyai/gateway_enterprise"
     pullPolicy: IfNotPresent
     tag: "2.11.1"
   dataserviceImage:
@@ -49,6 +49,13 @@ images:
 
 nameOverride: ""
 fullnameOverride: ""
+
+# Labels added to every resource created by this chart.
+# Example:
+# commonLabels:
+#   environment: production
+#   team: platform
+commonLabels: {}
 
 selectorLabels: {}
 
@@ -103,7 +110,6 @@ environment:
   #  - AZURE_STORAGE_KEY
   #  - AWS_ASSUME_ROLE_ACCESS_KEY_ID
   #  - AWS_ASSUME_ROLE_SECRET_ACCESS_KEY
-  #  - MONGO_DB_CONNECTION_URL
   
   # Application environment variables
   # When using existingSecret with explicit mode:
@@ -112,7 +118,7 @@ environment:
   data:
     SERVICE_NAME: portkeyenterprise
     PORT: "8787"
-    LOG_STORE: 
+    LOG_STORE: control_plane
     LOG_STORE_REGION: 
     LOG_STORE_ACCESS_KEY: 
     LOG_STORE_SECRET_KEY: 
@@ -120,11 +126,6 @@ environment:
     LOG_STORE_BASEPATH: 
     LOG_STORE_AWS_ROLE_ARN:
     LOG_STORE_AWS_EXTERNAL_ID:
-    # -- MongoDB configuration (⚠️ MAINTENANCE MODE)
-    MONGO_DB_CONNECTION_URL: 
-    MONGO_DATABASE: 
-    MONGO_COLLECTION_NAME:
-    MONGO_GENERATIONS_HOOKS_COLLECTION_NAME:
     AWS_ASSUME_ROLE_ACCESS_KEY_ID:
     AWS_ASSUME_ROLE_SECRET_ACCESS_KEY:
     AWS_ASSUME_ROLE_REGION:
@@ -136,12 +137,6 @@ environment:
     AZURE_STORAGE_ACCOUNT: 
     AZURE_STORAGE_KEY: 
     AZURE_STORAGE_CONTAINER:
-    ANALYTICS_STORE: clickhouse
-    ANALYTICS_STORE_ENDPOINT: 
-    ANALYTICS_STORE_USER: 
-    ANALYTICS_STORE_PASSWORD: 
-    ANALYTICS_LOG_TABLE: 
-    ANALYTICS_FEEDBACK_TABLE: 
     # -- Minimum supported Redis version: 6.2
     CACHE_STORE: redis
     REDIS_URL: redis://redis:6379
@@ -184,7 +179,7 @@ securityContext:
 
 
 service:
-  type: NodePort
+  type: ClusterIP
   port: 8787
   containerPort:
   additionalLabels: {}
@@ -277,6 +272,12 @@ autoscaling:
       stabilizationWindowSeconds: 300
       podScaleDownValue: 1
       periodSeconds: 60
+
+pdb:
+  enabled: false
+  # minAvailable and maxUnavailable are mutually exclusive; set only one.
+  minAvailable: 1
+  maxUnavailable: ""
 
 # Additional volumes on the output Deployment definition.
 volumes: []
@@ -396,7 +397,6 @@ dataservice:
     startupProbe:
       httpGet:
         path: /health
-        port: 8081
       initialDelaySeconds: 60
       failureThreshold: 3
       periodSeconds: 10
@@ -404,14 +404,12 @@ dataservice:
     livenessProbe:
       httpGet:
         path: /health
-        port: 8081
       failureThreshold: 3
       periodSeconds: 10
       timeoutSeconds: 1
     readinessProbe:
       httpGet:
         path: /health
-        port: 8081
       failureThreshold: 3
       periodSeconds: 10
       timeoutSeconds: 1
@@ -476,12 +474,16 @@ dataservice:
         stabilizationWindowSeconds: 300
         podScaleDownValue: 1
         periodSeconds: 60
+  pdb:
+    enabled: false
+    minAvailable: 1
+    maxUnavailable: ""
 
 # Redis-specific configuration section
 # Minimum supported Redis version: 6.2
 redis:
   name: "redis"  
-  serviceType: NodePort  
+  serviceType: ClusterIP
   servicePort: 6379
   containerPort: 6379
   # -- Number of old ReplicaSets to retain to allow rollback. Defaults to 10.

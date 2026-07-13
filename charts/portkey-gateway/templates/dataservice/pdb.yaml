@@ -1,0 +1,17 @@
+{{- if and .Values.dataservice.enabled .Values.dataservice.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "portkeyenterprise.fullname" . }}-{{ .Values.dataservice.name }}
+  labels:
+    {{- include "dataservice.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.dataservice.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.dataservice.pdb.maxUnavailable }}
+  {{- else }}
+  minAvailable: {{ .Values.dataservice.pdb.minAvailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "dataservice.selectorLabels" . | nindent 6 }}
+{{- end }}

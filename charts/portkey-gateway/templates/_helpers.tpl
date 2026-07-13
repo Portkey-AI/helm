@@ -31,6 +31,15 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
+User-defined labels applied to every resource.
+*/}}
+{{- define "portkeyenterprise.commonLabels" -}}
+{{- with .Values.commonLabels }}
+{{- toYaml . }}
+{{- end }}
+{{- end }}
+
+{{/*
 Common labels
 */}}
 {{- define "portkeyenterprise.labels" -}}
@@ -39,6 +48,7 @@ helm.sh/chart: {{ include "portkeyenterprise.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- include "portkeyenterprise.commonLabels" . }}
 {{- end }}
 
 {{/*
@@ -175,6 +185,7 @@ helm.sh/chart: {{ include "portkeyenterprise.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- include "portkeyenterprise.commonLabels" . }}
 {{- end }}
 
 {{/*
@@ -266,6 +277,24 @@ Common Environment Env
 {{- end }}
 
 {{/*
+Built-in defaults rendered only when not already provided in environment.data.
+*/}}
+{{- define "portkeyenterprise.builtinDefaults" -}}
+{{- $env := include "portkeyenterprise.commonEnvMap" . | fromYaml -}}
+{{- $defaults := dict
+  "ALBUS_BASEPATH"           "https://mp.us.prod.airs-gw.portkey.ai"
+  "CONTROL_PLANE_BASEPATH"   "https://aigw.portkey.ai/v1"
+  "SOURCE_SYNC_API_BASEPATH" "https://aigw.portkey.ai/v1/sync"
+  "CONFIG_READER_PATH"       "https://api.portkey.ai/v1/sync/model-configs"
+-}}
+{{- range $key, $val := $defaults }}
+{{- if not (hasKey $env $key) }}
+{{- include "portkeyenterprise.renderEnvVar" (list $key $val) | nindent 0 }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
 Common Environment Env as Map
 */}}
 {{- define "portkeyenterprise.commonEnvMap" -}}
@@ -332,7 +361,7 @@ Common Environment Env as Map
 {{- define "logStore.commonEnv" -}}
 {{- $commonEnv := include "portkeyenterprise.commonEnvMap" . | fromYaml -}}
 {{- range $key, $value := $commonEnv }}
-{{- if has $key (list "LOG_STORE" "MONGO_DB_CONNECTION_URL" "MONGO_DATABASE" "MONGO_COLLECTION_NAME" "MONGO_GENERATION_HOOKS_COLLECTION_NAME" "LOG_STORE_ACCESS_KEY" "LOG_STORE_SECRET_KEY" "LOG_STORE_REGION" "LOG_STORE_GENERATIONS_BUCKET" "LOG_STORE_BASEPATH" "LOG_STORE_AWS_ROLE_ARN" "LOG_STORE_AWS_EXTERNAL_ID" "AZURE_AUTH_MODE" "AZURE_STORAGE_ACCOUNT" "AZURE_STORAGE_KEY" "AZURE_STORAGE_CONTAINER" "AZURE_MANAGED_CLIENT_ID" "AZURE_ENTRA_CLIENT_ID" "AZURE_ENTRA_CLIENT_SECRET" "AZURE_ENTRA_TENANT_ID") }}
+{{- if has $key (list "LOG_STORE" "LOG_STORE_ACCESS_KEY" "LOG_STORE_SECRET_KEY" "LOG_STORE_REGION" "LOG_STORE_GENERATIONS_BUCKET" "LOG_STORE_BASEPATH" "LOG_STORE_AWS_ROLE_ARN" "LOG_STORE_AWS_EXTERNAL_ID" "AZURE_AUTH_MODE" "AZURE_STORAGE_ACCOUNT" "AZURE_STORAGE_KEY" "AZURE_STORAGE_CONTAINER" "AZURE_MANAGED_CLIENT_ID" "AZURE_ENTRA_CLIENT_ID" "AZURE_ENTRA_CLIENT_SECRET" "AZURE_ENTRA_TENANT_ID") }}
 {{- include "portkeyenterprise.renderEnvVar" (list $key $value) | nindent 0 }}
 {{- end }}
 {{- end }}
@@ -340,8 +369,9 @@ Common Environment Env as Map
 
 {{- define "analyticStore.commonEnv" -}}
 {{- $commonEnv := include "portkeyenterprise.commonEnvMap" . | fromYaml -}}
+{{- include "portkeyenterprise.renderEnvVar" (list "ANALYTICS_STORE" "control_plane") | nindent 0 }}
 {{- range $key, $value := $commonEnv }}
-{{- if has $key (list "ANALYTICS_STORE" "ANALYTICS_STORE_ENDPOINT" "ANALYTICS_STORE_USER" "ANALYTICS_STORE_PASSWORD" "ANALYTICS_LOG_TABLE" "ANALYTICS_FEEDBACK_TABLE") }}
+{{- if has $key (list "ANALYTICS_STORE_ENDPOINT" "ANALYTICS_STORE_USER" "ANALYTICS_STORE_PASSWORD" "ANALYTICS_LOG_TABLE" "ANALYTICS_FEEDBACK_TABLE") }}
 {{- include "portkeyenterprise.renderEnvVar" (list $key $value) | nindent 0 }}
 {{- end }}
 {{- end }}
@@ -517,6 +547,7 @@ helm.sh/chart: {{ include "portkeyenterprise.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- include "portkeyenterprise.commonLabels" . }}
 {{- end }}
 
 {{/*
@@ -538,6 +569,7 @@ helm.sh/chart: {{ include "portkeyenterprise.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- include "portkeyenterprise.commonLabels" . }}
 {{- end }}
 
 {{/*
@@ -600,6 +632,7 @@ helm.sh/chart: {{ include "portkeyenterprise.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- include "portkeyenterprise.commonLabels" . }}
 {{- end }}
 
 {{/*
