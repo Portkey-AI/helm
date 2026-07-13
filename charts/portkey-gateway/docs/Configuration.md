@@ -13,10 +13,10 @@
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `images.gatewayImage.repository` | string | `"docker.io/portkeyai/gateway_enterprise"` | Gateway container image repository |
+| `images.gatewayImage.repository` | string | `"registry.airs-gw.portkey.ai/gateway_enterprise"` | Gateway container image repository |
 | `images.gatewayImage.pullPolicy` | string | `"IfNotPresent"` | Image pull policy for gateway |
 | `images.gatewayImage.tag` | string | `"1.15.8"` | Gateway image tag |
-| `images.dataserviceImage.repository` | string | `"docker.io/portkeyai/data-service"` | Dataservice container image repository |
+| `images.dataserviceImage.repository` | string | `"registry.airs-gw.portkey.ai/data-service"` | Dataservice container image repository |
 | `images.dataserviceImage.pullPolicy` | string | `"IfNotPresent"` | Image pull policy for dataservice |
 | `images.dataserviceImage.tag` | string | `"1.2.8"` | Dataservice image tag |
 | `images.redisImage.repository` | string | `"docker.io/redis"` | Redis container image repository |

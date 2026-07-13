@@ -24,22 +24,22 @@ Update your `values.yaml` with the appropriate storage backends:
 ```bash
 helm repo add portkey-ai https://portkey-ai.github.io/helm
 helm repo update
-helm upgrade --install portkey-ai portkey-ai/airs-gw \
+helm upgrade --install airs-gw portkey-ai/airs-gw \
   -f ./values.yaml \
-  -n portkeyai \
+  -n airs-gw \
   --create-namespace
 ```
 
 ### 4. Verify
 
 ```bash
-kubectl get pods -n portkeyai
+kubectl get pods -n airs-gw
 ```
 
 ### 5. Test (Optional)
 
 ```bash
-kubectl port-forward <pod-name> -n portkeyai 8787:8787
+kubectl port-forward <pod-name> -n airs-gw 8787:8787
 ```
 
 ## Data Service (Optional)
@@ -64,16 +64,21 @@ For detailed fine-tuning information, see [DataService.md](./docs/DataService.md
 ## Uninstallation
 
 ```bash
-helm uninstall portkey-gateway --namespace portkeyai
+helm uninstall airs-gw --namespace airs-gw
 ```
+
+---
+
+## References
+
+- [External Redis / Cache Store configuration](./docs/Redis.md) — configure AWS ElastiCache, Azure Managed Redis, or GCP Memorystore as the cache store
+- [All available configuration options](./docs/Configuration.md) — full reference for all Helm chart values
+- [Deployment guide](http://localhost:3000/self-hosting/hybrid-deployments) — end-to-end steps for deploying on EKS, AKS, or GKE
 
 ---
 
 ## Support
 
-For additional help:
-
-- Check the [full configuration reference](values.yaml)
-- Review logs: `kubectl logs -n portkeyai deployment/portkey-gateway`
-- Contact support([suport@portkey.ai](mailto:suport@portkey.ai)) with your configuration details
+- Review logs: `kubectl logs -n airs-gw deployment/portkey-gateway`
+- Contact [support@portkey.ai](mailto:support@portkey.ai) with your configuration details
 

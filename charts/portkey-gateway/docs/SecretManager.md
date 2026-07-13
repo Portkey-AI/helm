@@ -12,7 +12,7 @@ Applications accept values as either normal strings or filesystem paths. If the 
 1. Amazon EKS cluster (v1.23+ recommended)
 2. AWS CLI configured and `kubectl` access
 3. An IRSA role with at least `secretsmanager:GetSecretValue` and `secretsmanager:DescribeSecret`
-4. Namespace created (e.g., `portkeyai`)
+4. Namespace created (e.g., `airs-gw`)
 
 Example IAM policy for IRSA:
 ```json
@@ -100,7 +100,7 @@ apiVersion: secrets-store.csi.x-k8s.io/v1
 kind: SecretProviderClass
 metadata:
   name: portkey-gateway-aws-secrets
-  namespace: portkeyai
+  namespace: airs-gw
 spec:
   provider: aws
   parameters:
@@ -293,7 +293,7 @@ apiVersion: secrets-store.csi.x-k8s.io/v1
 kind: SecretProviderClass
 metadata:
   name: portkey-gateway-aws-secrets
-  namespace: portkeyai
+  namespace: airs-gw
 spec:
   provider: aws
   parameters:
@@ -534,7 +534,7 @@ apiVersion: secrets-store.csi.x-k8s.io/v1
 kind: SecretProviderClass
 metadata:
   name: portkey-gateway-aws-secrets
-  namespace: portkeyai
+  namespace: airs-gw
 spec:
   provider: aws
   parameters:
@@ -649,16 +649,16 @@ kubectl -n kube-system get pods -l app.kubernetes.io/name=secrets-store-csi-driv
 ```
 - SecretProviderClass:
 ```bash
-kubectl -n portkeyai get secretproviderclass portkey-gateway-aws-secrets -o yaml
+kubectl -n airs-gw get secretproviderclass portkey-gateway-aws-secrets -o yaml
 ```
 - Secret exists after pod starts (Option A/C):
 ```bash
-kubectl -n portkeyai get secret portkey-gateway-env -o yaml
+kubectl -n airs-gw get secret portkey-gateway-env -o yaml
 ```
 - Mount present on pods:
 ```bash
-kubectl -n portkeyai get pods -l app.kubernetes.io/name=portkey-gateway
-kubectl -n portkeyai exec -it deploy/<release>-portkey-gateway -- ls -l /mnt/secrets
+kubectl -n airs-gw get pods -l app.kubernetes.io/name=portkey-gateway
+kubectl -n airs-gw exec -it deploy/<release>-portkey-gateway -- ls -l /mnt/secrets
 ```
 
 ## Rotation

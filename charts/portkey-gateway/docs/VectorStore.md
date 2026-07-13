@@ -46,7 +46,7 @@ environment:
 Apply the configuration by upgrading the Helm installation:
 
 ```sh
-helm upgrade --install portkey-ai portkey-ai/gateway -f ./values.yaml -n portkeyai --create-namespace
+helm upgrade --install portkey-ai portkey-ai/gateway -f ./values.yaml -n airs-gw --create-namespace
 ```
 
 
@@ -55,7 +55,7 @@ helm upgrade --install portkey-ai portkey-ai/gateway -f ./values.yaml -n portkey
 After deploying, port-forward the Milvus service to access it locally:
 
 ```sh
-kubectl port-forward -n portkeyai svc/milvus 19530:19530
+kubectl port-forward -n airs-gw svc/milvus 19530:19530
 ```
 
 ## Connect to Milvus
@@ -140,5 +140,5 @@ curl --location --request POST 'http://localhost:19530/v2/vectordb/collections/d
 - The `dim` value in the collection schema must match your embedding model's output dimensions. Refer to your embedding provider's documentation for the correct dimension size.
 - Ensure Milvus is fully ready before creating collections. You can check pod status with:
   ```sh
-  kubectl get pods -n portkeyai | grep milvus
+  kubectl get pods -n airs-gw | grep milvus
   ```
