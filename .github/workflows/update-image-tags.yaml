@@ -1,0 +1,191 @@
+name: Update Image Tags from Changelogs
+
+on:
+  push:
+    branches: [chore/update-image-tags-workflow]
+  schedule:
+    - cron: '0 8 * * *'  # daily at 08:00 UTC
+  workflow_dispatch:       # allow manual trigger from Actions UI
+
+jobs:
+  update-tags:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch latest versions from changelogs
+        id: versions
+        run: |
+          fetch_latest() {
+            curl -sf "$1" | grep -m1 '<Update label=' | sed 's/.*label="\([^"]*\)".*/\1/'
+          }
+          BASE="https://raw.githubusercontent.com/Portkey-AI/docs-core/main/changelog"
+
+          GATEWAY_VER=$(fetch_latest "${BASE}/enterprise.mdx")
+          DATASERVICE_VER=$(fetch_latest "${BASE}/data-service.mdx")
+          BACKEND_VER=$(fetch_latest "${BASE}/backend.mdx")
+          FRONTEND_VER=$(fetch_latest "${BASE}/frontend.mdx")
+
+          echo "gateway=${GATEWAY_VER}"         >> "$GITHUB_OUTPUT"
+          echo "dataservice=${DATASERVICE_VER}" >> "$GITHUB_OUTPUT"
+          echo "backend=${BACKEND_VER}"         >> "$GITHUB_OUTPUT"
+          echo "frontend=${FRONTEND_VER}"       >> "$GITHUB_OUTPUT"
+
+          echo "Fetched versions:"
+          echo "  gateway:      ${GATEWAY_VER}"
+          echo "  data-service: ${DATASERVICE_VER}"
+          echo "  backend:      ${BACKEND_VER}"
+          echo "  frontend:     ${FRONTEND_VER}"
+
+      - name: Capture current tags (for PR body)
+        id: current
+        run: |
+          GW_FILE="charts/portkey-gateway/values.yaml"
+          APP_FILE="charts/portkey-app/values.yaml"
+
+          # Read-only extraction: grep the image block then pull the tag line value
+          get_tag() { grep -A4 "$1:" "$2" | grep 'tag:' | head -1 | sed 's/.*tag:[[:space:]]*"\(.*\)"/\1/'; }
+
+          echo "gw_gateway=$(get_tag gatewayImage ${GW_FILE})"           >> "$GITHUB_OUTPUT"
+          echo "gw_dataservice=$(get_tag dataserviceImage ${GW_FILE})"   >> "$GITHUB_OUTPUT"
+          echo "app_gateway=$(get_tag gatewayImage ${APP_FILE})"         >> "$GITHUB_OUTPUT"
+          echo "app_dataservice=$(get_tag dataserviceImage ${APP_FILE})" >> "$GITHUB_OUTPUT"
+          echo "app_backend=$(get_tag backendImage ${APP_FILE})"         >> "$GITHUB_OUTPUT"
+          echo "app_frontend=$(get_tag frontendImage ${APP_FILE})"       >> "$GITHUB_OUTPUT"
+
+      - name: Patch image tags
+        env:
+          GATEWAY_VER:     ${{ steps.versions.outputs.gateway }}
+          DATASERVICE_VER: ${{ steps.versions.outputs.dataservice }}
+          BACKEND_VER:     ${{ steps.versions.outputs.backend }}
+          FRONTEND_VER:    ${{ steps.versions.outputs.frontend }}
+        run: |
+          GW_FILE="charts/portkey-gateway/values.yaml"
+          APP_FILE="charts/portkey-app/values.yaml"
+
+          # sed range: from the image key line to the first tag: line after it.
+          # Only rewrites that one tag: line — every other byte in the file is untouched.
+          set_tag() {
+            sed -i "/$1:/,/tag:/ s|\(^[[:space:]]*tag: \).*|\1\"$2\"|" "$3"
+          }
+
+          # portkey-gateway chart
+          set_tag gatewayImage     "${GATEWAY_VER}"     "${GW_FILE}"
+          set_tag dataserviceImage "${DATASERVICE_VER}" "${GW_FILE}"
+
+          # portkey-app chart
+          set_tag gatewayImage     "${GATEWAY_VER}"     "${APP_FILE}"
+          set_tag dataserviceImage "${DATASERVICE_VER}" "${APP_FILE}"
+          set_tag backendImage     "${BACKEND_VER}"     "${APP_FILE}"
+          set_tag frontendImage    "${FRONTEND_VER}"    "${APP_FILE}"
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No tag changes detected — all values.yaml files are already up to date."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Changes detected:"
+            git diff --stat
+          fi
+
+      - name: Build PR body
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          CUR_GW_GATEWAY:      ${{ steps.current.outputs.gw_gateway }}
+          CUR_GW_DATASERVICE:  ${{ steps.current.outputs.gw_dataservice }}
+          CUR_APP_GATEWAY:     ${{ steps.current.outputs.app_gateway }}
+          CUR_APP_DATASERVICE: ${{ steps.current.outputs.app_dataservice }}
+          CUR_APP_BACKEND:     ${{ steps.current.outputs.app_backend }}
+          CUR_APP_FRONTEND:    ${{ steps.current.outputs.app_frontend }}
+          NEW_GATEWAY:     ${{ steps.versions.outputs.gateway }}
+          NEW_DATASERVICE: ${{ steps.versions.outputs.dataservice }}
+          NEW_BACKEND:     ${{ steps.versions.outputs.backend }}
+          NEW_FRONTEND:    ${{ steps.versions.outputs.frontend }}
+        run: |
+          cat <<'BODY' > /tmp/pr_body.md
+          ## Image tag updates from changelogs
+
+          Automated update from [Portkey changelogs](https://github.com/Portkey-AI/docs-core/tree/main/changelog).
+
+          ### `charts/portkey-gateway/values.yaml`
+
+          | Image | Before | After |
+          |-------|--------|-------|
+          BODY
+
+          echo "| \`gatewayImage\`     | \`${CUR_GW_GATEWAY}\`     | \`${NEW_GATEWAY}\`     |" >> /tmp/pr_body.md
+          echo "| \`dataserviceImage\` | \`${CUR_GW_DATASERVICE}\` | \`${NEW_DATASERVICE}\` |" >> /tmp/pr_body.md
+
+          cat <<'BODY' >> /tmp/pr_body.md
+
+          ### `charts/portkey-app/values.yaml`
+
+          | Image | Before | After |
+          |-------|--------|-------|
+          BODY
+
+          echo "| \`gatewayImage\`     | \`${CUR_APP_GATEWAY}\`     | \`${NEW_GATEWAY}\`     |" >> /tmp/pr_body.md
+          echo "| \`dataserviceImage\` | \`${CUR_APP_DATASERVICE}\` | \`${NEW_DATASERVICE}\` |" >> /tmp/pr_body.md
+          echo "| \`backendImage\`     | \`${CUR_APP_BACKEND}\`     | \`${NEW_BACKEND}\`     |" >> /tmp/pr_body.md
+          echo "| \`frontendImage\`    | \`${CUR_APP_FRONTEND}\`    | \`${NEW_FRONTEND}\`    |" >> /tmp/pr_body.md
+
+          cat <<'BODY' >> /tmp/pr_body.md
+
+          > Rows where Before = After mean the tag was already current for that chart.
+
+          ### Changelog sources
+          - Enterprise Gateway: https://github.com/Portkey-AI/docs-core/blob/main/changelog/enterprise.mdx
+          - Data Service: https://github.com/Portkey-AI/docs-core/blob/main/changelog/data-service.mdx
+          - Backend: https://github.com/Portkey-AI/docs-core/blob/main/changelog/backend.mdx
+          - Frontend: https://github.com/Portkey-AI/docs-core/blob/main/changelog/frontend.mdx
+          BODY
+
+      - name: Create branch and open PR
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GATEWAY_VER:     ${{ steps.versions.outputs.gateway }}
+          DATASERVICE_VER: ${{ steps.versions.outputs.dataservice }}
+          BACKEND_VER:     ${{ steps.versions.outputs.backend }}
+          FRONTEND_VER:    ${{ steps.versions.outputs.frontend }}
+        run: |
+          BRANCH="chore/update-image-tags-$(date +%Y%m%d)"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -B "${BRANCH}"
+          git add charts/portkey-gateway/values.yaml charts/portkey-app/values.yaml
+          git commit -m "chore: update image tags from changelogs
+
+          - gateway:      ${GATEWAY_VER}
+          - data-service: ${DATASERVICE_VER}
+          - backend:      ${BACKEND_VER}
+          - frontend:     ${FRONTEND_VER}"
+
+          git push --force-with-lease origin "${BRANCH}"
+
+          # Open a new PR or update an existing one for the same branch (idempotent)
+          EXISTING_PR=$(gh pr list --head "${BRANCH}" --json number --jq '.[0].number')
+          if [ -z "${EXISTING_PR}" ]; then
+            gh pr create \
+              --base main \
+              --head "${BRANCH}" \
+              --title "chore: update image tags (gateway=${GATEWAY_VER}, backend=${BACKEND_VER}, frontend=${FRONTEND_VER})" \
+              --body-file /tmp/pr_body.md
+          else
+            echo "PR #${EXISTING_PR} already exists for ${BRANCH} — updating body."
+            gh pr edit "${EXISTING_PR}" \
+              --title "chore: update image tags (gateway=${GATEWAY_VER}, backend=${BACKEND_VER}, frontend=${FRONTEND_VER})" \
+              --body-file /tmp/pr_body.md
+          fi
