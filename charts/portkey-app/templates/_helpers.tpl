@@ -742,19 +742,19 @@ Template containing common environment variables that are used by several servic
 {{- end }}
 
 {{- define "portkey.backendURL" -}}
-{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.backend.containerPort }}
+{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.backend.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.backend.service.port }}
 {{- end -}}
 
 {{- define "portkey.frontendURL" -}}
-{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.backend.service.httpPort }}
+{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.frontend.service.httpPort }}
 {{- end -}}
 
 {{- define "portkey.dataserviceURL" -}}
-{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.dataservice.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.dataservice.containerPort }}
+{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.dataservice.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.dataservice.service.port }}
 {{- end -}}
 
 {{- define "portkey.gatewayURL" -}}
-{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.gateway.containerPort }}
+{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.gateway.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.gateway.service.port }}
 {{- end -}}
 
 {{- define "portkey.mcpURL" -}}
