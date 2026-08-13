@@ -105,9 +105,6 @@ spec:
             {{- toYaml .Values.mysql.statefulSet.securityContext | nindent 12 }}
           {{- if .Values.mysql.statefulSet.persistence.enabled }}
           volumeMounts:
-            {{- with .Values.clickhouse.statefulSet.volumeMounts }}
-              {{- toYaml . | nindent 12 }}
-            {{- end }}
             - mountPath: /var/lib/mysql
               name: data
             {{- with .Values.mysql.statefulSet.volumeMounts }}
