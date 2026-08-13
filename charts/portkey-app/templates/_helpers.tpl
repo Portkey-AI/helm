@@ -746,7 +746,7 @@ Template containing common environment variables that are used by several servic
 {{- end -}}
 
 {{- define "portkey.frontendURL" -}}
-{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.backend.service.httpPort }}
+{{- include "portkey.containerProtocol" . }}://{{ include "portkey.fullname" . }}-{{ .Values.frontend.name }}.{{.Release.Namespace}}.svc.cluster.local:{{ .Values.frontend.service.httpPort }}
 {{- end -}}
 
 {{- define "portkey.dataserviceURL" -}}
