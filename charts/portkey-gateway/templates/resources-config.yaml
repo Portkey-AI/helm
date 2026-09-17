@@ -1,9 +1,10 @@
+{{- if .Values.resourceConfig.create }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: resource-config
+  name: {{ .Values.resourceConfig.nameOverride | default "resource-config" }}
+  labels:
+    {{- include "portkeyenterprise.labels" . | nindent 4 }}
 data:
-  document_db.pem: |
-    -----BEGIN CERTIFICATE-----
-    ____
-    -----END CERTIFICATE-----
+  {{- toYaml .Values.resourceConfig.data | nindent 2 }}
+{{- end }}
