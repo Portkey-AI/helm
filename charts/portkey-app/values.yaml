@@ -185,13 +185,14 @@ backend:
     annotations: {}
     podSecurityContext: {}
     securityContext: {}
-    # resources:
-    #   limits:
-    #     cpu: 1000m
-    #     memory: 1Gi
-    #   requests:
-    #     cpu: 200m
-    #     memory: 500Mi
+    # Resource requests are required for the HorizontalPodAutoscaler to work.
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 200m
+        memory: 500Mi
     startupProbe:
       httpGet:
         path: /health
@@ -394,13 +395,14 @@ dataservice:
       runAsUser: 1000
       readOnlyRootFilesystem: true
       allowPrivilegeEscalation: false
-    # resources:
-    #   limits:
-    #     cpu: 1000m
-    #     memory: 1Gi
-    #   requests:
-    #     cpu: 200m
-    #     memory: 500Mi
+    # Resource requests are required for the HorizontalPodAutoscaler to work.
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
     startupProbe:
       httpGet:
         path: /health
@@ -494,13 +496,14 @@ frontend:
       runAsUser: 101
       readOnlyRootFilesystem: true
       allowPrivilegeEscalation: false
-    # resources:
-    #   limits:
-    #     cpu: 1000m
-    #     memory: 1Gi
-    #   requests:
-    #     cpu: 200m
-    #     memory: 500Mi
+    # Resource requests are required for the HorizontalPodAutoscaler to work.
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 200m
+        memory: 500Mi
     # startupProbe:
     #   httpGet:
     #     path: /
