@@ -27,6 +27,7 @@ images:
 config:
   jwtPrivateKey: "" # Required: set a strong secret for signing the frontend JWT tokens, or provide it via config.existingSecretName
   disableOrgCreation: false # Set to true to disable organization creation post installation and first time login
+  allowMultiOrgCreation: false # Set to true to let org owners/admins create additional organizations. Ignored when disableOrgCreation is true
   disableTestimonial: true # Set to true to disable testimonial section in the frontend
   noAuth:
     enabled: false # Set to true to disable authentication and allow access to the application without any authentication
