@@ -37,6 +37,19 @@ config:
 - If you are installing for the first time you should set noAuth.enabled true. This will allow you to access the application without any authentication, post which you should configure OAuth and switch it on.
 - Strongly recommended to use OAuth for authentication in production.
 
+### Organization Creation
+
+```yaml
+config:
+  disableOrgCreation: false
+  allowMultiOrgCreation: false
+```
+
+- By default, a user who is not part of any organization can self-provision exactly one organization on first login. This is how the first organization gets created in an air-gapped install.
+- Set `disableOrgCreation: true` to lock this down entirely once your first organization exists. This sets `DISABLE_ORG_CREATION=ON` on the backend.
+- Set `allowMultiOrgCreation: true` to let users who are already an `owner` or `admin` of an organization create additional ones. This sets `ALLOW_MULTI_ORG_CREATION=ON` on the backend. Plain members and users with a pending invite remain blocked.
+- `disableOrgCreation` takes precedence: when it is `true`, `allowMultiOrgCreation` is ignored and `ALLOW_MULTI_ORG_CREATION` is not set.
+
 ### Blob Storage Configuration
 
 ```yaml

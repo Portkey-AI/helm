@@ -96,6 +96,9 @@ spec:
             {{- if .Values.config.disableOrgCreation }}
             - name: DISABLE_ORG_CREATION
               value: "ON"
+            {{- else if .Values.config.allowMultiOrgCreation }}
+            - name: ALLOW_MULTI_ORG_CREATION
+              value: "ON"
             {{- end }}
             {{- if .Values.mcp.enabled }}
             - name: MCP_ENABLED
