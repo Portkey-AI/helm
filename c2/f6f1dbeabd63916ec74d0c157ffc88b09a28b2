@@ -1,0 +1,23 @@
+charts/portkey-app/docs/secret-manager-integration.md
+  s_2a418a6324d430::t_b212e4932aeae3 150-151
+charts/portkey-app/docs/sso-setup.md
+  s_2a418a6324d430::t_e2b6f9667276d5 131-132,135-136
+charts/portkey-app/templates/_helpers.tpl
+  s_2a418a6324d430::t_f998d10c0e4310 375,377,379-384
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "c2f6f1dbeabd63916ec74d0c157ffc88b09a28b2",
+  "prompts": {},
+  "sessions": {
+    "s_2a418a6324d430": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0c51f8e2-0a3c-457c-9551-75c5f711f21f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Mahesh Vagicherla <maheshmahi19@outlook.com>"
+    }
+  }
+}
