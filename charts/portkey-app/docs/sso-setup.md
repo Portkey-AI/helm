@@ -114,6 +114,28 @@ config:
 
 ---
 
+## Verified Email Domains
+
+Domain verification from Organisation Settings relies on sending a verification email, which isn't possible in air-gapped deployments. Instead, declare your verified domains in `values.yaml`:
+
+```yaml
+config:
+  oauth:
+    enabled: true
+    # ...SAML/OIDC settings above...
+    verifiedEmailDomains:
+      - "acme.com"      # exact domain: user@acme.com
+      - "*.acme.io"     # domain and its subdomains: user@acme.io, user@eu.acme.io
+```
+
+These domains:
+
+* Are passed to the backend as the comma-separated `VERIFIED_EMAIL_DOMAINS` environment variable.
+* Apply to **every** organisation in the deployment, in addition to any domains verified from Organisation Settings.
+* Are accepted wherever a verified domain is required: SSO sign-in domain checks, SCIM user creation, and invited users when auto-provisioning is disabled.
+
+---
+
 **Note:**
 
 * Use only one `oauthType` (`saml` or `oidc`) in the config at a time.

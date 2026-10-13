@@ -372,6 +372,10 @@ Template containing common environment variables that are used by several servic
       name: {{ include "portkey.secretsName" . }}
       key: oauthMetadataXml
       optional: true
+{{- with .Values.config.oauth.verifiedEmailDomains }}
+- name: VERIFIED_EMAIL_DOMAINS
+  value: {{ (kindIs "slice" .) | ternary (join "," .) (toString .) | quote }}
+{{- end }}
 {{- end }}
 {{- if .Values.config.noAuth.enabled }}
 - name: AUTH_MODE
