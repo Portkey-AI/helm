@@ -372,9 +372,16 @@ Template containing common environment variables that are used by several servic
       name: {{ include "portkey.secretsName" . }}
       key: oauthMetadataXml
       optional: true
-{{- with .Values.config.oauth.verifiedEmailDomains }}
+{{- /* Plain value from values.yaml wins (works with or without existingSecretName); otherwise read the optional secret key. */}}
 - name: VERIFIED_EMAIL_DOMAINS
+{{- with .Values.config.oauth.verifiedEmailDomains }}
   value: {{ (kindIs "slice" .) | ternary (join "," .) (toString .) | quote }}
+{{- else }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "portkey.secretsName" . }}
+      key: oauthVerifiedEmailDomains
+      optional: true
 {{- end }}
 {{- end }}
 {{- if .Values.config.noAuth.enabled }}
