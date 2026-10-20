@@ -1,0 +1,19 @@
+charts/portkey-app/Chart.yaml
+  s_692e7b59c6fada::t_9187c7ab7da3bd 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "52f9ae8e7fde3f4c513882d92e198f18ef96a530",
+  "prompts": {},
+  "sessions": {
+    "s_692e7b59c6fada": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4cb205a4-8290-4047-a9d1-dbe930be9bc2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Mahesh Vagicherla <maheshmahi19@outlook.com>"
+    }
+  }
+}
