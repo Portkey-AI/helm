@@ -1,0 +1,19 @@
+charts/portkey-app/docs/secret-manager-integration.md
+  s_f3a70f80b4145d::t_0d97964ab56e58 252-253
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "7d702ed23bb9016117b6b45b34d9b6a89ea0bbca",
+  "prompts": {},
+  "sessions": {
+    "s_f3a70f80b4145d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "94d0d5fa-a5ae-4d96-b21e-cbd45ae61a43",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Mahesh Vagicherla <maheshmahi19@outlook.com>"
+    }
+  }
+}
