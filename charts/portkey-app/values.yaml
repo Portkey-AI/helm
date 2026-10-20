@@ -102,6 +102,11 @@ config:
     oauthClientSecret: ""
     oauthRedirectURI: ""
     oauthMetadataXml: ""
+    # Email domains treated as verified for every organisation (in addition to
+    # domains verified from the UI, which needs outbound mail). Used for SSO/SCIM
+    # domain checks and invited-user provisioning. "*." also allows subdomains.
+    # e.g. ["acme.com", "*.acme.io"]
+    verifiedEmailDomains: []
 
   smtp:
     enabled: false

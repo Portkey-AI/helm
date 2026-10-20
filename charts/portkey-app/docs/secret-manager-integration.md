@@ -147,6 +147,8 @@ spec:
             objectAlias: oauthRedirectURI
           - path: oauthMetadataXml
             objectAlias: oauthMetadataXml
+          - path: oauthVerifiedEmailDomains
+            objectAlias: oauthVerifiedEmailDomains
           - path: smtpHost
             objectAlias: smtpHost
           - path: smtpPort
@@ -247,6 +249,8 @@ spec:
           key: oauthRedirectURI
         - objectName: oauthMetadataXml
           key: oauthMetadataXml
+        - objectName: oauthVerifiedEmailDomains
+          key: oauthVerifiedEmailDomains
         - objectName: smtpHost
           key: smtpHost
         - objectName: smtpPort
