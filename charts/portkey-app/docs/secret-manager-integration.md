@@ -249,6 +249,8 @@ spec:
           key: oauthRedirectURI
         - objectName: oauthMetadataXml
           key: oauthMetadataXml
+        - objectName: oauthVerifiedEmailDomains
+          key: oauthVerifiedEmailDomains
         - objectName: smtpHost
           key: smtpHost
         - objectName: smtpPort
