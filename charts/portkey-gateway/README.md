@@ -333,18 +333,29 @@ MONGO_GENERATION_HOOKS_COLLECTION_NAME: "<Mongo Collection for Hooks>"
 ```
 
 **For PEM file authentication:**
-1. Add your PEM file to `resources-config.yaml`
+1. Add your PEM certificate content to the `resourceConfig.data` section in `values.yaml`:
+```yaml
+resourceConfig:
+  create: true
+  data:
+    document_db.pem: |
+      -----BEGIN CERTIFICATE-----
+      <your certificate content>
+      -----END CERTIFICATE-----
+```
 2. Configure volume mounting in `values.yaml`:
 ```yaml
 volumes:
 - name: shared-folder
   configMap:
-    name: resource-config
+    name: resource-config  # matches resourceConfig.nameOverride or default
 volumeMounts:
 - name: shared-folder
   mountPath: /etc/shared/document_db.pem
   subPath: document_db.pem
 ```
+
+> **Multi-release note**: If two Helm releases deploy into the same namespace (e.g., separate ArgoCD apps for gateway and MCP), set `resourceConfig.create: false` in one release to avoid ConfigMap ownership conflicts.
 </details>
 
 ---

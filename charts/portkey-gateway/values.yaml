@@ -278,11 +278,26 @@ autoscaling:
       podScaleDownValue: 1
       periodSeconds: 60
 
+# Resource ConfigMap (e.g., PEM certificates for DocumentDB/MongoDB)
+# Set create to false when this ConfigMap is already managed by another release
+# in the same namespace (avoids ArgoCD ownership conflicts).
+resourceConfig:
+  # -- Whether to create the resource-config ConfigMap
+  create: true
+  # -- Override the ConfigMap name (default: "resource-config")
+  nameOverride: ""
+  # -- Data entries for the ConfigMap
+  data:
+    document_db.pem: |
+      -----BEGIN CERTIFICATE-----
+      ____
+      -----END CERTIFICATE-----
+
 # Additional volumes on the output Deployment definition.
 volumes: []
 # - name: shared-folder
 #   configMap:
-#     name: resource-config
+#     name: resource-config  # matches resourceConfig.nameOverride or default name
 
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts: []
