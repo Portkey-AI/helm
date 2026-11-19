@@ -25,7 +25,7 @@ spec:
       name: mcp
     {{- end }}
   selector:
-    {{- include "portkeyenterprise.selectorLabels" . | nindent 4 }}
+    {{- include "gateway.selectorLabels" . | nindent 4 }}
 ---
 {{- if and .Values.mcpService.enabled (eq (include "mcp.enabled" .) "true") }}
 apiVersion: v1
@@ -49,5 +49,5 @@ spec:
       protocol: TCP
       name: mcp
   selector:
-    {{- include "portkeyenterprise.selectorLabels" . | nindent 4 }}
+    {{- include "gateway.selectorLabels" . | nindent 4 }}
 {{- end }}
