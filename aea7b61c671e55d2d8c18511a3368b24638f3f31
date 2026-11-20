@@ -1,0 +1,25 @@
+charts/portkey-app/values.yaml
+  s_692e7b59c6fada::t_0b6bab8f03740e 35,39,47
+charts/portkey-gateway/values.yaml
+  s_692e7b59c6fada::t_0b6bab8f03740e 23
+charts/portkey-app/Chart.yaml
+  s_692e7b59c6fada::t_0b6bab8f03740e 8
+charts/portkey-gateway/Chart.yaml
+  s_692e7b59c6fada::t_0b6bab8f03740e 7-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "aea7b61c671e55d2d8c18511a3368b24638f3f31",
+  "prompts": {},
+  "sessions": {
+    "s_692e7b59c6fada": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4cb205a4-8290-4047-a9d1-dbe930be9bc2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Mahesh Vagicherla <maheshmahi19@outlook.com>"
+    }
+  }
+}

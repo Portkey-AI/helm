@@ -1,0 +1,23 @@
+charts/portkey-app/docs/sso-setup.md
+  s_2a418a6324d430::t_f8d8c6d0fb237b 117-138
+charts/portkey-app/templates/_helpers.tpl
+  s_2a418a6324d430::t_d0a23028a623b2 375-378
+charts/portkey-app/values.yaml
+  s_2a418a6324d430::t_9f5a36516a2cfe 105-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "f5805e210eae6ee75012e9e9ecc248126c2362c4",
+  "prompts": {},
+  "sessions": {
+    "s_2a418a6324d430": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0c51f8e2-0a3c-457c-9551-75c5f711f21f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Mahesh Vagicherla <maheshmahi19@outlook.com>"
+    }
+  }
+}
