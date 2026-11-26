@@ -1,0 +1,14 @@
+charts/portkey-app/docs/clickhouse-upgrade.md
+  h_f05cfb07bca7d1 3,5,7,9,11,13-23,27,36-38,40,44,61,80-85,87-96,98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "06215d3c7eb905451163f3e0b93e988fd39e7712",
+  "prompts": {},
+  "humans": {
+    "h_f05cfb07bca7d1": {
+      "author": "sk-portkey <ssaikrishna@paloaltonetworks.com>"
+    }
+  }
+}
