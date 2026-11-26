@@ -1,0 +1,23 @@
+charts/portkey-app/values.yaml
+  s_831698f6ac8f0a::t_f97922d95cfa84 59
+  s_831698f6ac8f0a::t_193a83fc1676d7 796-798
+charts/portkey-app/docs/clickhouse-upgrade.md
+  s_831698f6ac8f0a::t_6c318f77ffa79a 1-48,50-75
+  s_831698f6ac8f0a::t_50174ed48df4ff 49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "bfdd7979d22cab780ebd6f2e6cb0260445eeac35",
+  "prompts": {},
+  "sessions": {
+    "s_831698f6ac8f0a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "af1a3303-aef7-469a-bed9-6bdfa4861c29",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "sk-portkey <ssaikrishna@paloaltonetworks.com>"
+    }
+  }
+}
