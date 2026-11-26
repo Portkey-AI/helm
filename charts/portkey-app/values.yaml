@@ -793,8 +793,9 @@ redis:
 clickhouse:
   name: "clickhouse"
   store: "clickhouse"
-  # -- Pins the server's default-profile behaviour to an older ClickHouse release (the `compatibility` setting) so the image can be upgraded independently. Only applies to in-cluster ClickHouse.
-  # e.g. with images.clickhouseImage.tag "26.11-alpine", set compatibility: "26.6"
+  # -- ClickHouse `compatibility` setting for the default profile. Only applies to in-cluster ClickHouse.
+  # Leave empty on the default image (24.10-alpine). The only supported upgrade is
+  # images.clickhouseImage.tag: "26.11-alpine" with compatibility: "26.6" (quoted). See docs/clickhouse-upgrade.md.
   compatibility: ""
   external:
     # If enabled, use the following values to connect to an external database. This will also disable the
