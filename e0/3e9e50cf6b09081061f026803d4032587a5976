@@ -1,0 +1,21 @@
+charts/portkey-app/Chart.yaml
+  s_8108102c3881ce::t_c8003b2c709408 8
+charts/portkey-app/values.yaml
+  s_8108102c3881ce::t_dce25df659aa61 34-35,38-39,42-43,46-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "e03e9e50cf6b09081061f026803d4032587a5976",
+  "prompts": {},
+  "sessions": {
+    "s_8108102c3881ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9acbc9ed-cf95-4e9d-930b-b8b19c3a956f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "sk-portkey <ssaikrishna@paloaltonetworks.com>"
+    }
+  }
+}
