@@ -1,0 +1,19 @@
+charts/portkey-app/Chart.yaml
+  s_ffbb4fafb04965::t_28c3882511d0d0 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "7507beabf158d2decde093daae76433df19c4c27",
+  "prompts": {},
+  "sessions": {
+    "s_ffbb4fafb04965": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "67e77ebf-ac96-4054-ad26-fa4d06f8ab03",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "sk-portkey <ssaikrishna@paloaltonetworks.com>"
+    }
+  }
+}
