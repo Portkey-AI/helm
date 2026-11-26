@@ -56,7 +56,7 @@ images:
   clickhouseImage:
     repository: "docker.io/clickhouse/clickhouse-server"
     pullPolicy: IfNotPresent
-    tag: "26.11-alpine"
+    tag: "24.10-alpine"
 
 ingress:
   enabled: true
@@ -793,8 +793,9 @@ redis:
 clickhouse:
   name: "clickhouse"
   store: "clickhouse"
-  # -- Pins the server's default-profile behaviour to an older ClickHouse release (the `compatibility` setting) so the image can be upgraded independently. Only applies to in-cluster ClickHouse. Set to "" to disable.
-  compatibility: "26.6"
+  # -- Pins the server's default-profile behaviour to an older ClickHouse release (the `compatibility` setting) so the image can be upgraded independently. Only applies to in-cluster ClickHouse.
+  # e.g. with images.clickhouseImage.tag "26.11-alpine", set compatibility: "26.6"
+  compatibility: ""
   external:
     # If enabled, use the following values to connect to an external database. This will also disable the
     # creation of a clickhouse stateful-set and service.
