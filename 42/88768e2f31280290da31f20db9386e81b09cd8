@@ -1,0 +1,14 @@
+charts/portkey-app/values.yaml
+  h_f05cfb07bca7d1 796-798
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "4288768e2f31280290da31f20db9386e81b09cd8",
+  "prompts": {},
+  "humans": {
+    "h_f05cfb07bca7d1": {
+      "author": "sk-portkey <ssaikrishna@paloaltonetworks.com>"
+    }
+  }
+}
